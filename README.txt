@@ -16,3 +16,10 @@ Update notes for this version:
 - Compact preview blocks are used where screenshots are not available yet. Replace them with images later if you want.
 
 For YouTube cards, replace VIDEO_ID-like links or thumbnails by copying an existing card and changing the title, description, and YouTube ID.
+
+Update notes for this version:
+- Added 6 long-form YouTube video links supplied by the user.
+- Added 7 YouTube Shorts links supplied by the user.
+- Removed https://www.youtube.com/watch?v=AflRNMIMLpU from the Videos page because it is not an Imagining Physics video.
+- New additions are placed at the top of their pages; existing entries keep the newest-first ordering where previously verified.
+- Some supplied YouTube links did not expose reliable public title metadata, so they are marked with ID-based fallback titles for easy renaming.
