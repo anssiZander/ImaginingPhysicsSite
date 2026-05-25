@@ -1,206 +1,338 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Shadertoy shader demos and visual experiments." />
-  <title>Shadertoy | Imagining Physics</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-<a class="skip-link" href="#main-content">Skip to content</a>
-<header class="site-header">
-  <div class="container nav">
-    <a class="logo" href="index.html">Imagining Physics</a>
-    <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="site-nav" aria-label="Main navigation">
-      <ul>
-        <li><a href="index.html" class="">Home</a></li>
-        <li><a href="videos.html" class="">Videos</a></li>
-        <li><a href="shorts.html" class="">Shorts</a></li>
-        <li><a href="interactive.html" class="">Interactive demos</a></li>
-        <li><a href="shadertoy.html" class="active">Shadertoy</a></li>
-        <li><a href="games.html" class="">Games</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
-<main id="main-content">
-
-<section class="page-hero">
-  <div class="container">
-    <p class="eyebrow">Shadertoy demos</p>
-    <h1>Shader experiments</h1>
-    <p class="page-intro">Public shader links found for the Amirk Shadertoy profile, newest found result first. The profile search index says there are more shaders than I could individually retrieve here, so this page is set up to extend quickly.</p>
-    <div class="hero-actions">
-      <a class="button button-primary" href="https://www.shadertoy.com/user/Amirk" target="_blank" rel="noopener noreferrer">Open full Shadertoy profile</a>
-    </div>
-  </div>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="notice"><strong>Note:</strong> Preview boxes are intentionally small because no reliable preview images were available. Replace the compact label with screenshots later if desired.</div>
-    <div class="card-grid">
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">2025-11-16</span>
-          <h2>Speed of light in Ring</h2>
-          <p>A ring/camera-speed shader result found from the Amirk Shadertoy search results.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/w3SfWm" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Shadertoy shader demos and visual experiments."
+    />
+    <title>Shadertoy | Imagining Physics</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="index.html">Imagining Physics</a>
+        <button
+          class="nav-toggle"
+          aria-label="Open navigation"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site-nav" aria-label="Main navigation">
+          <ul>
+            <li><a href="index.html" class="">Home</a></li>
+            <li><a href="about.html" class="">About</a></li>
+            <li><a href="videos.html" class="">Videos</a></li>
+            <li><a href="shorts.html" class="">Shorts</a></li>
+            <li><a href="interactive.html" class="">Interactive demos</a></li>
+            <li><a href="shadertoy.html" class="active">Shadertoy</a></li>
+            <li><a href="games.html" class="">Games</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content">
+      <section class="page-hero">
+        <div class="container">
+          <p class="eyebrow">Shadertoy demos</p>
+          <h1>Shader experiments</h1>
+          <p class="page-intro">
+            Links to some of my demos and code in shadertoy. Shadertoy is a
+            platform for creating and sharing shaders. "Shader" is a type of
+            program that runs on the GPU and can create complex visual effects
+            in real time. The shaders linked here are mostly visual experiments
+            related to physics concepts, but they can also be appreciated for
+            their artistic and technical qualities.
+          </p>
+          <div class="hero-actions">
+            <a
+              class="button button-primary"
+              href="https://www.shadertoy.com/user/Amirk"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Open full Shadertoy profile</a
+            >
+          </div>
         </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">2024-03-18</span>
-          <h2>Superluminal Rockets</h2>
-          <p>A fly-by of a superluminal rocket armada; the search result notes that Doppler effects and beaming are omitted.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/DldyR7" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
+      </section>
+      <section class="section">
+        <div class="container">
+          <div class="card-grid">
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">2024-03-18</span>
+                <h2>Superluminal Rockets</h2>
+                <p>A fly-by of a superluminal rocket armada.</p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/DldyR7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">2023-12-14</span>
+                <h2>Rindler transformations 2D</h2>
+                <p>
+                  Construction of Rindler coordinates for an observer under
+                  constant proper acceleration.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/dtGfD3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">2023-03-08</span>
+                <h2>Origins of Magnetism 3</h2>
+                <p>
+                  Magnetic forces are electric forces in the moving frame. Part
+                  3
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/csyGRm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">2022-07-12</span>
+                <h2>Relativistic Space Drive</h2>
+                <p>
+                  Relativistic speeds from first person perspective. Retardation
+                  effects included.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/7sKBzz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Black Hole Geodesics 2D</h2>
+                <p>Launch a fan of light rays around a black hole.</p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/ctBGDm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Maxwell's Equations simulation</h2>
+                <p>
+                  Wave propagation in a refractive medium with absorbing
+                  boundaries.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/NddyRs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Origins of Magnetism 2</h2>
+                <p>
+                  Magnetic forces are electric forces in the moving frame. Part
+                  2
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/DlBSRG"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Maxwell's Equations with soft refraction</h2>
+                <p>Wave propagation in a refractive medium</p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/sd3yzB"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Origins of Magnetism 1</h2>
+                <p>
+                  Magnetic forces are electric forces in the moving frame. Part
+                  1
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/mt2XWD"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Rindler Horizon</h2>
+                <p>
+                  Visualization of Rindler horizon in first person perspective.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/fdcfD8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Fireworks with trails</h2>
+                <p>My first ever shader :).</p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/sljcWz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">Shadertoy</span>
+                <h2>Terrel-Penrose effect</h2>
+                <p>
+                  What Spheres, both rotating and unrotating, look like for a
+                  fast-moving observer.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/mdGyzR"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">2022-06-14</span>
+                <h2>Retard3D</h2>
+                <p>
+                  My first attempt at a ray-marched 3D scene with retardation
+                  effects.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/7sVczK"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+            <article class="card compact-card">
+              <div class="placeholder-thumb compact">Shader</div>
+              <div class="card-body">
+                <span class="card-tag">2022-04-28</span>
+                <h2>Game of Life on Torus</h2>
+                <p>
+                  A buffer-practice: Game of Life shader on a Toroidal world.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.shadertoy.com/view/slfBz2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on Shadertoy →</a
+                >
+              </div>
+            </article>
+          </div>
         </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">2023-12-14</span>
-          <h2>Rindler transformations 2D</h2>
-          <p>Construction of Rindler coordinates for an observer under constant proper acceleration.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/dtGfD3" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <strong>Imagining Physics</strong>
+          <p>
+            Visualizing physics through videos, simulations, shaders, and small
+            games.
+          </p>
         </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">2023-03-08</span>
-          <h2>Shader csyGRm</h2>
-          <p>Public Shadertoy result associated with Amirk. Rename this card after checking the exact title on Shadertoy.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/csyGRm" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">2022-07-12</span>
-          <h2>Relativistic Space Drive</h2>
-          <p>Boost-the-rocket special-relativity visualization; found as a public Shadertoy result by Amirk.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/7sKBzz" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader ctBGDm</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/ctBGDm" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader NddyRs</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/NddyRs" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader DlBSRG</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/DlBSRG" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader sd3yzB</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/sd3yzB" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader mt2XWD</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/mt2XWD" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader fdcfD8</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/fdcfD8" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader sljcWz</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/sljcWz" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">Shadertoy</span>
-          <h2>Shader mdGyzR</h2>
-          <p>Public Shadertoy link.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/mdGyzR" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">2022-06-14</span>
-          <h2>Retard3D</h2>
-          <p>Retarded-visualization style shader result found from the Amirk Shadertoy search results.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/7sVczK" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-      <article class="card compact-card">
-        <div class="placeholder-thumb compact">Shader</div>
-        <div class="card-body">
-          <span class="card-tag">2022-04-09</span>
-          <h2>Game of Life shader</h2>
-          <p>A buffer-practice Game of Life shader result found from the Amirk Shadertoy search results.</p>
-          <a class="text-link" href="https://www.shadertoy.com/view/NtjyDR" target="_blank" rel="noopener noreferrer">Open on Shadertoy →</a>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-
-</main>
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div>
-      <strong>Imagining Physics</strong>
-      <p>Visualizing physics through videos, simulations, shaders, and small games.</p>
-    </div>
-    <nav aria-label="Footer navigation">
-      <ul class="footer-links">
-        <li><a href="videos.html">Videos</a></li>
-        <li><a href="shorts.html">Shorts</a></li>
-        <li><a href="interactive.html">Interactive demos</a></li>
-        <li><a href="shadertoy.html">Shadertoy</a></li>
-        <li><a href="games.html">Games</a></li>
-        <li><a href="https://www.youtube.com/@imaginingPhysics" target="_blank" rel="noopener noreferrer">YouTube</a></li>
-      </ul>
-    </nav>
-  </div>
-</footer>
-<script src="main.js"></script>
-</body>
+        <nav aria-label="Footer navigation">
+          <ul class="footer-links">
+            <li><a href="videos.html">Videos</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="shorts.html">Shorts</a></li>
+            <li><a href="interactive.html">Interactive demos</a></li>
+            <li><a href="shadertoy.html">Shadertoy</a></li>
+            <li><a href="games.html">Games</a></li>
+            <li>
+              <a
+                href="https://www.youtube.com/@imaginingPhysics"
+                target="_blank"
+                rel="noopener noreferrer"
+                >YouTube</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+    <script src="main.js"></script>
+  </body>
 </html>
