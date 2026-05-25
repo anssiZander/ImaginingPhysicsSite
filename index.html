@@ -1,118 +1,223 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Scientific videos, simulations, shaders, and games by Imagining Physics." />
-  <title>Imagining Physics</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-<a class="skip-link" href="#main-content">Skip to content</a>
-<header class="site-header">
-  <div class="container nav">
-    <a class="logo" href="index.html">Imagining Physics</a>
-    <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="site-nav" aria-label="Main navigation">
-      <ul>
-        <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="about.html" class="">About</a></li>
-        <li><a href="videos.html" class="">Videos</a></li>
-        <li><a href="shorts.html" class="">Shorts</a></li>
-        <li><a href="interactive.html" class="">Interactive demos</a></li>
-        <li><a href="shadertoy.html" class="">Shadertoy</a></li>
-        <li><a href="games.html" class="">Games</a></li>
-      </ul>
-    </nav>
-  </div>
-</header>
-<main id="main-content">
-
-<section class="hero">
-  <div class="container hero-grid">
-    <div>
-      <p class="eyebrow">Scientific visualization channel</p>
-      <h1>Imagining Physics</h1>
-      <p class="hero-text">Visualizing physics through videos, browser demos, shaders, and small games. The focus is on making abstract ideas easier to see: relativity, quantum mechanics, geometry, waves, and simulation.</p>
-      <div class="hero-actions">
-        <a class="button button-primary" href="https://www.youtube.com/@imaginingPhysics" target="_blank" rel="noopener noreferrer">Visit the YouTube channel</a>
-        <a class="button button-secondary" href="videos.html">Browse videos</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Scientific videos, simulations, shaders, and games by Imagining Physics."
+    />
+    <title>Imagining Physics</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="index.html">Imagining Physics</a>
+        <button
+          class="nav-toggle"
+          aria-label="Open navigation"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site-nav" aria-label="Main navigation">
+          <ul>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="about.html" class="">About</a></li>
+            <li><a href="videos.html" class="">Videos</a></li>
+            <li><a href="shorts.html" class="">Shorts</a></li>
+            <li><a href="interactive.html" class="">Interactive demos</a></li>
+            <li><a href="shadertoy.html" class="">Shadertoy</a></li>
+            <li><a href="games.html" class="">Games</a></li>
+          </ul>
+        </nav>
       </div>
-    </div>
-    <div class="home-panel" aria-hidden="true">
-      <div class="panel-label">Videos first. Simulations, Shadertoys, and games as supporting material.</div>
-    </div>
-  </div>
-</section>
-<section class="section">
-  <div class="container">
-    <div class="section-heading">
-      <p class="eyebrow">Featured</p>
-      <h2>Start here</h2>
-    </div>
-    <div class="card-grid">
-      <article class="card">
-  <img class="thumbnail" src="https://i.ytimg.com/vi/Ix1XlxF66Zk/hqdefault.jpg" alt="Thumbnail for Relativistic phenomena from first person perspective" loading="lazy" />
-  <div class="card-body">
-    <span class="card-tag">YouTube</span>
-    <h2>Relativistic phenomena from first person perspective</h2>
-    <p>A first-person visualization of special relativistic phenomena.</p>
-    <a class="text-link" href="https://www.youtube.com/watch?v=Ix1XlxF66Zk" target="_blank" rel="noopener noreferrer">Open on YouTube →</a>
-  </div>
-</article>
-<article class="card">
-  <img class="thumbnail" src="https://i.ytimg.com/vi/HwbhDchFQq0/hqdefault.jpg" alt="Thumbnail for Double-Slit Experiment in Pilot-Wave Theory Visualized" loading="lazy" />
-  <div class="card-body">
-    <span class="card-tag">YouTube</span>
-    <h2>Double-Slit Experiment in Pilot-Wave Theory Visualized</h2>
-    <p>A Bohmian / pilot-wave visualization of the double-slit experiment.</p>
-    <a class="text-link" href="https://www.youtube.com/watch?v=HwbhDchFQq0" target="_blank" rel="noopener noreferrer">Open on YouTube →</a>
-  </div>
-</article>
-<article class="card">
-  <img class="thumbnail" src="https://i.ytimg.com/vi/FafKPSrGNeA/hqdefault.jpg" alt="Thumbnail for SPIN in Bohmian Mechanics, #CORE1" loading="lazy" />
-  <div class="card-body">
-    <span class="card-tag">YouTube</span>
-    <h2>SPIN in Bohmian Mechanics, #CORE1</h2>
-    <p>A visualization of how spin can be handled in Bohmian mechanics.</p>
-    <a class="text-link" href="https://www.youtube.com/watch?v=FafKPSrGNeA" target="_blank" rel="noopener noreferrer">Open on YouTube →</a>
-  </div>
-</article>
-<article class="card">
-  <img class="thumbnail" src="ImageVR.png" alt="Thumbnail for Game of Coriolis in VR" loading="lazy" />
-  <div class="card-body">
-    <span class="card-tag">VR / SideQuest</span>
-    <h2>Game of Coriolis in VR</h2>
-    <p>An immersive VR version for experiencing Coriolis and centrifugal forces directly.</p>
-    <a class="text-link" href="https://sidequestvr.com/app/45584/ballistic-missile-simulator" target="_blank" rel="noopener noreferrer">Open VR version &rarr;</a>
-  </div>
-</article>
-    </div>
-  </div>
-</section>
-
-</main>
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div>
-      <strong>Imagining Physics</strong>
-      <p>Visualizing physics through videos, simulations, shaders, and small games.</p>
-    </div>
-    <nav aria-label="Footer navigation">
-      <ul class="footer-links">
-        <li><a href="videos.html">Videos</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="shorts.html">Shorts</a></li>
-        <li><a href="interactive.html">Interactive demos</a></li>
-        <li><a href="shadertoy.html">Shadertoy</a></li>
-        <li><a href="games.html">Games</a></li>
-        <li><a href="https://www.youtube.com/@imaginingPhysics" target="_blank" rel="noopener noreferrer">YouTube</a></li>
-      </ul>
-    </nav>
-  </div>
-</footer>
-<script src="main.js"></script>
-</body>
+    </header>
+    <main id="main-content">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <p class="eyebrow">Scientific visualization channel</p>
+            <h1>Imagining Physics</h1>
+            <p class="hero-text">
+              Visualizing physics through videos, browser demos, shaders, and
+              small games. The focus is on making abstract ideas easier to see:
+              relativity, quantum mechanics, geometry, waves, and simulation.
+            </p>
+            <div class="hero-actions">
+              <a
+                class="button button-primary"
+                href="https://www.youtube.com/@imaginingPhysics"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Visit the YouTube channel</a
+              >
+              <a class="button button-secondary" href="videos.html"
+                >Browse videos</a
+              >
+            </div>
+          </div>
+          <div class="home-panel" aria-hidden="true">
+            <div class="panel-label">
+              Videos first. Simulations, Shadertoys, and games as supporting
+              material.
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Featured</p>
+            <h2>Start here</h2>
+          </div>
+          <div class="card-grid">
+            <article class="card">
+              <img
+                class="thumbnail"
+                src="https://i.ytimg.com/vi/Ix1XlxF66Zk/hqdefault.jpg"
+                alt="Thumbnail for Relativistic phenomena from first person perspective"
+                loading="lazy"
+              />
+              <div class="card-body">
+                <span class="card-tag">YouTube</span>
+                <h2>Relativistic phenomena from first person perspective</h2>
+                <p>
+                  A first-person visualization of special relativistic
+                  phenomena.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.youtube.com/watch?v=Ix1XlxF66Zk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on YouTube →</a
+                >
+              </div>
+            </article>
+            <article class="card">
+              <img
+                class="thumbnail"
+                src="https://i.ytimg.com/vi/HwbhDchFQq0/hqdefault.jpg"
+                alt="Thumbnail for Double-Slit Experiment in Pilot-Wave Theory Visualized"
+                loading="lazy"
+              />
+              <div class="card-body">
+                <span class="card-tag">YouTube</span>
+                <h2>Double-Slit Experiment in Pilot-Wave Theory Visualized</h2>
+                <p>
+                  A Bohmian / pilot-wave visualization of the double-slit
+                  experiment.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.youtube.com/watch?v=HwbhDchFQq0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on YouTube →</a
+                >
+              </div>
+            </article>
+            <article class="card">
+              <img
+                class="thumbnail"
+                src="https://i.ytimg.com/vi/FafKPSrGNeA/hqdefault.jpg"
+                alt="Thumbnail for SPIN in Bohmian Mechanics, #CORE1"
+                loading="lazy"
+              />
+              <div class="card-body">
+                <span class="card-tag">YouTube</span>
+                <h2>SPIN in Bohmian Mechanics, #CORE1</h2>
+                <p>
+                  A visualization of how spin can be handled in Bohmian
+                  mechanics.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://www.youtube.com/watch?v=FafKPSrGNeA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open on YouTube →</a
+                >
+              </div>
+            </article>
+            <article class="card">
+              <img
+                class="thumbnail"
+                src="ImageVR.png"
+                alt="Thumbnail for Game of Coriolis in VR"
+                loading="lazy"
+              />
+              <div class="card-body">
+                <span class="card-tag">VR / SideQuest</span>
+                <h2>Game of Coriolis in VR</h2>
+                <p>
+                  An immersive VR version for experiencing Coriolis and
+                  centrifugal forces directly.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://sidequestvr.com/app/45584/ballistic-missile-simulator"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open VR version &rarr;</a
+                >
+              </div>
+            </article>
+            <article class="card">
+              <div class="placeholder-thumb">XR Demo</div>
+              <div class="card-body">
+                <span class="card-tag">WebXR / relativity</span>
+                <h2>Relativistic Observer XR Demo</h2>
+                <p>
+                  An interactive desktop and VR demo for exploring relativistic
+                  observation, Lorentz contraction, and aberration. Note: It is
+                  meant to be experienced in a VR headset for the full effect.
+                </p>
+                <a
+                  class="text-link"
+                  href="https://anssizander.github.io/VRrelativity/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Open demo &rarr;</a
+                >
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <strong>Imagining Physics</strong>
+          <p>
+            Visualizing physics through videos, simulations, shaders, and small
+            games.
+          </p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <ul class="footer-links">
+            <li><a href="videos.html">Videos</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="shorts.html">Shorts</a></li>
+            <li><a href="interactive.html">Interactive demos</a></li>
+            <li><a href="shadertoy.html">Shadertoy</a></li>
+            <li><a href="games.html">Games</a></li>
+            <li>
+              <a
+                href="https://www.youtube.com/@imaginingPhysics"
+                target="_blank"
+                rel="noopener noreferrer"
+                >YouTube</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+    <script src="main.js"></script>
+  </body>
 </html>
