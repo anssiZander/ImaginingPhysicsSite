@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap");
+
 :root {
   --bg: #070812;
   --bg-soft: #0e1122;
@@ -126,12 +128,15 @@ a:hover { color: #fff; }
   margin: 0 0 .75rem;
 }
 
-h1, h2, h3 { line-height: 1.1; }
+h1, h2, h3 {
+  font-family: Orbitron, Inter, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 500;
+  line-height: 1.1;
+}
 .hero h1,
 .page-hero h1 {
   margin: 0 0 1rem;
   font-size: clamp(2.35rem, 5vw, 4.6rem);
-  letter-spacing: -.04em;
 }
 
 .lead, .hero-text, .card p, .page-intro, .site-footer p {
@@ -209,6 +214,7 @@ h1, h2, h3 { line-height: 1.1; }
 .section-heading { margin-bottom: 1.5rem; }
 .section-heading h2 { margin: 0; font-size: clamp(1.75rem, 3vw, 2.55rem); }
 .section-heading p:last-child { max-width: 70ch; color: var(--text-soft); }
+.older-videos-heading { margin-top: 2.8rem; }
 
 .page-hero { padding: 4.2rem 0 2rem; }
 .page-intro { max-width: 78ch; }
@@ -377,6 +383,14 @@ h1, h2, h3 { line-height: 1.1; }
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+.about-photo {
+  width: 100%;
+  aspect-ratio: 507 / 1129;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
 .about-copy {
   max-width: 720px;
   padding-top: .25rem;
@@ -435,6 +449,10 @@ h1, h2, h3 { line-height: 1.1; }
     max-width: 520px;
   }
   .about-photo-placeholder {
+    max-width: 360px;
+    width: 100%;
+  }
+  .about-photo {
     max-width: 360px;
     width: 100%;
   }
