@@ -5,11 +5,18 @@ This is a static HTML/CSS/JavaScript site for Imagining Physics. It is intended 
 Pages included:
 - index.html: landing page with featured links
 - about.html: background and introduction
+- blog.html: thumbnail links to interactive blog posts
 - videos.html: long-form YouTube videos
 - shorts.html: YouTube Shorts
 - interactive.html: GitHub Pages / browser-based demos
 - shadertoy.html: Shadertoy shader links
 - games.html: Game of Coriolis and VR version links
+
+Blog comments:
+- Blog posts use Utterances to keep one GitHub issue thread per post URL.
+- Before comments can be posted, install the Utterances GitHub App for
+  anssiZander/ImaginingPhysicsSite at https://github.com/apps/utterances.
+- Visitors need a GitHub account to leave a comment or question.
 
 Local preview:
 - Open this folder in VS Code and run index.html with the Live Server extension, or open index.html directly in a browser.

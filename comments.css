@@ -1,0 +1,46 @@
+.comments-section {
+  margin: 3rem 0 0;
+  padding: 1.5rem;
+  color: var(--ink, #253142);
+  background: var(--surface, #fff);
+  border: 1px solid var(--line, #dbe4f0);
+  border-radius: 18px;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.1);
+}
+
+.comments-heading {
+  margin-bottom: 1.25rem;
+}
+
+.comments-heading h2 {
+  margin: 0 0 0.5rem;
+}
+
+.comments-heading p {
+  margin: 0;
+  color: var(--muted, #5d6b7a);
+}
+
+.comments-widget {
+  min-height: 120px;
+}
+
+.comments-status {
+  margin: 0;
+  padding: 1rem;
+  color: var(--muted, #5d6b7a);
+  background: color-mix(in srgb, var(--surface, #fff) 92%, var(--cyan, #007f9f));
+  border: 1px solid var(--line, #dbe4f0);
+  border-radius: 12px;
+}
+
+.utterances {
+  max-width: none;
+}
+
+@media (max-width: 640px) {
+  .comments-section {
+    margin-top: 2rem;
+    padding: 1rem;
+  }
+}

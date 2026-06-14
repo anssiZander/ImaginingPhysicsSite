@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stern-Gerlach in Bohmian Mechanics | Imagining Physics</title>
-  <meta name="description" content="An interactive notebook about spinor splitting, Bohmian trajectories, and detection in the Stern-Gerlach experiment." />
+  <title>Bohmian Tunneling | Imagining Physics</title>
+  <meta name="description" content="An interactive Imagining Physics notebook about quantum tunneling, reflected and transmitted wave packets, and Bohmian trajectories." />
   <link rel="stylesheet" href="../comments.css" />
   <script>
     window.MathJax = {
@@ -48,6 +48,7 @@
     }
     .site-banner h1 {
       margin: 0;
+      color: #fff;
       font-size: 2.25rem;
       line-height: 1.1;
     }
@@ -67,6 +68,7 @@
       margin-bottom: 2.8rem;
       scroll-margin-top: 24px;
     }
+
     .page-nav {
       display: flex;
       padding-top: 1rem;
@@ -89,12 +91,17 @@
       color: var(--blue-900);
       box-shadow: 0 1px 3px rgba(0, 0, 51, 0.06);
     }
+    .nav-button:hover {
+      border-color: #bdd0e6;
+      background: #f1f6fc;
+    }
     .primary-button {
       border: 1px solid var(--blue-700);
       background: var(--blue-700);
       color: #fff;
     }
     .primary-button:hover {
+      border-color: var(--blue-800);
       background: var(--blue-800);
       color: #fff;
     }
@@ -205,7 +212,7 @@
       border: 0;
       border-radius: 0;
       background: rgba(0, 0, 0, 0.22);
-      color: rgba(255, 255, 255, 0.86);
+      color: rgba(255, 255, 255, 0.88);
       font: 700 2rem/1 "Segoe UI", system-ui, sans-serif;
       cursor: pointer;
     }
@@ -238,17 +245,11 @@
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
     }
-    .full-applet-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
     .site-footer {
       background: var(--blue-900);
       color: #fff;
     }
     .site-footer-inner { padding: 1.5rem 0; }
-    .site-footer a { color: #cce7ff; }
 
     @media (max-width: 760px) {
       .page-hero h1 { font-size: 2.25rem; }
@@ -314,6 +315,7 @@
     .nav-button:hover {
       border-color: rgba(255, 255, 255, 0.3);
       background: rgba(255, 255, 255, 0.085);
+      color: #fff;
     }
     .primary-button {
       border-color: rgba(255, 255, 255, 0.18);
@@ -350,6 +352,10 @@
     .equation {
       border-left-color: var(--cyan);
       background: var(--surface);
+      color: var(--ink);
+    }
+    .next-step {
+      border-color: var(--line);
     }
     .site-footer {
       border-top: 1px solid var(--line);
@@ -359,13 +365,9 @@
     .site-footer a { color: var(--cyan); }
 
     @media (max-width: 760px) {
-      .site-banner h1,
-      .page-hero h1 {
-        font-size: 1.75rem;
-      }
-      .page-title-line {
-        display: block;
-      }
+      .site-banner h1 { font-size: 1.65rem; }
+      .site-banner p { font-size: 0.95rem; }
+      .page-hero h1 { font-size: 1.75rem; }
     }
   </style>
 </head>
@@ -382,228 +384,168 @@
 
     <section class="page-hero" aria-labelledby="page-title">
       <p class="kicker">Educational notebook</p>
-      <h1 id="page-title">
-        <span class="page-title-line">Stern-Gerlach in</span>
-        <span class="page-title-line">Bohmian Mechanics</span>
-      </h1>
-      <p>What is Spin in Bohmian mechanics?</p>
+      <h1 id="page-title">Bohmian Tunneling</h1>
+      <p>Follow a wave packet and its Bohmian trajectories as they meet a finite potential barrier.</p>
     </section>
 
     <section class="intro-grid" aria-label="Notebook preview and section navigation">
       <figure class="header-image">
-        <img src="spinSplitPoster.png" alt="A spinor wave packet splitting in a Stern-Gerlach magnetic field">
+        <img src="transmissionPoster.png" alt="A quantum wave packet and Bohmian trajectories interacting with a potential barrier">
       </figure>
       <aside class="note-box" aria-labelledby="sections-nav">
         <h2 id="sections-nav">Sections</h2>
         <ul class="note-list">
-          <li><a href="#free-propagation">Before the magnet</a></li>
-          <li><a href="#definite-spin">Definite spin</a></li>
-          <li><a href="#spin-splitting">Spin superposition</a></li>
-          <li><a href="#representations">Contextuality of spin</a></li>
+          <li><a href="#transmission">Above-barrier transmission</a></li>
+          <li><a href="#tunneling">Quantum tunneling</a></li>
+          <li><a href="#ensemble">An ensemble of outcomes</a></li>
           <li><a href="#theory">Theory and equations</a></li>
-          <li><a href="#full-applet">Full Demos</a></li>
-
+          <li><a href="#full-applet">Full applet</a></li>
         </ul>
       </aside>
     </section>
 
-    <section class="applet-section" aria-labelledby="free-propagation">
-      <h2 id="free-propagation">Before the magnet</h2>
+    <section class="applet-section" aria-labelledby="transmission">
+      <h2 id="transmission">Above-barrier transmission</h2>
       <p>
-        Bohmian mechanics allows us to provide an unusually "detailed" version of what is going on in Stern-Gerlach (SG) experiment.
-        As you may know, in SG we send a spin 1/2- particle (in the original experiment, a silver-atom) through a non-uniform 
-        magnetic field. The magnetic field needs to be non-uniform in order couple with the magnetic dipole moment of the particle.
+        Begin with an incoming packet whose mean kinetic energy exceeds the barrier height.
+        The barrier still distorts the wave and can produce partial reflection, but transmission
+        is not classically forbidden. 
       </p>
       <p>
-        The simulation scene is a tunnel, where the spin half particle travels. You can adjust the spin direction and momentum.
-        The default spin axis is aligned with the motion. Such a state also corresponds to an up/down superposition,
-        as we want it.
+        Note, how some reflected particles never even "touch the wall". 
+        The reflecting component of the wave pushes them back before they "get in contact".
+      </p>
+      <p>
+        Some particles almost seem to get "trapped inside the wall" for a time. 
+        This happens since there is wave reflection also when "stepping from higher potential to lower one", 
+        which is a bit counterintuitive classically.
+      </p>
+      <p>
+         Adjust the momentum and barrier height to move across the
+        boundary \(E=V_0\).
       </p>
       <div class="applet-shell is-inactive">
-        <div class="applet-toolbar">Free propagation: magnetic gradient off</div>
-        <div class="applet-stage" style="background-image:url('freePropagationPoster.png')">
-          <iframe class="applet-frame" title="Free Pauli spinor propagation before a Stern-Gerlach magnet"
-            data-src="full-applet.html?embed=1&amp;preset=free-propagation" allow="fullscreen"></iframe>
-          <button class="applet-play" type="button" aria-label="Play free-propagation simulation">Play</button>
+        <div class="applet-toolbar">Compare kinetic energy with barrier height</div>
+        <div class="applet-stage" style="background-image:url('transmissionPoster.png')">
+          <iframe class="applet-frame" title="Above-barrier Bohmian transmission"
+            data-src="full-applet.html?embed=1&amp;preset=transmission" allow="fullscreen"></iframe>
+          <button class="applet-play" type="button" aria-label="Play above-barrier transmission simulation">Play</button>
         </div>
       </div>
-      <p class="caption">The field lines are absent and the packet remains spatially unsplit.</p>
+      <p class="caption">Incoming packet whose mean kinetic energy exceeds the potential barrier.</p>
     </section>
 
-
-
-    <section class="applet-section" aria-labelledby="spin-splitting">
-      <h2 id="spin-splitting">A spin superposition</h2>
+    <section class="applet-section" aria-labelledby="tunneling">
+      <h2 id="tunneling">Quantum tunneling</h2>
       <p>
-        In bohmian mechanics, the particles do not contain the spin. The spin is in the wave, so to speak.
-        Each Bohmian particle simply follows where the splitting wave happens to guide it. 
-      </p>
-      <p>
-        Let us prepare the spinorial wave function in an equal superposition of \(+z\) and \(-z\) components. 
-        The Pauli equation will dictate how the wave components will couple with opposite signs to the magnetic field. 
-        This causes the spinor wave to separate into spatially distinct packets.
+        When \(E&lt;V_0\), a classical particle cannot enter the barrier region. 
+        Classically it cannot pass trough, no matter how thin the barrier is. 
         
       </p>
+      <p>
+        The quantum wave instead penetrates the barrier, although the amplitude decays exponentially.
+        Therefore, for a thin enough barrier, a substantial portion of the wave can pass trough! 
+        Change the barrier height and thickness to see how strongly they suppress transmission.
+      </p>
       <div class="applet-shell is-inactive">
-        <div class="applet-toolbar">Equal up/down superposition and beam splitting</div>
-        <div class="applet-stage" style="background-image:url('spinSplitPoster.png')">
-          <iframe class="applet-frame" title="Spin-superposition packet splitting in a Stern-Gerlach field"
-            data-src="full-applet.html?embed=1&amp;preset=spin-split" allow="fullscreen"></iframe>
-          <button class="applet-play" type="button" aria-label="Play spin-splitting simulation">Play</button>
+        <div class="applet-toolbar">A classically forbidden barrier</div>
+        <div class="applet-stage" style="background-image:url('tunnelingPoster.png')">
+          <iframe class="applet-frame" title="Bohmian quantum tunneling through a finite barrier"
+            data-src="full-applet.html?embed=1&amp;preset=tunneling" allow="fullscreen"></iframe>
+          <button class="applet-play" type="button" aria-label="Play quantum tunneling simulation">Play</button>
         </div>
       </div>
-      <p class="caption">The wave splits, and the bohmian particles get carried along.</p>
+      <p class="caption">The red barrier indicates that its height exceeds the packet's mean kinetic energy.</p>
     </section>
-    <p>
-        Q: What determines whether a particle ends up in the upper or lower portion of the packet?
-         
-    </p>
-    <p>
-        
-        A: The position of the particle as the splitting is enacted. If the particle is (roughly) in the 
-        upper portion of the packet, the upward wave component will dominate can carry it up.
-        Conversely, if the particle is in the lower portion, it will go along with the downward component of the wave. 
-    </p>
-    <p>
-        In the middle region there is quite a competion for the particles between the packets.
-    </p>
 
-    <section class="applet-section" aria-labelledby="representations">
-      <h2 id="representations">Contextuality of Spin</h2>
+    <section class="applet-section" aria-labelledby="ensemble">
+      <h2 id="ensemble">A larger ensemble</h2>
       <p>
-        As we have seen, in Bohmian mechanics the particle does not posses an intrinsic property called spin. 
-        The spin is "in the wave". This really is no problem, but may lead to confusion from the point of view 
-        of the traditional interpretation. 
+        Let us follow a larger ensemble to observe the equivariance in action again.
+        The inital position are sampled from \(|\psi|^2\).
+         displays the reflected and transmitted probabilities. 
       </p>
       <p>
-         Let us demonstrate with a simplified version of the SG experiment. This demo allows you to rotate the SG-magnets.
-         Try flipping the SG-apparatus upside down. Now up is down and vise versa, right? Indeed, if you look at the color coding
-         of the wave, you observe that the packet which originally went up, now goes down (and vise versa). 
-         Just as one would expect.
+        As usual, the particle density follows the squared modulus of the wave, testifying to the empirical equivalence of 
+        the standard interpretation and the bohmian interpretation.
       </p>
       <p>
-         However, if you look at the particles, the one that happen to start in the upper portion will still be guided up, 
-         and the one starting from the lower portion will be guided down. The particles did not notice the inversion of the field!
-         This is what is referred to as contextuality of spin.
-         
-      </p>
-      <p>
-         
-         Contextuality is may seem surpricing, even wrong, 
-         but only if you hold on to the idea of particles themselves carrying the spin. 
-         As soon as you recal the particles just follow the wave, there is nothing mysterious about it whatsoever.
-         And the statistics will remain exactly the same, so empirically the Bohmian mechanics 
-         continues to produce the standard predictions of quantum mechanics.
+        Play with
       </p>
       <div class="applet-shell is-inactive">
-        <div class="applet-toolbar">Pilot-wave contextuality with adjustable magnet orientation</div>
-        <div class="applet-stage" style="background-image:url('multiviewPoster.png')">
-          <iframe class="applet-frame" title="Pilot-wave Stern-Gerlach contextuality simulation"
-            data-src="multiview-applet/index.html?embed=1" allow="fullscreen"></iframe>
-          <button class="applet-play" type="button" aria-label="Play pilot-wave Stern-Gerlach simulation">Play</button>
+        <div class="applet-toolbar">Reflected and transmitted particle populations</div>
+        <div class="applet-stage" style="background-image:url('ensemblePoster.png')">
+          <iframe class="applet-frame" title="Bohmian tunneling ensemble"
+            data-src="full-applet.html?embed=1&amp;preset=ensemble" allow="fullscreen"></iframe>
+          <button class="applet-play" type="button" aria-label="Play tunneling ensemble simulation">Play</button>
         </div>
       </div>
-      <p class="caption">
-        Flip the SG magnet upside down. 
-        The spin carrying wave will flip, but the particles will not. Statistics remain the same. 
-      </p>
+      <p class="caption">Equivariance of the two distributions become evident with a larger sample.</p>
     </section>
 
     <section id="theory" aria-labelledby="theory-title">
       <h2 id="theory-title">Theory and equations</h2>
       <div class="theory-grid">
         <div>
-          <h3>The Pauli spinor</h3>
-          <p>The "Schrödinger wave" is replaced by a spinorial wave function. Spin-\(\tfrac12\) state has two complex components:</p>
+          <h3>Wave evolution</h3>
+          <p>The packet evolves according to the time-dependent Schrödinger equation:</p>
           <div class="equation">
             \[
-              \Psi(\mathbf x,t)
-              =
-              \begin{pmatrix}
-                \psi_+(\mathbf x,t)\\
-                \psi_-(\mathbf x,t)
-              \end{pmatrix},
-              \qquad
-              \rho=\Psi^\dagger\Psi .
-            \]
-          </div>
-          <p>The two components represent amplitudes for opposite spin outcomes along the selected measurement axis.</p>
-        </div>
-        <div>
-          <h3>Magnetic interaction</h3>
-          <p>The Schrödinger wave equation is replaced by the Pauli equation, which contains the coupling between spin and the magnetic field:</p>
-          <div class="equation">
-            \[
-              i\hbar\frac{\partial\Psi}{\partial t}
+              i\hbar\frac{\partial\psi}{\partial t}
               =
               \left[
-                \frac{1}{2m}
-                \left(-i\hbar\nabla-q\mathbf A\right)^2
-                +q\Phi
-                -\boldsymbol{\mu}\cdot\mathbf B(\mathbf x)
-              \right]\Psi .
+                -\frac{\hbar^2}{2m}\nabla^2+V(\mathbf x)
+              \right]\psi .
             \]
           </div>
-          <p>
-            Here \(q\) is the particle's charge, \(\Phi\) is the scalar potential,
-            and \(\mathbf B=\nabla\times\mathbf A\). A spatial gradient in
-            \(\mathbf B\) gives the two spin components opposite forces and
-            separates their wave packets. The simulation retains the spin-field
-            interaction but neglects the orbital coupling to \(\mathbf A\).
-            For a neutral atom's center of mass, \(q=0\), so this orbital term
-            vanishes while the magnetic-moment coupling remains.
-          </p>
+          <p>The finite barrier occupies a region of width \(a\) with potential \(V_0\).</p>
         </div>
         <div>
-          <h3>Measurement probabilities</h3>
-          <p>For an initial spin state \(a\lvert +z\rangle+b\lvert -z\rangle\), ideal branch weights are</p>
+          <h3>Evanescent penetration</h3>
+          <p>For a stationary component with \(E&lt;V_0\), the wave number inside the barrier is imaginary:</p>
           <div class="equation">
             \[
-              P(+z)=|a|^2,
+              \kappa=\frac{\sqrt{2m(V_0-E)}}{\hbar},
               \qquad
-              P(-z)=|b|^2,
-              \qquad
-              |a|^2+|b|^2=1 .
+              \psi_{\mathrm{barrier}}\sim e^{-\kappa y}.
             \]
           </div>
-          <p>The equal superposition used in the splitting demo has equal Born weights for the two branches.</p>
+          <p>For a sufficiently wide barrier, the transmission probability scales approximately as \(T\propto e^{-2\kappa a}\).</p>
+        </div>
+        <div>
+          <h3>Probability balance</h3>
+          <div class="equation">
+            \[
+              \rho=|\psi|^2,
+              \qquad
+              R+T=1 .
+            \]
+          </div>
+          <p>The reflected and transmitted packets are parts of one continuously evolving wave function.</p>
         </div>
         <div>
           <h3>Bohmian guidance</h3>
           <div class="equation">
             \[
-              \mathbf v
+              \dot{\mathbf x}
               =
               \frac{\mathbf j}{\rho},
               \qquad
               \mathbf j
               =
               \frac{\hbar}{m}\operatorname{Im}
-              (\Psi^\dagger\nabla\Psi)
-              -\frac{q}{m}\mathbf A\,\rho
-              +
-              \frac{s\hbar}{m}
-              \nabla\times
-              (\Psi^\dagger\boldsymbol{\sigma}\Psi).
+              \left(\psi^*\nabla\psi\right).
             \]
           </div>
-          <p>
-            The particle has one position and one continuous path, guided by the
-            gauge-covariant Pauli current of the full spinor. Equivalently, the
-            vector potential contributes \(-q\mathbf A/m\) directly to
-            \(\mathbf v=\mathbf j/\rho\).
-          </p>
+          <p>Each particle follows one continuous path into either the reflected or transmitted branch.</p>
         </div>
       </div>
     </section>
 
     <section class="next-step" aria-labelledby="full-applet">
-      <h2 id="full-applet">Full Applets</h2>
-      <p>Open either simulation at its original scale in a separate browser tab.</p>
-      <div class="full-applet-links">
-        <a class="primary-button" href="full-applet.html" target="_blank" rel="noopener">Open Close-Up Applet</a>
-        <a class="primary-button" href="multiview-applet/index.html" target="_blank" rel="noopener">Open Rotating SG Applet</a>
-      </div>
+      <h2 id="full-applet">Full Applet</h2>
+      <p>Open the original-scale simulation with its complete controls in a separate browser tab.</p>
+      <a class="primary-button" href="full-applet.html" target="_blank" rel="noopener">Open Full Applet</a>
     </section>
 
     <section class="comments-section" aria-labelledby="comments-title">
@@ -619,8 +561,8 @@
 
   <footer class="site-footer">
     <div class="site-footer-inner">
-      An Imagining Physics notebook adapted from
-      <a href="https://github.com/anssiZander/BohmianSternGerlach3D-public" target="_blank" rel="noopener">BohmianSternGerlach3D-public</a>
+      An Imagining Physics interactive notebook adapted from
+      <a href="https://github.com/anssiZander/BohmianTunneling" target="_blank" rel="noopener">BohmianTunneling</a>
       by Anssi Zander.
     </div>
   </footer>
