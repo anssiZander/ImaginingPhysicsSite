@@ -463,7 +463,7 @@ h1, h2, h3 {
 }
 .about-photo {
   width: 100%;
-  aspect-ratio: 507 / 1129;
+  aspect-ratio: 507 / 700;
   object-fit: contain;
   border: 1px solid var(--border);
   border-radius: var(--radius);
