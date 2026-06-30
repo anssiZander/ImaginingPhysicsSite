@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bohmian Free Particle 2D | Imagining Physics</title>
+  <meta name="description" content="An interactive Imagining Physics notebook about free Gaussian wave packets and Bohmian trajectories in two dimensions." />
+  <link rel="stylesheet" href="../comments.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]]
+      },
+      svg: {
+        fontCache: "global"
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root {
+      --blue-900: #f3f6ff;
+      --blue-800: #f3f6ff;
+      --blue-700: #00eaff;
+      --ink: #f3f6ff;
+      --muted: #bac3df;
+      --paper: #070812;
+      --surface: rgba(255, 255, 255, 0.055);
+      --line: rgba(255, 255, 255, 0.12);
+      --cyan: #00eaff;
+      --magenta: #ff2bd6;
+      --cyan-soft: rgba(0, 234, 255, 0.16);
+      --magenta-soft: rgba(255, 43, 214, 0.16);
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--blue-700);
+    }
+
+    a:hover {
+      color: var(--blue-800);
+    }
+
+    .site-banner {
+      padding: 1rem;
+      background: var(--blue-900);
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .site-banner h1 {
+      margin: 0;
+      color: #fff;
+      font-size: 2.25rem;
+      font-weight: 750;
+      line-height: 1.1;
+    }
+
+    .site-banner p {
+      margin: 0.45rem 0 0;
+      color: #fff;
+      font-size: 1.05rem;
+      line-height: 1.35;
+    }
+
+    main,
+    .site-footer-inner {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    main {
+      padding-bottom: 3.5rem;
+    }
+
+    section {
+      margin-bottom: 2.8rem;
+      scroll-margin-top: 120px;
+    }
+
+    .page-nav {
+      display: flex;
+      padding-top: 1rem;
+    }
+
+    .nav-button,
+    .primary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0.55rem 0.9rem;
+      border-radius: 4px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-decoration: none;
+    }
+
+    .nav-button {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--blue-900);
+      box-shadow: 0 1px 3px rgba(0, 0, 51, 0.06);
+    }
+
+    .nav-button:hover {
+      border-color: #bdd0e6;
+      background: #f1f6fc;
+    }
+
+    .primary-button {
+      border: 1px solid var(--blue-700);
+      background: var(--blue-700);
+      color: #fff;
+    }
+
+    .primary-button:hover {
+      border-color: var(--blue-800);
+      background: var(--blue-800);
+      color: #fff;
+    }
+
+    .page-hero {
+      margin-bottom: 0.8rem;
+      padding: 1.4rem 0 0.7rem;
+    }
+
+    .kicker {
+      margin: 0 0 0.45rem;
+      color: var(--blue-700);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .page-hero h1 {
+      max-width: 900px;
+      margin: 0;
+      color: var(--blue-900);
+      font-size: 3rem;
+      font-weight: 750;
+      line-height: 1.12;
+    }
+
+    .page-hero p:last-child {
+      max-width: 760px;
+      margin: 0.9rem 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .header-image {
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid #11294d;
+      border-radius: 8px;
+      background: #07101f;
+      box-shadow: 0 8px 24px rgba(0, 0, 45, 0.14);
+    }
+
+    .header-image img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1108 / 713;
+      object-fit: cover;
+    }
+
+    .note-box {
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 1px 4px rgba(0, 0, 51, 0.06);
+    }
+
+    .note-box h2 {
+      margin: 0 0 0.55rem;
+      color: var(--blue-900);
+      font-size: 1.1rem;
+    }
+
+    .note-list {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    .note-list li {
+      margin: 0.45rem 0;
+    }
+
+    .video-section {
+      margin-top: 2.4rem;
+    }
+
+    .video-section > p {
+      max-width: 860px;
+      color: var(--muted);
+    }
+
+    .video-section .video-card,
+    .applet-section .video-card {
+      margin: 1.4rem 0 1.2rem;
+    }
+
+    .video-card {
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid #11294d;
+      border-radius: 8px;
+      background: #07101f;
+      box-shadow: 0 8px 24px rgba(0, 0, 45, 0.18);
+    }
+
+    .video-window {
+      position: relative;
+      background: #050b15;
+    }
+
+    .comparison-video {
+      display: block;
+      width: 100%;
+      height: 650px;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .comparison-video.is-double-height {
+      height: 1300px;
+    }
+
+    .comparison-video:focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: -3px;
+    }
+
+    .video-controls {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: grid;
+      grid-template-columns: auto auto minmax(6rem, 1fr);
+      gap: 0.45rem 0.65rem;
+      align-items: center;
+      padding: 0.6rem 0.75rem 0.7rem;
+      background: linear-gradient(180deg, rgba(5, 11, 21, 0.25), rgba(5, 11, 21, 0.95));
+      color: #f8fbff;
+    }
+
+    .video-seek {
+      grid-column: 1 / -1;
+      width: 100%;
+      accent-color: #55c7e7;
+      cursor: pointer;
+    }
+
+    .video-control-button {
+      min-width: 74px;
+      min-height: 34px;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid rgba(217, 230, 248, 0.7);
+      border-radius: 4px;
+      background: rgba(6, 18, 37, 0.78);
+      color: #f8fbff;
+      cursor: pointer;
+      font: 700 0.86rem/1 "Segoe UI", system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+
+    .video-control-button:hover,
+    .video-control-button:focus-visible {
+      border-color: #fff;
+      background: rgba(0, 85, 170, 0.86);
+      outline: none;
+    }
+
+    .video-time {
+      justify-self: end;
+      color: #d9e6f8;
+      font-size: 0.86rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .video-card figcaption {
+      display: grid;
+      gap: 0.2rem;
+      padding: 0.75rem 0.85rem 0.85rem;
+      border-top: 1px solid rgba(125, 174, 255, 0.22);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .video-card strong {
+      color: var(--blue-900);
+      font-size: 0.98rem;
+    }
+
+    h2 {
+      margin: 0 0 0.7rem;
+      color: var(--blue-900);
+      font-size: 1.5rem;
+      line-height: 1.25;
+    }
+
+    h3 {
+      margin: 1.4rem 0 0.35rem;
+      color: var(--blue-900);
+      font-size: 1.08rem;
+    }
+
+    p {
+      margin: 0 0 1rem;
+    }
+
+    .applet-section {
+      margin-top: 3rem;
+    }
+
+    .applet-shell {
+      overflow: hidden;
+      border: 1px solid #11294d;
+      border-radius: 8px;
+      background: #07101f;
+      box-shadow: 0 8px 24px rgba(0, 0, 45, 0.18);
+    }
+
+    .applet-toolbar {
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid rgba(125, 174, 255, 0.22);
+      background: #061225;
+      color: #d9e6f8;
+      font-size: 0.88rem;
+    }
+
+    .applet-stage {
+      position: relative;
+      min-height: 650px;
+      background: #000;
+    }
+
+    .applet-stage.has-poster {
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    .applet-frame {
+      display: block;
+      width: 100%;
+      height: 650px;
+      border: 0;
+      background: #000;
+    }
+
+    .applet-shell.is-inactive .applet-frame {
+      visibility: hidden;
+    }
+
+    .applet-play {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      background: rgba(0, 0, 0, 0.2);
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      font: 700 3rem/1 "Segoe UI", system-ui, sans-serif;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .applet-play:hover,
+    .applet-play:focus-visible {
+      background: rgba(0, 0, 0, 0.32);
+      color: rgba(255, 255, 255, 0.9);
+      outline: none;
+    }
+
+    .caption {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .equation {
+      margin: 1rem 0 1.15rem;
+      padding: 0.85rem 1rem;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--blue-700);
+      border-radius: 8px;
+      background: var(--surface);
+      color: #162335;
+      font-size: 1.1rem;
+      line-height: 1.65;
+    }
+
+    .eq-label {
+      display: block;
+      margin-bottom: 0.3rem;
+      color: var(--blue-900);
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .equation mjx-container {
+      margin: 0.15rem 0 0 !important;
+    }
+
+    .next-step {
+      padding-top: 2rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .site-footer {
+      padding: 1.5rem 1rem;
+      background: #eee;
+      color: #555;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .site-footer p {
+      margin: 0.35rem 0;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 0%, rgba(0, 234, 255, 0.11), transparent 28rem),
+        radial-gradient(circle at 85% 5%, rgba(255, 43, 214, 0.12), transparent 26rem),
+        linear-gradient(180deg, #070812 0%, #090b16 100%);
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    a { color: var(--cyan); }
+    a:hover { color: #fff; }
+
+    .site-banner {
+      background: rgba(7, 8, 18, 0.82);
+      border-bottom: 1px solid var(--line);
+      box-shadow: none;
+      backdrop-filter: blur(14px);
+    }
+
+    .site-banner h1,
+    .page-hero h1,
+    h2,
+    h3 {
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      font-weight: 750;
+    }
+
+    .site-banner p,
+    .page-hero p:last-child,
+    .video-section > p,
+    .caption {
+      color: var(--muted);
+    }
+
+    .kicker {
+      color: var(--cyan);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .nav-button {
+      border-color: var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .nav-button:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.085);
+      color: #fff;
+    }
+
+    .primary-button {
+      border-color: rgba(255, 255, 255, 0.18);
+      background: linear-gradient(135deg, var(--cyan-soft), var(--magenta-soft));
+      color: var(--ink);
+      box-shadow: 0 0 26px rgba(0, 234, 255, 0.08), 0 0 34px rgba(255, 43, 214, 0.07);
+    }
+
+    .primary-button:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, rgba(0, 234, 255, 0.22), rgba(255, 43, 214, 0.21));
+    }
+
+    .note-box,
+    .equation,
+    .video-card figcaption {
+      border-color: var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .note-box { border-left-color: var(--cyan); }
+
+    .header-image,
+    .video-card,
+    .applet-shell {
+      border-color: var(--line);
+      background: #050714;
+      box-shadow: var(--shadow);
+    }
+
+    .video-window,
+    .applet-stage,
+    .applet-frame {
+      background-color: #000;
+    }
+
+    .video-card strong,
+    .eq-label {
+      color: var(--cyan);
+    }
+
+    .video-controls {
+      background: linear-gradient(180deg, rgba(5, 7, 20, 0.18), rgba(5, 7, 20, 0.96));
+    }
+
+    .video-control-button {
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.055);
+      color: var(--ink);
+    }
+
+    .video-control-button:hover,
+    .video-control-button:focus-visible {
+      border-color: rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, rgba(0, 234, 255, 0.2), rgba(255, 43, 214, 0.17));
+    }
+
+    .video-time { color: var(--muted); }
+    .video-seek { accent-color: var(--cyan); }
+
+    .applet-toolbar {
+      border-bottom-color: var(--line);
+      background:
+        linear-gradient(135deg, rgba(0, 234, 255, 0.11), rgba(255, 43, 214, 0.1)),
+        #0e1122;
+      color: var(--ink);
+    }
+
+    .equation {
+      border-left-color: var(--cyan);
+      color: var(--ink);
+    }
+
+    .next-step {
+      border-top-color: var(--line);
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--line);
+      background: rgba(7, 8, 18, 0.72);
+      color: var(--muted);
+    }
+
+    @media (max-width: 820px) {
+      .intro-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .page-hero h1 {
+        font-size: 2.3rem;
+      }
+
+      .site-banner h1 {
+        font-size: 1.9rem;
+      }
+
+      .applet-stage {
+        min-height: 560px;
+      }
+
+      .applet-frame {
+        height: 560px;
+      }
+
+      .comparison-video {
+        height: 560px;
+      }
+
+      .comparison-video.is-double-height {
+        height: 1120px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        font-size: 15px;
+      }
+
+      .page-hero h1 {
+        font-size: 2rem;
+      }
+
+      .site-banner {
+        padding: 0.8rem 1rem;
+      }
+
+      .site-banner h1 {
+        font-size: 1.65rem;
+      }
+
+      .site-banner p {
+        font-size: 0.92rem;
+      }
+
+      .nav-button,
+      .primary-button {
+        width: 100%;
+      }
+
+      .applet-stage {
+        min-height: 620px;
+      }
+
+      .applet-frame {
+        height: 620px;
+      }
+
+      .comparison-video {
+        height: 620px;
+      }
+
+      .comparison-video.is-double-height {
+        height: 1240px;
+      }
+
+      .video-controls {
+        grid-template-columns: auto auto minmax(4.5rem, 1fr);
+        gap: 0.4rem 0.5rem;
+        padding: 0.5rem 0.55rem 0.6rem;
+      }
+
+      .video-control-button {
+        min-width: 62px;
+        min-height: 32px;
+        padding: 0.32rem 0.45rem;
+        font-size: 0.78rem;
+      }
+
+      .video-time {
+        font-size: 0.78rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-banner">
+    <h1>Imagining Physics</h1>
+    <p>Visualizing physics through simulations, videos, shaders, and games</p>
+  </header>
+
+  <main>
+    <nav class="page-nav" aria-label="Page navigation">
+      <a class="nav-button" href="../blog.html" aria-label="Back to Imagining Physics blog posts">Back to Blog Posts</a>
+    </nav>
+
+    <section class="page-hero" aria-labelledby="page-title">
+      <p class="kicker">Educational notebook</p>
+      <h1 id="page-title">Bohmian Motion of a Free Particle</h1>
+      <p>A Gaussian wave packet and its Bohmian trajectories.</p>
+    </section>
+
+    <section class="intro-grid" aria-label="Header image and section navigation">
+      <figure class="header-image">
+        <img src="headerImage.jpg" alt="Bohmian free wave-packet simulation">
+      </figure>
+
+      <aside class="note-box" aria-labelledby="sections-nav">
+        <h2 id="sections-nav">Sections</h2>
+        <ul class="note-list">
+          <li><a href="#comparison-videos">Introduction</a></li>
+          <li><a href="#spreading-applet">The Bohmian Approach to the Free Particle</a></li>
+          <li><a href="#ensemble-applet">Trajectory ensemble</a></li>
+          <li><a href="#split-applet">Asymmetric wave packet</a></li>
+          <li><a href="#theory">Theory &amp; Equations</a></li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="comparison-videos" class="video-section" aria-labelledby="comparison-videos-title">
+      <h2 id="comparison-videos-title">Intro: From classical to Quantum to Pilot Wave</h2>
+      <p>
+        Newton’s 1st law tells us that a particle in motion will remain in motion
+         at a constant speed and in a straight line if there are no external agents acting on it.
+      </p>
+
+      <figure class="video-card">
+        <div class="video-window">
+          <video
+            class="comparison-video"
+              src="videos/classicalParticle0000-0517.mp4"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="0"
+              aria-label="Classical particle animation"
+          ></video>
+        </div>
+        <figcaption>
+          <strong>Classical particle</strong>
+          <span>Classical free particle in a box.</span>
+        </figcaption>
+      </figure>
+        <p>
+        In standard quantum mechanics the point particle is replaced by a wave. The evolution of the wave is described by
+        Schrödinger's equation. Schrödinger’s equation does not immediately describe particles following trajectories.
+        It’s a wave equation.  A free particle is therefore represented by the wave solution.
+        The colors here represent different values of the phase.
+        </p>
+
+
+      <figure class="video-card">
+        <div class="video-window">
+          <video
+            class="comparison-video"
+              src="videos/quantumWave0525-1134.mp4"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="0"
+              aria-label="Standard quantum wave animation"
+          ></video>
+        </div>
+        <figcaption>
+          <strong>Standard quantum wave</strong>
+          <span>The state is represented by the spreading wave packet density and phase.</span>
+        </figcaption>
+      </figure>
+
+
+        <p>
+        The wave is not very localized and so intuitively do not represent a particle,
+        whose main property is having a localized position after all.
+        </p>
+        <p>
+        So what exactly does this tell us about the particle that we eventually detect?
+        Well, the packet’s amplitude—or more precisely the modulus square of the amplitude—at a given location
+        only describes the likelihood of detecting a particle if a detector were placed at that location.
+        For example, in this picture a particle is most likely to be found where the packet is red and has essentially
+        zero chance of being found in locations that are shaded black.  This is the Born interpretation of the wave.
+        </p>
+        <p>
+        If the packet starts off narrow, a particle would be initially found somewhere fairly limited.
+         The spreading packet also tells us that later it would be found in a much wider region.
+          But why is this?  Why wouldn’t the particle just move forward like Newton’s Laws predict?
+           Why would a lone particle’s choice to veer off depend on the size of the region of space that you initially chose it in?
+            For that matter, why is it veering off at all?
+        It’s “free” isn’t it?
+        </p>
+
+        <p>
+        Clearly something more interesting and subtle is going on here.
+        Sadly, standard quantum mechanics gives little insight.
+        </p>
+        <p>
+        You see, as we have said, standard quantum mechanics only tells us where we are likely to find a particle
+        if we make a measurement.  It makes no predictions about where an individual particle actually is,
+        how it got there, why it moves the way it does, or even if there is an actual particle to be spoken of!
+        Some may even go a bit further and tell you that there is no particle unless and until it is measured.
+        The fact is, the standard approach is very useful for predicting the statistics of measuring an ensemble
+        but it is not very useful for understanding individual particle behavior or the dynamics of the physical process
+         that is unfolding.
+        </p>
+    </section>
+
+    <section class="applet-section" aria-labelledby="spreading-applet">
+      <h2 id="spreading-applet">The Bohmian Approach to the Free Particle</h2>
+
+      <p>
+      In the Bohmian view a quantum free particle is still described by a wave packet according to Schrodinger’s equation.
+
+        Observe how the Bohmian particle always moves such that its velocity is orthogonal to the phase gradient.
+        Basically the particle is surfing the Schrödinger's wave!
+      </p>
+
+      <figure class="video-card">
+        <div class="video-window">
+          <video
+            class="comparison-video"
+              src="videos/bohmianQuantum1146-2199.mp4"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="0"
+              aria-label="Bohmian quantum packet animation"
+          ></video>
+        </div>
+        <figcaption>
+          <strong>Bohmian quantum packet</strong>
+          <span>The particle has a definite position while the wave supplies its guidance field.</span>
+        </figcaption>
+      </figure>
+
+        <p>
+        Bohmian mechanics allows a very nice gradual transition into classical physics.
+        By increasing the scale, the trajectory starts to resemble the Newtonian free motion more and more.
+      </p>
+
+      <figure class="video-card">
+        <div class="video-window">
+          <video
+            class="comparison-video is-double-height"
+              src="videos/bohmianSemiClassical1146-2087.mp4"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              tabindex="0"
+              aria-label="Bohmian semi-classical packet animation"
+          ></video>
+        </div>
+        <figcaption>
+          <strong>Semi-classical Bohmian packet</strong>
+          <span>In larger scales the bohmian trajectory turns increasingly similar to a classical path.</span>
+        </figcaption>
+      </figure>
+
+      <p>
+        Playing with Bohmian particle and its wave your self with the following demo.
+        Try narrowing down the inital wave packet and see how it affects the evolution.
+        That is Heisenberg's uncertainty principle in action.
+      </p>
+
+      <div class="applet-shell is-inactive">
+        <div class="applet-toolbar">Single free particle</div>
+        <div class="applet-stage has-poster" style="background-image: url('singleParticleImage.jpg');">
+          <iframe
+            class="applet-frame"
+            title="Single free Gaussian packet demonstration"
+            data-src="full-applet.html?embed=1&amp;preset=spreading"
+            allow="fullscreen"
+          ></iframe>
+          <button class="applet-play" type="button" aria-label="Play wave-packet spreading simulation">Play</button>
+        </div>
+      </div>
+      <p class="caption">
+        Bohmian trajectories are guided by the local phase gradient.
+      </p>
+    </section>
+
+    <section class="applet-section" aria-labelledby="ensemble-applet">
+      <h2 id="ensemble-applet">Many trajectories at once</h2>
+      <p>
+        The initial position of a single bohmian particle is distributed according to the wave function's density.
+        We can visualize many trajectories together to see how they collectively represent the evolving quantum flow.
+      </p>
+
+      <p>
+      With Bohmian mechanics, we can further visualize the individual particle dynamics by tracking
+      an ensemble of possible initial positions and the trajectory bundle that results.
+      Seeing them animated will help you to develop more intuition and understanding of the dynamics that are inherent
+      in the equations of quantum mechanics, even if you don’t do the calculations yourself yet.
+      For instance, from this trajectory picture we can see a few new things:
+      </p>
+
+      <ol>
+        <li>Particles are guided by a flowing and propagating wave, just like streamlines in a fluid.</li>
+        <li>Particles follow paths that are perpendicular to the wavefronts, just like rays in optics.</li>
+        <li>Particles near the center of the packet tend to move in straight lines.</li>
+        <li>Particles near the edges tend to curve away from the packet center despite being “free.”</li>
+        <li>Particle speeds are correlated with initial position in the packet.</li>
+      </ol>
+
+      <p>
+      Even more than this, the trajectories, energies,
+      and velocities can all now be computed and modeled continuously throughout the process giving us
+      an unfolding picture of what the particles could be doing as they navigate through the quantum landscape.
+      Rather than just saying that Newton’s laws are violated, we can see how…and why!
+      </p>
+
+
+
+
+
+      <div class="applet-shell is-inactive">
+        <div class="applet-toolbar">Many Bohmian trajectories</div>
+        <div class="applet-stage has-poster" style="background-image: url('manyParticleImage.jpg');">
+          <iframe
+            class="applet-frame"
+            title="Free-packet Bohmian trajectory ensemble"
+            data-src="full-applet.html?embed=1&amp;preset=ensemble"
+            allow="fullscreen"
+          ></iframe>
+          <button class="applet-play" type="button" aria-label="Play trajectory ensemble simulation">Play</button>
+        </div>
+      </div>
+      <p class="caption">
+        The ensemble expands with the packet while individual paths display the local quantum flow.
+      </p>
+
+      <p>
+      This may seem all well and good for a free particle, but isn’t that kind of boring?
+      Well, we can apply these same tools and techniques to help you develop more intuition and understanding
+      of even more interesting and complicated systems, when the free particle becomes “less free” by colliding with a barrier,
+      a slit, another particle, a magnetic field, or even if we include spin. At every stage using this
+      Bohmian picture to supplement the standard one covered in most classes will help you develop a good sense for
+      what so many may have told you is impossible, you can come to better understand how the quantum world behaves.
+      </p>
+    </section>
+
+    <section class="applet-section" aria-labelledby="split-applet">
+      <h2 id="split-applet">Asymmetric wave packet</h2>
+      <p>
+        The initial distribution does not have to be symmetric like a single Gaussian.
+        Let us end this lesson with a quick look at bohmian evolution under a double peaked initial distribution.
+        This is still a free particle (apart from the walls), but an asymmetric wave will "drive" the Bohmian particles
+        along more complex trajectories, making them quickly depart from Newtonian vision of inertial movement.
+      </p>
+
+      <div class="applet-shell is-inactive">
+        <div class="applet-toolbar">Two-component Gaussian packet</div>
+        <div class="applet-stage has-poster" style="background-image: url('doublePeakImage.jpg');">
+          <iframe
+            class="applet-frame"
+            title="Split Gaussian free-packet demonstration"
+            data-src="full-applet.html?embed=1&amp;preset=split"
+            allow="fullscreen"
+          ></iframe>
+          <button class="applet-play" type="button" aria-label="Play split wave-packet simulation">Play</button>
+        </div>
+      </div>
+      <p class="caption">
+        The paths of the Bohmian particles lose their simplicity when the initial wave packet is non-symmetric.
+      </p>
+    </section>
+
+    <section id="theory" aria-labelledby="theory-title">
+      <h2 id="theory-title">Theory &amp; Equations</h2>
+
+      <h3>Free Schrödinger evolution</h3>
+      <p>
+        With no external potential, the wave function obeys the free-particle Schrödinger equation:
+      </p>
+      <div class="equation">
+        <span class="eq-label">Free Schrödinger equation</span>
+        \[
+          i\hbar\frac{\partial\psi}{\partial t}
+          =
+          -\frac{\hbar^2}{2m}\nabla^2\psi .
+        \]
+      </div>
+
+      <p>
+        A convenient initial state is a Gaussian envelope centered at \(\mathbf{x}_0\), multiplied
+        by a plane-wave phase with mean momentum \(\mathbf{p}_0\):
+      </p>
+      <div class="equation">
+        <span class="eq-label">Initial Gaussian packet</span>
+        \[
+          \psi(\mathbf{x},0)
+          =
+          A\exp\left[
+            -\frac{|\mathbf{x}-\mathbf{x}_0|^2}{4\sigma_0^2}
+            +\frac{i}{\hbar}\mathbf{p}_0\cdot(\mathbf{x}-\mathbf{x}_0)
+          \right].
+        \]
+      </div>
+
+      <h3>Spreading</h3>
+      <p>
+        For this Gaussian convention, the characteristic width grows with time according to
+      </p>
+      <div class="equation">
+        <span class="eq-label">Packet width</span>
+        \[
+          \sigma(t)
+          =
+          \sigma_0
+          \sqrt{
+            1+
+            \left(\frac{\hbar t}{2m\sigma_0^2}\right)^2
+          }.
+        \]
+      </div>
+      <p>
+        The packet center travels with the group velocity
+        \(\mathbf{v}_{\mathrm{g}}=\mathbf{p}_0/m\), while the increasing width represents quantum dispersion.
+      </p>
+
+      <h3>Bohmian guidance</h3>
+      <p>
+        Writing \(\psi=R e^{iS/\hbar}\), the Bohmian velocity is determined by the local phase gradient:
+      </p>
+      <div class="equation">
+        <span class="eq-label">Guidance law</span>
+        \[
+          \frac{d\mathbf{X}}{dt}
+          =
+          \frac{\mathbf{j}}{|\psi|^2}
+          =
+          \frac{\hbar}{m}
+          \operatorname{Im}\left(\frac{\nabla\psi}{\psi}\right)
+          =
+          \frac{\nabla S}{m},
+        \]
+        \[
+          \mathbf{j}
+          =
+          \frac{\hbar}{m}
+          \operatorname{Im}\left(\psi^*\nabla\psi\right).
+        \]
+      </div>
+      <p>
+        The density \(|\psi|^2\) describes the distribution of positions, while the phase controls
+        their local velocity. As the free packet spreads, its phase develops the spatial variation
+        that drives neighboring Bohmian trajectories apart.
+      </p>
+    </section>
+
+    <section class="next-step" aria-labelledby="full-applet">
+      <h2 id="full-applet">Full Applet</h2>
+      <p>Open the original-scale simulation with its complete control panel in a separate browser tab.</p>
+      <a class="primary-button" href="full-applet.html" target="_blank" rel="noopener">Open Full Applet</a>
+    </section>
+
+    <section class="comments-section" aria-labelledby="comments-title">
+      <div class="comments-heading">
+        <h2 id="comments-title">Comments and questions</h2>
+        <p>Share a thought about this post or ask a question.</p>
+      </div>
+      <div class="comments-widget" data-comments data-theme="github-light">
+        <noscript>JavaScript is required to load the comment section.</noscript>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <p>An Imagining Physics interactive notebook.</p>
+    </div>
+  </footer>
+
+  <script>
+    const comparisonVideos = Array.from(document.querySelectorAll(".comparison-video"));
+
+    const formatVideoTime = (seconds) => {
+      if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60).toString().padStart(2, "0");
+      return `${minutes}:${remainingSeconds}`;
+    };
+
+    const updateComparisonVideoControls = (video) => {
+      const controls = video.notebookControls;
+      if (!controls) return;
+
+      const duration = Number.isFinite(video.duration) ? video.duration : 0;
+      const currentTime = Number.isFinite(video.currentTime) ? video.currentTime : 0;
+
+      if (duration > 0 && video.dataset.seeking !== "true") {
+        controls.seek.value = Math.round((currentTime / duration) * Number(controls.seek.max));
+      } else if (duration === 0) {
+        controls.seek.value = 0;
+      }
+
+      controls.seek.disabled = duration === 0;
+      controls.toggle.textContent = video.paused ? "Continue" : "Pause";
+      controls.toggle.setAttribute("aria-label", `${video.getAttribute("aria-label") || "Video"} ${video.paused ? "continue" : "pause"}`);
+      controls.time.textContent = `${formatVideoTime(currentTime)} / ${formatVideoTime(duration)}`;
+    };
+
+    const createComparisonVideoControls = (video) => {
+      const label = video.getAttribute("aria-label") || "Video";
+      const controls = document.createElement("div");
+      controls.className = "video-controls";
+      controls.setAttribute("aria-label", `${label} controls`);
+
+      const seek = document.createElement("input");
+      seek.className = "video-seek";
+      seek.type = "range";
+      seek.min = "0";
+      seek.max = "1000";
+      seek.step = "1";
+      seek.value = "0";
+      seek.setAttribute("aria-label", `${label} timeline`);
+
+      const toggle = document.createElement("button");
+      toggle.className = "video-control-button";
+      toggle.type = "button";
+      toggle.textContent = "Pause";
+
+      const reset = document.createElement("button");
+      reset.className = "video-control-button";
+      reset.type = "button";
+      reset.textContent = "Reset";
+      reset.setAttribute("aria-label", `${label} reset`);
+
+      const time = document.createElement("output");
+      time.className = "video-time";
+      time.textContent = "0:00 / 0:00";
+
+      controls.append(seek, toggle, reset, time);
+      video.after(controls);
+      video.notebookControls = { controls, seek, toggle, reset, time };
+      updateComparisonVideoControls(video);
+    };
+
+    const playComparisonVideo = (video) => {
+      if (video.dataset.inView !== "true" || video.dataset.userPaused === "true") return;
+      const playRequest = video.play();
+      if (playRequest) playRequest.catch(() => {});
+    };
+
+    comparisonVideos.forEach((video) => {
+      video.dataset.inView = "false";
+      video.dataset.userPaused = "false";
+      video.dataset.seeking = "false";
+      createComparisonVideoControls(video);
+
+      const toggleVideo = () => {
+        if (video.paused) {
+          video.dataset.userPaused = "false";
+          playComparisonVideo(video);
+          updateComparisonVideoControls(video);
+          return;
+        }
+
+        video.dataset.userPaused = "true";
+        video.pause();
+        updateComparisonVideoControls(video);
+      };
+
+      video.addEventListener("click", toggleVideo);
+      video.addEventListener("keydown", (event) => {
+        if (event.key !== " " && event.key !== "Enter") return;
+        event.preventDefault();
+        toggleVideo();
+      });
+
+      video.notebookControls.toggle.addEventListener("click", toggleVideo);
+      video.notebookControls.reset.addEventListener("click", () => {
+        video.currentTime = 0;
+        video.dataset.userPaused = "false";
+        playComparisonVideo(video);
+        updateComparisonVideoControls(video);
+      });
+
+      video.notebookControls.seek.addEventListener("pointerdown", () => {
+        video.dataset.seeking = "true";
+      });
+
+      video.notebookControls.seek.addEventListener("pointerup", () => {
+        video.dataset.seeking = "false";
+        updateComparisonVideoControls(video);
+      });
+
+      video.notebookControls.seek.addEventListener("input", () => {
+        const duration = Number.isFinite(video.duration) ? video.duration : 0;
+        if (duration === 0) return;
+        video.currentTime = (Number(video.notebookControls.seek.value) / Number(video.notebookControls.seek.max)) * duration;
+        updateComparisonVideoControls(video);
+      });
+
+      video.notebookControls.seek.addEventListener("change", () => {
+        video.dataset.seeking = "false";
+        updateComparisonVideoControls(video);
+      });
+
+      video.addEventListener("loadedmetadata", () => updateComparisonVideoControls(video));
+      video.addEventListener("durationchange", () => updateComparisonVideoControls(video));
+      video.addEventListener("timeupdate", () => updateComparisonVideoControls(video));
+      video.addEventListener("play", () => updateComparisonVideoControls(video));
+      video.addEventListener("pause", () => updateComparisonVideoControls(video));
+    });
+
+    const videoVisibilityObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target;
+        video.dataset.inView = entry.isIntersecting ? "true" : "false";
+
+        if (entry.isIntersecting) {
+          playComparisonVideo(video);
+        } else {
+          video.pause();
+        }
+      });
+    });
+
+    comparisonVideos.forEach((video) => {
+      videoVisibilityObserver.observe(video);
+    });
+
+    const appletVisibilityObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) return;
+        const frame = entry.target.querySelector("iframe[src]");
+        frame?.contentWindow?.postMessage(
+          { type: "notebook:set-paused", paused: true },
+          window.location.origin
+        );
+      });
+    });
+
+    document.querySelectorAll(".applet-shell.is-inactive").forEach((shell) => {
+      const frame = shell.querySelector("iframe[data-src]");
+      const playButton = shell.querySelector(".applet-play");
+
+      playButton.addEventListener("click", () => {
+        if (!frame.hasAttribute("src")) {
+          frame.setAttribute("src", frame.dataset.src);
+        }
+        shell.classList.remove("is-inactive");
+        playButton.remove();
+        appletVisibilityObserver.observe(shell);
+      });
+    });
+  </script>
+  <script src="../comments.js"></script>
+</body>
+</html>
