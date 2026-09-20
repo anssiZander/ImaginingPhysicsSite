@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A new electric-field demo: give a charge a push, watch the radiation pulse travel outward, and see when nearby test particles respond." />
+    <title>Watching a charge radiate | Imagining Physics</title>
+    <link rel="canonical" href="https://imaginingphysics.com/accelerating-charge/radiation.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Watching a charge radiate" />
+    <meta property="og:description" content="One boost, an outward-moving field disturbance, and two detectors waiting for the news. Try the new electric-field demo." />
+    <meta property="og:url" content="https://imaginingphysics.com/accelerating-charge/radiation.html" />
+    <meta property="og:image" content="https://imaginingphysics.com/accelerating-charge/images/tour-field-update.jpg" />
+    <meta property="og:image:alt" content="The old and updated electric fields connected by a travelling radiation pulse." />
+    <meta property="article:published_time" content="2026-09-20" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../comments.css" />
+    <style>
+      .post { width:min(860px,calc(100% - 2rem)); margin:0 auto; padding:2.4rem 0 1rem; }
+      .post-back { color:var(--text-soft); font-size:.9rem; }
+      .post-header { margin:2.3rem 0 1.8rem; }
+      .post-header h1 { font-size:clamp(2rem,4.8vw,3.6rem); line-height:1.14; margin:.65rem 0 1rem; }
+      .post-meta { color:var(--muted); font-size:.88rem; }
+      .post-copy { max-width:72ch; color:var(--text-soft); font-size:1.06rem; line-height:1.75; }
+      .post-copy strong { color:var(--text); }
+      .post figure { margin:1.65rem 0 2.1rem; }
+      .post figure a { display:block; border:1px solid var(--border); border-radius:14px; overflow:hidden; background:#080e18; }
+      .post figure img { width:100%; height:auto; }
+      .post figcaption { margin:.65rem 0 0; color:var(--text-soft); font-size:.9rem; line-height:1.5; }
+      .post figcaption span { color:var(--cyan); font-weight:700; margin-right:.45rem; }
+      .post-reference { color:var(--muted); font-size:.85rem; }
+      .post-reference a { color:var(--cyan); text-decoration:underline; text-underline-offset:3px; }
+      .post a:focus-visible { outline:2px solid var(--cyan); outline-offset:5px; }
+      .post .comments-section { --ink:var(--text); --surface:#101321; --line:var(--border); --muted:#bac3df; }
+      .post .comments-heading h2 { font-size:1.3rem; }
+      @media(max-width:600px) {
+        .post { padding-top:1.5rem; }
+        .post-header { margin-top:1.7rem; }
+        .post-copy { font-size:1rem; }
+        .post figure { margin:1.3rem 0 1.6rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="../index.html">Imagining Physics</a>
+        <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+        <nav class="site-nav" aria-label="Main navigation">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../about.html">About</a></li>
+            <li><a href="../blog.html" class="active">Blog Posts</a></li>
+            <li><a href="../videos.html">Videos</a></li>
+            <li><a href="../shorts.html">Shorts</a></li>
+            <li><a href="../interactive.html">Interactive demos</a></li>
+            <li><a href="../shadertoy.html">Shadertoy</a></li>
+            <li><a href="../games.html">Games</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content" class="post">
+      <a class="post-back" href="../blog.html">&larr; All blog posts</a>
+      <article>
+        <header class="post-header">
+          <p class="eyebrow">Electromagnetism &middot; New demo</p>
+          <h1>Watching a charge radiate</h1>
+          <p class="post-meta"><time datetime="2026-09-20">20 September 2026</time></p>
+          <p class="post-copy">I’ve added a new electric-field demo to the site. Give the charge a push and watch the change spread outward at the speed of light.</p>
+          <a class="button button-primary" href="index.html" target="_blank" rel="noopener noreferrer">Play the full demo &nearr;</a>
+        </header>
+
+        <p class="post-copy">Start the <strong>Guided tour</strong> for a simple sequence: a charge at rest, one short boost, then steady coasting.</p>
+        <figure>
+          <a href="images/tour-rest.jpg" target="_blank" rel="noopener noreferrer" aria-label="View full-size screenshot: a field at rest">
+            <img src="images/tour-rest.jpg" width="1590" height="1080" alt="Straight electric field lines radiate from a stationary positive charge." fetchpriority="high" />
+          </a>
+          <figcaption><span>01</span>Before the boost. The arrows show the direction of electric force on a positive test charge.</figcaption>
+        </figure>
+
+        <p class="post-copy">After the boost, the distant field still points toward the starting position; the news has not reached it yet. Closer in, the field has adjusted to the new motion. The connecting bend marks the outward-moving radiation pulse.</p>
+        <figure>
+          <a href="images/tour-field-update.jpg" target="_blank" rel="noopener noreferrer" aria-label="View full-size screenshot: old field and updated field">
+            <img src="images/tour-field-update.jpg" width="1590" height="1080" alt="A highlighted field line bends between the old radial field outside the first-news circle and the updated field beside the moving charge." loading="lazy" />
+          </a>
+          <figcaption><span>02</span>Old field outside, updated field inside. The highlighted line connects the two through the pulse.</figcaption>
+        </figure>
+
+        <p class="post-copy">The charge can coast without making a new pulse. Radiation from the earlier acceleration keeps travelling. In the detector step, the nearer spring-mounted particle responds to the change before the farther one.</p>
+        <figure>
+          <a href="images/tour-detectors.jpg" target="_blank" rel="noopener noreferrer" aria-label="View full-size screenshot: the near detector receives the news first">
+            <img src="images/tour-detectors.jpg" width="1590" height="1080" alt="The near test particle is inside the expanding news boundary and marked news arrived; the far particle is outside and marked waiting." loading="lazy" />
+          </a>
+          <figcaption><span>03</span>The near detector has received the change; the far detector is still waiting. Their motion is amplified for visibility.</figcaption>
+        </figure>
+        <p class="post-reference">For the field equations, see <a href="https://www.feynmanlectures.caltech.edu/II_26.html" target="_blank" rel="noopener noreferrer">Feynman’s lectures on moving charges</a>.</p>
+
+        <p class="post-copy">Try a short push, release, then turn. Use WASD or hold the mouse or a finger to steer. Space pauses; right-drag pans; two fingers pan and pinch to zoom.</p>
+        <a class="button button-primary" href="index.html" target="_blank" rel="noopener noreferrer">Open the full demo &nearr;</a>
+      </article>
+
+      <section class="comments-section" aria-labelledby="comments-title">
+        <div class="comments-heading">
+          <h2 id="comments-title">Comments and questions</h2>
+          <p>Share a thought about this post or ask a question.</p>
+        </div>
+        <div class="comments-widget" data-comments data-theme="github-dark">
+          <noscript>JavaScript is required to load the comment section.</noscript>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <strong>Imagining Physics</strong>
+          <p>Visualizing physics through videos, simulations, shaders, and small games.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <ul class="footer-links">
+            <li><a href="../blog.html">Blog Posts</a></li>
+            <li><a href="../interactive.html">Interactive demos</a></li>
+            <li><a href="../about.html">About</a></li>
+            <li><a href="https://www.youtube.com/@imaginingPhysics" target="_blank" rel="noopener noreferrer">YouTube</a></li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+    <script src="../main.js"></script>
+    <script src="../comments.js"></script>
+  </body>
+</html>
