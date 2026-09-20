@@ -1,0 +1,1229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Steer an electric charge and watch acceleration send changes through its field at finite speed. Explore radiation with a guided tour and spring-bound test particles.">
+<title>A Charge in Motion | Imagining Physics</title>
+<style>
+  :root { color-scheme:dark; --bg:#080e18; --panel:#101a29; --text:#e8eff7; --muted:#91a3b9; --teal:#71ded2; --amber:#ffbe79; --border:#ffffff16; }
+  * { box-sizing:border-box; }
+  html,body { width:100%; height:100%; margin:0; overflow:hidden; }
+  body { background:var(--bg); color:var(--text); font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  button,input { font:inherit; }
+  button { color:inherit; cursor:pointer; }
+  button:focus-visible,input:focus-visible,summary:focus-visible,a:focus-visible { outline:2px solid var(--teal); outline-offset:5px; }
+  button { border:1px solid var(--border); background:#ffffff06; border-radius:9px; }
+  button:hover { background:#ffffff0e; border-color:#ffffff30; }
+  button:active { transform:translateY(1px); }
+  canvas { display:block; position:absolute; inset:0; width:100%; height:100%; touch-action:none; cursor:crosshair; user-select:none; -webkit-user-select:none; }
+  canvas.dragging { cursor:grabbing; }
+  .top { position:absolute; top:28px; left:32px; right:32px; display:flex; justify-content:space-between; align-items:flex-start; gap:24px; pointer-events:none; }
+  .eyebrow { color:var(--teal); font-size:10px; letter-spacing:.2em; text-transform:uppercase; font-weight:650; margin:0 0 7px; }
+  h1 { font-size:27px; line-height:1.12; font-weight:570; letter-spacing:-.045em; margin:0; }
+  .subtitle { font-size:12px; color:var(--muted); margin:9px 0 0; }
+  .readout { min-width:180px; text-align:right; font-variant-numeric:tabular-nums; }
+  .readout-top { display:flex; justify-content:flex-end; align-items:center; gap:12px; }
+  .status { color:var(--muted); font-size:11px; display:flex; align-items:center; gap:7px; }
+  .status-dot { width:5px; height:5px; background:var(--teal); border-radius:50%; }
+  .status[data-state="Accelerating"] .status-dot { background:var(--amber); box-shadow:0 0 10px #ffbe7950; }
+  .status[data-state="Paused"] .status-dot { background:var(--muted); }
+  .about { pointer-events:auto; width:26px; height:26px; border-radius:50%; font-family:Georgia,serif; font-style:italic; font-size:15px; }
+  .velocity { font-size:28px; font-weight:420; letter-spacing:-.05em; margin-top:7px; }
+  .velocity small { font-size:14px; color:var(--muted); letter-spacing:0; }
+  .readout-sub { color:var(--muted); font-size:10px; margin-top:2px; letter-spacing:.03em; }
+  .speed-meter { width:102px; height:2px; margin:10px 0 8px auto; background:#ffffff12; border-radius:2px; }
+  .speed-meter span { display:block; height:100%; width:0%; background:var(--teal); border-radius:2px; }
+  .paused-badge { position:absolute; top:27px; left:50%; transform:translateX(-50%); padding:7px 12px; border:1px solid var(--border); background:#101a29e8; border-radius:7px; color:#c9d6e6; font-size:11px; letter-spacing:.12em; pointer-events:none; }
+  [hidden] { display:none !important; }
+  .legend { position:absolute; left:32px; bottom:139px; display:flex; gap:20px; pointer-events:none; font-size:11px; color:var(--muted); }
+  .legend span { display:flex; align-items:center; gap:8px; }
+  .swatch { display:inline-block; height:2px; width:19px; background:var(--teal); border-radius:4px; }
+  .swatch.amber { background:var(--amber); box-shadow:0 0 7px #ffbe7930; }
+  .view-tools { position:absolute; right:32px; bottom:132px; display:flex; align-items:center; gap:10px; }
+  .zoom { font-variant-numeric:tabular-nums; color:var(--muted); font-size:11px; min-width:36px; text-align:right; }
+  .view-tools button { padding:6px 10px; color:#c5d3e5; background:#0d1724d9; font-size:11px; }
+  .view-tools .probe-toggle { position:absolute; right:0; bottom:39px; white-space:nowrap; }
+  .probe-toggle::before { content:""; display:inline-block; width:6px; height:6px; margin-right:7px; border-radius:50%; background:#657085; }
+  .probe-toggle[aria-pressed="true"]::before { background:linear-gradient(135deg,#c4acff,#ff6055); box-shadow:0 0 8px #c4acff40; }
+  .dock-wrap { position:absolute; bottom:23px; left:24px; right:24px; display:flex; justify-content:center; pointer-events:none; }
+  .dock { pointer-events:auto; width:min(1220px,100%); display:flex; align-items:center; gap:20px; padding:18px 22px; border:1px solid var(--border); border-radius:16px; background:#0f1928f5; box-shadow:0 12px 50px #0005; }
+  .steer { display:flex; align-items:center; gap:13px; flex-shrink:0; }
+  .keypad { display:grid; grid-template-columns:repeat(3,24px); grid-template-rows:repeat(2,24px); gap:3px; }
+  .keypad button { padding:0; border-radius:5px; font-size:10px; font-weight:600; background:#172336; color:#bdcbe0; touch-action:none; user-select:none; }
+  .keypad button[data-key="KeyW"] { grid-column:2; }
+  .keypad button[data-key="KeyA"] { grid-column:1; }
+  .keypad button.pressed { background:var(--teal); color:#08211f; border-color:var(--teal); }
+  .steer-copy strong { display:block; font-size:12px; font-weight:550; }
+  .steer-copy span { font-size:10px; color:var(--muted); white-space:nowrap; }
+  .separator { width:1px; height:39px; background:var(--border); flex-shrink:0; }
+  .slider-group { min-width:116px; flex:1; }
+  .control-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:11px; margin-bottom:10px; }
+  output { color:var(--teal); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  input[type="range"] { display:block; appearance:none; -webkit-appearance:none; width:100%; height:4px; margin:0; border-radius:4px; background:linear-gradient(to right,#69cabe var(--fill,40%),#27374a var(--fill,40%)); cursor:pointer; }
+  input[type="range"]::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#e0f6f1; box-shadow:0 0 0 3px #69cabe10; }
+  input[type="range"]::-moz-range-thumb { width:12px; height:12px; border:0; border-radius:50%; background:#e0f6f1; }
+  .contraction { flex-shrink:0; width:174px; }
+  .toggle { padding:0; background:none; border:0; display:flex; align-items:center; justify-content:space-between; gap:13px; width:100%; font-size:11px; }
+  .toggle:hover { background:none; }
+  .switch { flex-shrink:0; width:30px; height:17px; background:#28384c; border:1px solid #ffffff10; border-radius:20px; padding:2px; transition:background .15s; }
+  .switch::after { content:""; display:block; width:11px; height:11px; border-radius:50%; background:#d6e7e4; transition:transform .15s; }
+  .toggle[aria-checked="true"] .switch { background:#347d75; }
+  .toggle[aria-checked="true"] .switch::after { transform:translateX(13px); }
+  .mode-note { font-size:10px; color:var(--muted); margin-top:9px; }
+  .actions { display:flex; gap:7px; flex-shrink:0; }
+  .actions button { width:40px; height:39px; display:grid; place-items:center; }
+  .actions svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+  #pause { background:#ffffff0b; }
+  .hint { position:absolute; bottom:5px; width:100%; text-align:center; font-size:9px; letter-spacing:.02em; color:#778ca5; pointer-events:none; }
+  .touch-hint { display:none; }
+  kbd { font:inherit; color:#b4c4d9; }
+  .welcome { pointer-events:none; position:absolute; left:50%; top:calc(50% + 51px); transform:translateX(-50%); padding:9px 15px; color:#a1b5ca; font-size:11px; text-align:center; white-space:nowrap; background:#080e18e6; border:1px solid #ffffff0b; border-radius:30px; transition:opacity .35s; }
+  .welcome.used { opacity:0; }
+  dialog { color:var(--text); width:min(450px,calc(100vw - 32px)); padding:29px; border:1px solid #ffffff25; border-radius:17px; background:#111c2c; box-shadow:0 25px 100px #0008; font-size:13px; }
+  dialog::backdrop { background:#03080caa; backdrop-filter:blur(4px); }
+  dialog h2 { font-size:21px; font-weight:550; letter-spacing:-.03em; margin:0 0 17px; }
+  dialog p { color:#afc0d4; margin:13px 0; }
+  dialog strong { color:var(--text); font-weight:550; }
+  dialog a { color:var(--teal); text-underline-offset:3px; }
+  dialog .close { float:right; margin:-12px -12px 0 8px; border:0; width:28px; height:28px; font-size:22px; }
+  .sources { font-size:11px; border-top:1px solid var(--border); padding-top:14px; }
+  .tour-launch { position:absolute; left:32px; bottom:181px; padding:11px 18px; border:1px solid #ffe1a6; border-radius:12px; background:#ffcb83; color:#2c1d0c; font-size:13px; font-weight:700; box-shadow:0 4px 26px #ffbe7929; }
+  .tour-launch:hover { background:#ffdaa6; border-color:#ffedce; }
+  .tour-launch span { margin-right:8px; }
+  .tour-card { position:absolute; z-index:4; right:28px; bottom:88px; width:350px; max-height:calc(100dvh - 185px); display:flex; flex-direction:column; border:1px solid #ffcd8545; border-radius:18px; background:#111c2cf5; box-shadow:0 18px 65px #0007; overflow:hidden; }
+  .tour-heading { display:flex; align-items:center; gap:7px; padding:15px 17px 10px; flex-shrink:0; }
+  .tour-heading .tour-kicker { margin-right:auto; color:#ffce90; font-size:10px; letter-spacing:.12em; font-weight:650; text-transform:uppercase; }
+  .tour-icon { width:32px; height:32px; font-size:19px; line-height:1; }
+  .tour-progress { display:flex; gap:5px; padding:0 18px 4px; flex-shrink:0; }
+  .tour-progress i { height:3px; flex:1; border-radius:3px; background:#ffffff15; }
+  .tour-progress i.past { background:#ffcb8380; }
+  .tour-progress i.current { background:#ffcb83; }
+  .tour-content { overflow-y:auto; overscroll-behavior:contain; padding:14px 20px 8px; min-height:0; }
+  .tour-content h2 { font-size:24px; font-weight:580; letter-spacing:-.035em; line-height:1.15; margin:0 0 13px; }
+  .tour-content p { font-size:13px; line-height:1.55; margin:0 0 13px; color:#b7c7da; }
+  .tour-content .tour-action { color:#e8eff7; }
+  .tour-content .tour-look { border-left:2px solid #71ded2; padding-left:11px; color:#c5e9e4; }
+  .tour-content .tour-theory { color:#c3cddd; }
+  .tour-content details { font-size:11px; color:#8fa3ba; margin:0 0 12px; }
+  .tour-content summary { cursor:pointer; color:#b3c5da; }
+  .tour-content details p { font-size:11px; margin:8px 0 0; }
+  .tour-detectors { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .tour-detectors div { padding:8px; border:1px solid #ffffff18; border-radius:8px; font-size:10px; color:#bbabed; }
+  .tour-detectors div.arrived { color:#ffcb83; border-color:#ffcb8344; }
+  .tour-detectors strong { display:block; font-size:11px; margin-bottom:3px; }
+  .tour-footer { padding:10px 17px 16px; border-top:1px solid #ffffff0c; flex-shrink:0; }
+  .tour-play-row { display:flex; align-items:center; gap:9px; margin-bottom:11px; }
+  .tour-play { padding:6px 10px; min-width:72px; font-size:11px; }
+  .tour-state { color:#91a9bf; font-size:10px; }
+  .tour-nav { display:flex; align-items:center; gap:7px; }
+  .tour-nav button { padding:9px 12px; font-size:11px; }
+  .tour-nav .tour-next { margin-left:auto; background:#ffcb83; color:#2c1d0c; border-color:#ffcb83; font-weight:650; }
+  .tour-nav .tour-next:hover { background:#ffdaa6; }
+  .tour-card button:disabled { opacity:.35; cursor:default; transform:none; }
+  .tour-mini { position:absolute; z-index:4; right:28px; bottom:88px; display:flex; align-items:center; gap:10px; padding:10px; border:1px solid #ffcb8355; border-radius:13px; background:#111c2cf5; box-shadow:0 10px 35px #0006; }
+  .tour-mini .tour-resume { background:#ffcb83; color:#2c1d0c; border-color:#ffcb83; padding:10px 13px; font-weight:650; font-size:12px; }
+  .tour-mini .tour-exit { padding:10px 12px; font-size:12px; }
+  .tour-mini-copy { font-size:11px; color:#bed0e0; }
+  .tour-mini-copy small { display:block; color:#8fa3ba; font-size:10px; margin-top:3px; }
+  body.touring .dock-wrap,body.touring .view-tools,body.touring .legend,body.touring .hint,body.touring .welcome,body.touring .tour-launch,body.touring .paused-badge { display:none; }
+  body.touring canvas { cursor:default; }
+  body.touring canvas.dragging { cursor:grabbing; }
+  body.touring .subtitle { max-width:260px; }
+  @media (max-width:899px) {
+    .tour-card { left:12px; right:12px; bottom:82px; width:auto; max-height:43dvh; border-radius:15px; }
+    .tour-heading { padding:10px 13px 6px; }
+    .tour-progress { padding:0 14px 3px; }
+    .tour-content { padding:9px 15px 3px; }
+    .tour-content h2 { font-size:21px; margin-bottom:8px; }
+    .tour-content p { font-size:12px; line-height:1.45; margin-bottom:9px; }
+    .tour-footer { padding:8px 13px 11px; }
+    .tour-play-row { margin-bottom:7px; }
+    .tour-mini { left:12px; right:12px; bottom:82px; gap:7px; }
+    .tour-mini-copy { flex:1; }
+    .tour-mini .tour-resume,.tour-mini .tour-exit { padding:10px; }
+  }
+  @media (max-height:560px) and (min-width:600px) {
+    .tour-card { left:auto; right:14px; top:15px; bottom:80px; width:315px; max-height:none; }
+    body.touring .readout { visibility:hidden; }
+    .tour-content h2 { font-size:21px; }
+  }
+  @media (max-width:1000px) {
+    .dock { gap:12px; padding:17px; }
+    .slider-group { min-width:95px; }
+    .steer-copy { display:none; }
+    .contraction { width:167px; }
+    .separator { display:none; }
+  }
+  @media (max-width:790px) {
+    .top { top:20px; left:19px; right:19px; gap:10px; }
+    h1 { font-size:22px; }
+    .subtitle { font-size:10px; max-width:190px; }
+    .readout { min-width:115px; }
+    .velocity { font-size:24px; }
+    .readout-sub { font-size:9px; }
+    .eyebrow { font-size:8px; }
+    .dock-wrap { left:12px; right:12px; bottom:55px; }
+    .dock { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); grid-template-areas:"speed boost" "steer mode" "steer actions"; gap:16px 20px; padding:16px; }
+    .speed-control { grid-area:speed; }
+    .boost-control { grid-area:boost; }
+    .steer { grid-area:steer; }
+    .contraction { grid-area:mode; width:auto; }
+    .toggle { font-size:10px; gap:7px; }
+    .mode-note { font-size:9px; }
+    .actions { grid-area:actions; justify-content:flex-end; }
+    .actions button { width:37px; height:33px; }
+    .slider-group { min-width:0; }
+    .control-heading { font-size:10px; }
+    .legend { left:19px; bottom:236px; gap:12px; font-size:9px; }
+    .view-tools { right:19px; bottom:228px; }
+    .paused-badge { top:122px; }
+    .hint { bottom:9px; left:12px; width:170px; text-align:left; font-size:8px; }
+    .desktop-hint { display:none; }
+    .touch-hint { display:inline; }
+    .tour-launch { left:19px; bottom:281px; padding:10px 14px; font-size:12px; }
+  }
+  @media (max-height:530px) and (min-width:791px) {
+    .top { top:16px; }
+    .subtitle { display:none; }
+    .dock-wrap { bottom:21px; }
+    .dock { padding-top:11px; padding-bottom:11px; }
+    .legend { bottom:110px; }
+    .view-tools { bottom:105px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="field" tabindex="0" aria-label="Interactive electric field around a positive charge. Hold or drag a finger or the left mouse button to boost toward the pointer. Farther away boosts more. W, A, S, D also accelerate; release to coast. Space pauses. Right-drag or two fingers pan; pinch or scroll to zoom.">Your browser needs Canvas support to display this simulation.</canvas>
+<header class="top">
+  <div>
+    <p class="eyebrow">An electric field playground</p>
+    <h1>A charge in motion</h1>
+    <p class="subtitle">Move the charge. Watch the field catch up.</p>
+  </div>
+  <div class="readout">
+    <div class="readout-top"><span id="status" class="status" data-state="At rest"><i class="status-dot"></i><span id="status-text">At rest</span></span><button id="about" class="about" aria-label="About the field">i</button></div>
+    <div class="velocity"><span id="velocity">0.000</span> <small>c</small></div>
+    <div class="speed-meter"><span id="speed-fill"></span></div>
+    <div id="gamma" class="readout-sub">γ = 1.00 · contraction on</div>
+    <div class="readout-sub">Field updates always travel at c</div>
+  </div>
+</header>
+<div id="paused-badge" class="paused-badge" hidden>PAUSED</div>
+<div id="welcome" class="welcome">Auto sway · Hold anywhere to steer</div>
+<button id="guided-tour" class="tour-launch" data-tour-ui aria-controls="tour-card" aria-expanded="false"><span aria-hidden="true">✦</span>Guided tour</button>
+<section id="tour-card" class="tour-card" data-tour-ui aria-label="Guided tour" hidden>
+  <div class="tour-heading"><span class="tour-kicker" id="tour-step-label">Guided tour · 1 / 7</span><button id="tour-minimize" class="tour-icon" title="Minimize tour" aria-label="Minimize guided tour">−</button><button id="tour-exit" class="tour-icon" title="Exit tour (Escape)" aria-label="Exit guided tour">×</button></div>
+  <div id="tour-progress" class="tour-progress" aria-hidden="true"></div>
+  <div class="tour-content" id="tour-content">
+    <h2 id="tour-title" tabindex="-1"></h2>
+    <p id="tour-action" class="tour-action"></p>
+    <p id="tour-look" class="tour-look"></p>
+    <p id="tour-theory" class="tour-theory"></p>
+    <div id="tour-detectors" class="tour-detectors" hidden><div id="tour-near"><strong>Near detector</strong><span>Waiting for news</span></div><div id="tour-far"><strong>Far detector</strong><span>Waiting for news</span></div></div>
+    <details id="tour-details"><summary>A little more physics</summary><p id="tour-detail-text"></p></details>
+  </div>
+  <div class="tour-footer"><div class="tour-play-row"><button id="tour-play" class="tour-play">Play</button><span id="tour-state" class="tour-state" role="status"></span></div><div class="tour-nav"><button id="tour-back">← Back</button><button id="tour-replay">Replay</button><button id="tour-next" class="tour-next">Next →</button></div></div>
+</section>
+<div id="tour-mini" class="tour-mini" data-tour-ui hidden><button id="tour-restore" class="tour-resume">Open tour</button><span class="tour-mini-copy"><span id="tour-mini-step">Step 1 / 7</span><small id="tour-mini-state">Paused</small></span><button id="tour-mini-exit" class="tour-exit">Exit tour</button></div>
+<div class="legend" aria-label="Field color legend"><span><i class="swatch"></i>Electric field</span><span><i class="swatch amber"></i>Radiation bends</span></div>
+<div class="view-tools"><button id="test-particles" class="probe-toggle" aria-pressed="true" title="Show or hide spring-mounted positive test particles">Test particles: on</button><span id="zoom" class="zoom">67%</span><button id="recenter" title="Center the view and follow the charge">Recenter</button></div>
+<div class="dock-wrap"><section class="dock" aria-label="Simulation controls">
+  <div class="steer">
+    <div class="keypad" aria-label="Hold a direction to accelerate">
+      <button type="button" data-key="KeyW" aria-label="Accelerate up">W</button>
+      <button type="button" data-key="KeyA" aria-label="Accelerate left">A</button>
+      <button type="button" data-key="KeyS" aria-label="Accelerate down">S</button>
+      <button type="button" data-key="KeyD" aria-label="Accelerate right">D</button>
+    </div>
+    <div class="steer-copy"><strong>Hold to accelerate</strong><span>Release to coast</span></div>
+  </div>
+  <div class="separator"></div>
+  <label class="slider-group speed-control" for="sim-speed"><span class="control-heading"><span>Simulation speed</span><output id="sim-speed-value" for="sim-speed">1.00×</output></span><input id="sim-speed" type="range" min="0.1" max="3" step="0.05" value="1"></label>
+  <label class="slider-group boost-control" for="boost-strength"><span class="control-heading"><span>Boost strength</span><output id="boost-strength-value" for="boost-strength">1.00×</output></span><input id="boost-strength" type="range" min="0.1" max="3" step="0.05" value="1"></label>
+  <div class="separator"></div>
+  <div class="contraction"><button id="contraction" class="toggle" role="switch" aria-checked="true"><span>Relativistic contraction</span><i class="switch" aria-hidden="true"></i></button><div id="mode-note" class="mode-note">On · field crowds sideways</div></div>
+  <div class="actions">
+    <button id="pause" aria-label="Pause simulation" title="Pause / resume (Space)"><svg id="pause-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg></button>
+    <button id="reset" aria-label="Reset simulation" title="Reset charge, field and view"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.2 6.3A6.5 6.5 0 1 1 3.5 11M4 2.5v4h4"/></svg></button>
+  </div>
+</section></div>
+<div class="hint"><span class="desktop-hint">Hold / drag or <kbd>W A S D</kbd> to boost &nbsp;·&nbsp; <kbd>Space</kbd> pause &nbsp;·&nbsp; right-drag to pan &nbsp;·&nbsp; scroll / pinch to zoom</span><span class="touch-hint">Hold &amp; drag to boost · Two fingers to pan &amp; pinch to zoom</span></div>
+<dialog id="info">
+  <button class="close" id="close-info" aria-label="Close information">×</button>
+  <h2>The field has a memory.</h2>
+  <p><strong>Hold or drag one finger or the left mouse button</strong> to accelerate toward the pointer. Farther from the charge means a stronger boost, measured as a fraction of the screen so it feels the same at any zoom. Pointer boosts ease in, turn and fade out smoothly. Release to coast. <strong>W A S D</strong> and the on-screen keys also work. <strong>Boost strength</strong> adjusts both controls. Speed stays below <strong>0.92c</strong>.</p>
+  <p>Every line connects the charge to its older field. Changes spread at <strong>c</strong>, leaving outward-travelling bends. Amber emphasizes the acceleration contribution; color is not a calibrated field-strength or energy scale.</p>
+  <p><strong>Contraction on:</strong> numerical field lines of the relativistic point-charge electric field, shown in the plane of motion. For steady motion, the lines remain radial but crowd sideways.</p>
+  <p><strong>Contraction off:</strong> an illustrative comparison with evenly spaced radial lines during steady motion. It keeps the same trajectory and light-speed propagation; it is not the full relativistic Maxwell field.</p>
+  <p>The letters <strong>TEST PARTICLES</strong> are made of positive test particles attached to fixed anchors by damped springs. The local, delayed electric field displaces them; passing radiation makes the letters wobble. They turn from purple to red as their distance from their anchors increases. Their response is scaled for visibility. They do not alter the source or field. Use <strong>Test particles</strong> to hide or show them.</p>
+  <p><strong>Right-drag or move two fingers together to pan.</strong> Pinch two fingers or scroll to zoom. After a two-finger gesture, lift both fingers before boosting again. <strong>Recenter</strong> restores automatic following. Pause to compare the modes at the same instant; zoom, panning and settings remain adjustable while paused.</p>
+  <p class="sources">Physics background: <a href="https://www.feynmanlectures.caltech.edu/II_26.html" target="_blank" rel="noopener noreferrer">Feynman: fields of a moving charge</a> · <a href="https://www.feynmanlectures.caltech.edu/I_28.html" target="_blank" rel="noopener noreferrer">Electromagnetic radiation</a>.<br>All simulation code is included in this file. No connection is needed.</p>
+</dialog>
+<script id="simulation">
+(() => {
+  'use strict';
+
+  // Distances are arbitrary lab-frame units. C is the same in both display modes.
+  const C = 175, DT = 1 / 120, MAX_BETA = 0.92, BOOST = 0.72, EASE = 0.065, POINTER_EASE = 0.14;
+  const DEFAULT_ZOOM=1/1.5;
+  const TAU = 2 * Math.PI;
+  const $ = id => document.getElementById(id);
+  const canvas = $('field'), ctx = canvas.getContext('2d', { alpha:false });
+  const keys = new Set(), pointerKeys = new Map();
+  const canvasPointers = new Map();
+  let gesture=null, touchNavigation=false;
+  const keyButtons = [...document.querySelectorAll('[data-key]')];
+  const arrows = {ArrowUp:'KeyW', ArrowLeft:'KeyA', ArrowDown:'KeyS', ArrowRight:'KeyD'};
+  const camera = {x:0, y:0, zoom:DEFAULT_ZOOM, follow:true};
+  let width = innerWidth, height = innerHeight, dpr = 1;
+  const lineCount = 32;
+  let sim, history, fronts, paused = false, simSpeed = 1, boostStrength = 1, relativistic = true;
+  let accumulator = 0, lastFrame = 0, lastHud = -Infinity, dirty = true;
+  let frameMs = 0, drawnPoints = 0;
+  const PROBE_SPRING=49, PROBE_DAMPING=5, PROBE_GAIN=2.4e7, PROBE_MAX_FORCE=1176;
+  const PROBE_RESPONSE=6;
+  let automaticMotion=true;
+  let showProbes=true, activeProbes=[];
+  const tour={active:false,index:0,minimized:false,saved:null,detectors:[],rect:null};
+  const TOUR_BOOST_START=0.6, TOUR_BOOST_END=1.5, TOUR_BETA=0.28;
+  const tourSteps=[
+    {title:'A field at rest',start:0,end:0,
+      action:'Begin with a stationary positive charge. Its field is already established everywhere.',
+      look:'Look at the straight lines radiating from the charge.',
+      theory:'A field line shows the direction in which a small positive test charge would be pushed. With the source at rest, this pattern does not change.',
+      detail:'Field lines are a way to draw a vector field, not physical strings. This tour uses the relativistic field calculation throughout. At these modest speeds, contraction is subtle.'},
+    {title:'One gentle boost',start:0.3,end:2.1,
+      action:'Watch one smooth push to the right, followed by coasting. The scene will pause automatically.',
+      look:'The charge moves before the distant field changes. A dashed marker remembers where it started.',
+      theory:'A change in the charge’s motion cannot affect the whole field instantly. The news travels outward at the speed of light, c.',
+      detail:'The push has a smooth beginning and end. The charge reaches 0.28c, then continues at constant velocity. The camera stays fixed so the field’s delay is easy to see.'},
+    {title:'Old field, new field',start:2.1,end:2.1,
+      action:'Compare the two sides of the news boundary. Follow the highlighted field line through the bend.',
+      look:'The outer straight segment still traces back to the starting position. The inner segment connects to the moving charge.',
+      theory:'Outside the first-news boundary, the field is still the original field of a charge at rest. The transition between the old and updated regions contains the travelling disturbance.',
+      detail:'“Old position” works here because the charge started at rest. More generally the unupdated field reflects the old motion. For steady motion, the electric field points radially from the charge’s present position despite the finite news speed.'},
+    {title:'The bend travels away',start:2.1,end:3.35,
+      action:'Follow the highlighted bend as it moves outward. The two arrows show different things.',
+      look:'The disturbance travels outward at c. Its radiation electric field points sideways to that direction.',
+      theory:'Acceleration produces an electromagnetic disturbance that can carry energy away. The sideways field is the radiation contribution to the electric field.',
+      detail:'A magnetic field accompanies this electric field, although it is not drawn here. The radiation field falls as 1/r far from the charge. Finite delay alone is not a derivation of radiation; these bends follow the moving-charge field equations.'},
+    {title:'Coasting makes no new pulse',start:3.35,end:4.8,
+      action:'The push has ended. Keep watching the charge and the old pulse.',
+      look:'The speed remains 0.28c and acceleration is zero. The pulse keeps travelling away.',
+      theory:'Steady motion does not generate new radiation. Radiation from an earlier acceleration continues travelling after that acceleration is over.',
+      detail:'A steadily moving charge can still have a contracted-looking field. That steady field shape is different from a newly emitted radiation pulse. The news speed remains c in both display modes.'},
+    {title:'When the news arrives',start:0,end:4.4,
+      action:'Replay the same push with two spring-mounted detectors, initially settled in the static field.',
+      look:'The near detector receives the news first. The farther detector’s extra motion begins later.',
+      theory:'Each detector feels the electric field at its own location. It cannot respond to a change before that change reaches it.',
+      detail:'The badges mark the arrival of the first news, not the peak of the wobble. The springs add their own response time. These particles respond to the total electric field; their redness shows displacement, not radiation energy. Their response is amplified for visibility.'},
+    {title:'From one pulse to a wave',start:0,end:14,
+      action:'Watch a few smooth sideways oscillations, then choose “Try it yourself” to take over.',
+      look:'Repeated acceleration sends out a sequence of disturbances. The test particles respond as the changing field reaches them.',
+      theory:'Changing direction is acceleration too. Try a short boost, release to coast, then turn: watch where each new disturbance begins.',
+      detail:'Hold one finger or the left mouse button to boost toward the pointer. Farther away gives more boost. Right-drag or use two fingers to pan; pinch or scroll to zoom. Space pauses. You can replay this tour whenever you like.'}
+  ];
+  const GREETING='TEST PARTICLES';
+  const LETTERS={
+    A:['01110','10001','10001','11111','10001','10001','10001'],
+    B:['11110','10001','10001','11110','10001','10001','11110'],
+    C:['01111','10000','10000','10000','10000','10000','01111'],
+    D:['11110','10001','10001','10001','10001','10001','11110'],
+    E:['11111','10000','10000','11110','10000','10000','11111'],
+    H:['10001','10001','10001','11111','10001','10001','10001'],
+    I:['11111','00100','00100','00100','00100','00100','11111'],
+    L:['10000','10000','10000','10000','10000','10000','11111'],
+    P:['11110','10001','10001','11110','10000','10000','10000'],
+    R:['11110','10001','10001','11110','10100','10010','10001'],
+    S:['01111','10000','10000','01110','00001','00001','11110'],
+    T:['11111','00100','00100','00100','00100','00100','00100'],
+    Y:['10001','10001','01010','00100','00100','00100','00100']
+  };
+
+  function state(t=0,x=0,y=0,bx=0,by=0,ax=0,ay=0,psi=0) { return {t,x,y,bx,by,ax,ay,psi}; }
+  function snapshot(s) { return state(s.t,s.x,s.y,s.bx,s.by,s.ax,s.ay,s.psi); }
+  function reset() {
+    clearCanvasPointers();
+    sim = Object.assign(state(), {fx:0,fy:0,pointerX:0,pointerY:0,lastInputX:0,lastInputY:0});
+    history = [snapshot(sim)]; fronts = [];
+    keys.clear(); pointerKeys.clear(); syncKeyButtons();
+    camera.x=0; camera.y=0; camera.zoom=DEFAULT_ZOOM; camera.follow=true;
+    accumulator=0; paused=false;
+    $('welcome').classList.toggle('used',!automaticMotion);
+    $('recenter').textContent='Recenter';
+    createGreetingProbes();
+    updatePause(); dirty=true;
+  }
+
+  // Gentle steering with a smooth subluminal speed limit, and NO velocity drag.
+  // Acceleration is reduced only for the outward component near the speed limit.
+  function acceleration(bx,by,fx,fy) {
+    const dot = bx*fx+by*fy;
+    const reduction = Math.max(0,dot)/(MAX_BETA*MAX_BETA);
+    return [fx-bx*reduction, fy-by*reduction];
+  }
+  function step(dt) {
+    if(tour.active) {advanceTour(dt);return;}
+    if(automaticMotion && !keys.size && !pointerKeys.size && !canvasPointers.size) {
+      const t=sim.t+dt, ramp=Math.exp(-t/0.6);
+      const phase=0.9*(t-0.6*(1-ramp)), rate=0.9*(1-ramp);
+      sim.t=t;sim.x=100*(1-Math.cos(phase));sim.y=0;
+      sim.bx=100*Math.sin(phase)*rate/C;sim.by=0;
+      sim.ax=100*(Math.cos(phase)*rate*rate+Math.sin(phase)*1.5*ramp)/C;sim.ay=0;
+      sim.fx=sim.ax/(1-sim.bx*sim.bx/(MAX_BETA*MAX_BETA));sim.fy=0;
+      recordStep(dt);return;
+    }
+    if(keys.size || pointerKeys.size || canvasPointers.size) automaticMotion=false;
+    let ix = Number(keys.has('KeyD'))-Number(keys.has('KeyA'));
+    let iy = Number(keys.has('KeyS'))-Number(keys.has('KeyW'));
+    for (const key of pointerKeys.values()) {
+      if (!keys.has(key)) { ix += (key==='KeyD')-(key==='KeyA'); iy += (key==='KeyS')-(key==='KeyW'); }
+    }
+    const keyLength=Math.hypot(ix,iy);
+    if(keyLength) { ix/=keyLength; iy/=keyLength; $('welcome').classList.add('used'); }
+    // Keep pointer magnitude proportional to CSS-screen distance. Two cascaded
+    // eases soften press/release and sharp pointer turns without changing WASD.
+    const [px,py]=pointerBoost(), pointerEased=1-Math.exp(-dt/POINTER_EASE);
+    sim.pointerX+=(px-sim.pointerX)*pointerEased;sim.pointerY+=(py-sim.pointerY)*pointerEased;
+    if(px===0 && py===0 && Math.hypot(sim.pointerX,sim.pointerY)<0.0001) sim.pointerX=sim.pointerY=0;
+    ix+=sim.pointerX;iy+=sim.pointerY;
+    const inputLength=Math.hypot(ix,iy);
+    if((ix!==sim.lastInputX || iy!==sim.lastInputY) && (inputLength || Math.hypot(sim.fx,sim.fy)>0.05) && (!fronts.length || sim.t-fronts[fronts.length-1].t>0.18)) {
+      fronts.push({t:sim.t,x:sim.x,y:sim.y});
+      if(fronts.length>18) fronts.shift();
+    }
+    sim.lastInputX=ix; sim.lastInputY=iy;
+    const eased=1-Math.exp(-dt/EASE);
+    sim.fx+=(BOOST*boostStrength*ix-sim.fx)*eased; sim.fy+=(BOOST*boostStrength*iy-sim.fy)*eased;
+    if(!inputLength && Math.hypot(sim.fx,sim.fy)<0.0008) sim.fx=sim.fy=0;
+    const [a0x,a0y]=acceleration(sim.bx,sim.by,sim.fx,sim.fy);
+    let [ax,ay]=acceleration(sim.bx+a0x*dt/2,sim.by+a0y*dt/2,sim.fx,sim.fy);
+    let nx=sim.bx+ax*dt, ny=sim.by+ay*dt;
+    const speed=Math.hypot(nx,ny);
+    if(speed>MAX_BETA) { nx*=MAX_BETA/speed; ny*=MAX_BETA/speed; }
+    ax=(nx-sim.bx)/dt; ay=(ny-sim.by)/dt;
+    const mx=(sim.bx+nx)/2, my=(sim.by+ny)/2;
+    const gamma=1/Math.sqrt(1-mx*mx-my*my);
+    // Fermi-Walker transport of the initial field-line labels. This accumulated
+    // Thomas rotation is essential for exact line tangency when steering turns.
+    sim.psi -= gamma*gamma/(gamma+1)*(mx*ay-my*ax)*dt;
+    sim.x+=C*mx*dt; sim.y+=C*my*dt; sim.t+=dt;
+    sim.bx=nx; sim.by=ny; sim.ax=ax; sim.ay=ay;
+    recordStep(dt);
+  }
+  function recordStep(dt) {
+    const {ax,ay}=sim,copy=snapshot(sim), n=history.length;
+    // A coasting interval is a straight characteristic segment: keep its ends,
+    // instead of accumulating identical-velocity samples indefinitely.
+    if(n>1 && ax===0 && ay===0 && history[n-1].ax===0 && history[n-1].ay===0 && history[n-2].ax===0 && history[n-2].ay===0) history[n-1]=copy;
+    else history.push(copy);
+    stepProbes(dt);
+  }
+
+  function sourceAt(t) {
+    if(t<=0) return state(t);
+    if(t>=sim.t) return sim;
+    let lo=0,hi=history.length-1;
+    while(hi-lo>1) {const mid=(lo+hi)>>1;if(history[mid].t<=t)lo=mid;else hi=mid;}
+    const a=history[lo],b=history[hi],h=b.t-a.t,u=(t-a.t)/h;
+    if(a.bx===b.bx && a.by===b.by) return state(t,a.x+C*a.bx*(t-a.t),a.y+C*a.by*(t-a.t),a.bx,a.by,0,0,a.psi);
+    // Hermite interpolation keeps position and velocity consistent across the
+    // saved trajectory. Constant-velocity intervals remain exact above.
+    const u2=u*u,u3=u2*u,H0=2*u3-3*u2+1,H1=u3-2*u2+u,H2=-2*u3+3*u2,H3=u3-u2;
+    const D0=(6*u2-6*u)/h,D1=3*u2-4*u+1,D2=(-6*u2+6*u)/h,D3=3*u2-2*u;
+    const A0=(12*u-6)/(h*h),A1=(6*u-4)/h,A2=(-12*u+6)/(h*h),A3=(6*u-2)/h;
+    return state(t,
+      H0*a.x+H1*h*C*a.bx+H2*b.x+H3*h*C*b.bx,
+      H0*a.y+H1*h*C*a.by+H2*b.y+H3*h*C*b.by,
+      (D0*a.x+D2*b.x)/C+D1*a.bx+D3*b.bx,
+      (D0*a.y+D2*b.y)/C+D1*a.by+D3*b.by,
+      (A0*a.x+A2*b.x)/C+A1*a.bx+A3*b.bx,
+      (A0*a.y+A2*b.y)/C+A1*a.by+A3*b.by,
+      a.psi+(b.psi-a.psi)*u);
+  }
+  function retardedSource(x,y) {
+    // Outside the first light sphere the source is still seen at rest at (0,0).
+    const initialTime=sim.t-Math.hypot(x,y)/C;
+    if(initialTime<=0) return state(initialTime);
+    let lo=0,hi=sim.t,t=Math.max(0,sim.t-Math.hypot(x-sim.x,y-sim.y)/C),s;
+    for(let i=0;i<32;i++) {
+      s=sourceAt(t);
+      const dx=x-s.x,dy=y-s.y,r=Math.hypot(dx,dy),error=t+r/C-sim.t;
+      if(Math.abs(error)<1e-8) return s;
+      if(error>0)hi=t;else lo=t;
+      const kappa=r>1e-12 ? 1-(dx*s.bx+dy*s.by)/r : 1;
+      const next=t-error/kappa;
+      t=next>lo && next<hi ? next : (lo+hi)/2;
+    }
+    return sourceAt(t);
+  }
+  function electricField(x,y) {
+    const s=retardedSource(x,y),dx=x-s.x,dy=y-s.y,r=Math.hypot(dx,dy);
+    if(r<1e-9)return [0,0];
+    const nx=dx/r,ny=dy/r,b2=s.bx*s.bx+s.by*s.by;
+    const kappa=1-nx*s.bx-ny*s.by,ax=s.ax,ay=s.ay,age=sim.t-s.t;
+    const vx=nx-s.bx,vy=ny-s.by;
+    // A small finite core removes the point singularity only for the probes.
+    const radius2=r*r+20*20;
+    if(relativistic) {
+      const da=nx*ax+ny*ay,den=kappa*kappa*kappa*radius2;
+      return [((1-b2)*vx+age*(vx*da-kappa*ax))/den,
+              ((1-b2)*vy+age*(vy*da-kappa*ay))/den];
+    }
+    // Match the uncontracted construction's local line tangent and give a
+    // steadily coasting source an isotropic inverse-square comparison field.
+    const lambda=Math.hypot(vx,vy),ux=vx/lambda,uy=vy/lambda;
+    const dot=s.bx*ux+s.by*uy,da=ax*ux+ay*uy,root=Math.sqrt(dot*dot+1-b2);
+    const ld=-da+(dot*da-s.bx*ax-s.by*ay)/root,den=radius2*lambda*lambda*lambda;
+    return [(vx-age*(ax+ld*ux))/den,(vy-age*(ay+ld*uy))/den];
+  }
+  function probeForce(x,y) {
+    const e=electricField(x,y),mag=Math.hypot(e[0],e[1]);
+    // Smooth saturation keeps close encounters small and the springs stable.
+    const scale=mag>0 ? PROBE_RESPONSE*PROBE_MAX_FORCE*Math.tanh(PROBE_GAIN*mag/PROBE_MAX_FORCE)/mag : 0;
+    return [e[0]*scale,e[1]*scale];
+  }
+  function newProbe(ax,ay) {
+    const p={ax,ay,x:ax,y:ay,vx:0,vy:0};
+    // Start at static balance rather than introducing a spurious initial pulse.
+    for(let i=0;i<20;i++) {
+      const [fx,fy]=probeForce(p.x,p.y);
+      p.x+=(ax+fx/PROBE_SPRING-p.x)*0.5;p.y+=(ay+fy/PROBE_SPRING-p.y)*0.5;
+    }
+    return p;
+  }
+  function createGreetingProbes() {
+    activeProbes=[];
+    const narrow=width<760,lines=narrow?['TEST','PARTICLES']:[GREETING];
+    const columns=text=>[...text].reduce((n,ch)=>n+(ch===' '?4:6),0)-1;
+    const maxColumns=Math.max(...lines.map(columns));
+    let pixels=Math.min(9,(width-Math.max(40,width*0.14))/maxColumns);
+    if(narrow)pixels=Math.min(pixels,Math.max(100,height*0.45-145)/((lines.length-1)*10+6));
+    const top=narrow?180:Math.max(140,height*0.18-3*pixels);
+    for(let row=0;row<lines.length;row++) {
+      const text=lines[row],left=(width-(columns(text)-1)*pixels)/2;
+      let column=0;
+      for(const ch of text) {
+        if(ch===' ') {column+=4;continue;}
+        const glyph=LETTERS[ch];
+        for(let y=0;y<7;y++)for(let x=0;x<5;x++)if(glyph[y][x]==='1') {
+          const sx=left+(column+x)*pixels,sy=top+(row*10+y)*pixels;
+          const p=newProbe((sx-width/2)/DEFAULT_ZOOM,(sy-height/2)/DEFAULT_ZOOM);
+          p.spacing=pixels/DEFAULT_ZOOM;activeProbes.push(p);
+        }
+        column+=6;
+      }
+    }
+    // These letter-shaped anchors are fixed in the laboratory. Only reset
+    // rebuilds the layout; zooming, panning and coasting never move the anchors.
+  }
+  function stepProbes(dt) {
+    // Semi-implicit integration of m*x'' = qE - k*(x-anchor) - damping*x'.
+    for(const p of activeProbes) {
+      const [fx,fy]=probeForce(p.x,p.y);
+      p.vx+=(fx-PROBE_SPRING*(p.x-p.ax)-PROBE_DAMPING*p.vx)*dt;
+      p.vy+=(fy-PROBE_SPRING*(p.y-p.ay)-PROBE_DAMPING*p.vy)*dt;
+      p.x+=p.vx*dt;p.y+=p.vy*dt;
+    }
+  }
+
+  // The lesson prescribes a smooth trajectory, but uses the same saved history,
+  // field equations and spring integration as free play. Replays rebuild all of it.
+  function tourMotion(t) {
+    if(tour.index===6) {
+      const ramp=Math.exp(-t/0.65),phase=1.2*(t-0.65*(1-ramp)),rate=1.2*(1-ramp);
+      return state(t,45*(1-Math.cos(phase)),0,45*Math.sin(phase)*rate/C,0,
+        45*(Math.cos(phase)*rate*rate+Math.sin(phase)*(1.2/0.65)*ramp)/C,0);
+    }
+    const duration=TOUR_BOOST_END-TOUR_BOOST_START;
+    if(t<=TOUR_BOOST_START)return state(t);
+    if(t>=TOUR_BOOST_END)return state(t,C*TOUR_BETA*(duration/2+t-TOUR_BOOST_END),0,TOUR_BETA);
+    const u=(t-TOUR_BOOST_START)/duration;
+    const b=TOUR_BETA*(10*u**3-15*u**4+6*u**5);
+    const x=C*TOUR_BETA*duration*(2.5*u**4-3*u**5+u**6);
+    return state(t,x,0,b,0,TOUR_BETA*30*u*u*(1-u)*(1-u)/duration);
+  }
+  function writeTourState(t) {
+    const dt=t-sim.t;
+    Object.assign(sim,tourMotion(t));
+    // Retain a compatible force for a smooth handoff into free steering.
+    sim.fx=sim.ax*sim.bx>0?sim.ax/(1-sim.bx*sim.bx/(MAX_BETA*MAX_BETA)):sim.ax;
+    sim.fy=0;sim.pointerX=sim.pointerY=0;
+    recordStep(dt);
+  }
+  function advanceTour(dt) {
+    const end=tourSteps[tour.index].end;
+    if(sim.t<end)writeTourState(Math.min(end,sim.t+dt));
+    if(sim.t>=end-1e-9) {
+      paused=true;accumulator=0;updatePause();updateTourPlayback();dirty=true;
+    }
+  }
+  function syncSettings() {
+    $('sim-speed').value=simSpeed;$('sim-speed-value').textContent=simSpeed.toFixed(2)+'×';styleRange($('sim-speed'));
+    $('boost-strength').value=boostStrength;$('boost-strength-value').textContent=boostStrength.toFixed(2)+'×';styleRange($('boost-strength'));
+    $('contraction').setAttribute('aria-checked',String(relativistic));
+    $('mode-note').textContent=relativistic?'On · field crowds sideways':'Off · even radial spacing';
+    $('test-particles').setAttribute('aria-pressed',String(showProbes));
+    $('test-particles').textContent=showProbes?'Test particles: on':'Test particles: off';
+  }
+  function startTour() {
+    if(tour.active){setTourMinimized(false);return;}
+    tour.saved={sim:{...sim},history,fronts,probes:activeProbes,camera:{...camera},paused,simSpeed,boostStrength,relativistic,showProbes,automaticMotion};
+    tour.active=true;tour.minimized=false;automaticMotion=false;
+    document.body.classList.add('touring');$('guided-tour').setAttribute('aria-expanded','true');
+    loadTourStep(0);
+  }
+  function endTour(keepScene=false) {
+    if(!tour.active)return;
+    const saved=tour.saved;clearKeys();tour.active=false;tour.saved=null;tour.detectors=[];
+    document.body.classList.remove('touring');$('tour-card').hidden=true;$('tour-mini').hidden=true;
+    $('guided-tour').setAttribute('aria-expanded','false');
+    simSpeed=saved.simSpeed;boostStrength=saved.boostStrength;relativistic=saved.relativistic;showProbes=saved.showProbes;
+    if(keepScene) {
+      automaticMotion=false;paused=false;
+      camera.follow=true;
+      // The final chapter's letters are already part of this continuous scene.
+    } else {
+      sim=saved.sim;history=saved.history;fronts=saved.fronts;activeProbes=saved.probes;
+      Object.assign(camera,saved.camera);paused=saved.paused;automaticMotion=saved.automaticMotion;
+    }
+    $('welcome').classList.toggle('used',!automaticMotion);
+    $('recenter').textContent=camera.follow?'Recenter':'Follow charge';
+    accumulator=0;lastFrame=0;syncSettings();updatePause();dirty=true;
+    if(keepScene)canvas.focus({preventScroll:true});else $('guided-tour').focus({preventScroll:true});
+  }
+  function updateTourPlayback() {
+    if(!tour.active)return;
+    const step=tourSteps[tour.index],still=step.end===step.start,finished=sim.t>=step.end-1e-9;
+    $('tour-play').disabled=still;
+    $('tour-play').textContent=still?'Paused':finished?'Play again':paused?'Play':'Pause';
+    const label=still?'Take your time to look.':finished?'Scene complete · ready for the next step.':paused?'Paused · pan or zoom to inspect.':'Playing · pauses automatically.';
+    if($('tour-state').textContent!==label)$('tour-state').textContent=label;
+    $('tour-mini-state').textContent=paused?'Paused — open when ready':'Playing — will pause automatically';
+    if(tour.index===5)tour.detectors.forEach((p,i)=>{
+      const arrived=sim.t>=p.arrival,box=$(i===0?'tour-near':'tour-far');
+      box.classList.toggle('arrived',arrived);box.querySelector('span').textContent=arrived?'News has arrived':'Waiting for news';
+    });
+  }
+  function renderTourCard() {
+    const s=tourSteps[tour.index];
+    $('tour-card').hidden=tour.minimized;$('tour-mini').hidden=!tour.minimized;
+    $('tour-step-label').textContent=`Guided tour · ${tour.index+1} / ${tourSteps.length}`;
+    $('tour-mini-step').textContent=`Step ${tour.index+1} / ${tourSteps.length}`;
+    $('tour-title').textContent=s.title;$('tour-action').textContent=s.action;$('tour-look').textContent=s.look;$('tour-theory').textContent=s.theory;
+    $('tour-detail-text').textContent=s.detail;$('tour-details').open=false;
+    $('tour-progress').innerHTML=tourSteps.map((_,i)=>`<i class="${i===tour.index?'current':i<tour.index?'past':''}"></i>`).join('');
+    $('tour-back').disabled=tour.index===0;
+    $('tour-next').textContent=tour.index===6?'Try it yourself':'Next →';
+    $('tour-detectors').hidden=tour.index!==5;$('tour-content').scrollTop=0;
+  }
+  function fitTourView() {
+    if(!tour.active)return;
+    const side=width>=900||(height<=560&&width>=600);
+    const panel=$(tour.minimized?'tour-mini':'tour-card').getBoundingClientRect();
+    const right=side&&!tour.minimized?panel.left-22:width-18;
+    const bottom=side?height-65:panel.top-12;
+    const top=height<=560?125:155;
+    tour.rect={left:18,top,width:Math.max(150,right-18),height:Math.max(110,bottom-top)};
+    const r=tour.rect;
+    camera.zoom=Math.max(0.10,Math.min(0.92,(r.width-28)/1100,(r.height-24)/950));
+    const centerX=r.left+r.width/2,centerY=r.top+r.height/2;
+    camera.x=65-(centerX-width/2)/camera.zoom;
+    camera.y=-65-(centerY-height/2)/camera.zoom;
+    camera.follow=false;dirty=true;updateHud();
+  }
+  function createTourDetectors() {
+    activeProbes=[[80,-180],[80,-335]].map(([x,y],i)=>{
+      const p=newProbe(x,y);p.spacing=24;p.label=i?'Far':'Near';
+      // Converge the static equilibrium before the scripted source begins moving.
+      for(let j=0;j<100;j++) {const [fx,fy]=probeForce(p.x,p.y);p.x+=(x+fx/PROBE_SPRING-p.x)*0.5;p.y+=(y+fy/PROBE_SPRING-p.y)*0.5;}
+      p.initialX=p.x;p.initialY=p.y;p.arrival=TOUR_BOOST_START+Math.hypot(p.x,p.y)/C;
+      return p;
+    });
+    tour.detectors=activeProbes;
+  }
+  function createTourGreeting() {
+    const r=tour.rect,lines=r.width<550?['TEST','PARTICLES']:[GREETING];
+    const columns=text=>[...text].reduce((n,ch)=>n+(ch===' '?4:6),0)-1;
+    const pixels=Math.min(9,(r.width-36)/Math.max(...lines.map(columns)),r.height*0.32/((lines.length-1)*10+7));
+    activeProbes=[];
+    lines.forEach((line,row)=>{
+      let col=0;const left=r.left+(r.width-(columns(line)-1)*pixels)/2;
+      for(const ch of line) {
+        if(ch===' '){col+=4;continue;}
+        LETTERS[ch].forEach((bits,y)=>[...bits].forEach((bit,x)=>{
+          if(bit!=='1')return;
+          const sx=left+(col+x)*pixels,sy=r.top+20+(row*10+y)*pixels;
+          const p=newProbe(camera.x+(sx-width/2)/camera.zoom,camera.y+(sy-height/2)/camera.zoom);
+          p.spacing=pixels/camera.zoom;activeProbes.push(p);
+        }));col+=6;
+      }
+    });
+  }
+  function loadTourStep(index) {
+    tour.index=Math.max(0,Math.min(tourSteps.length-1,index));clearKeys();automaticMotion=false;
+    reset();relativistic=true;simSpeed=tour.index===6?0.9:0.35;
+    activeProbes=[];tour.detectors=[];showProbes=tour.index>=5;
+    renderTourCard();fitTourView();
+    if(tour.index===5)createTourDetectors();else if(tour.index===6)createTourGreeting();
+    const target=tourSteps[tour.index].start;
+    while(sim.t<target-1e-9)writeTourState(Math.min(target,sim.t+DT));
+    paused=tourSteps[tour.index].end===target;
+    accumulator=0;lastFrame=0;syncSettings();updatePause();updateTourPlayback();dirty=true;
+    if(!tour.minimized)$('tour-title').focus({preventScroll:true});
+  }
+  function setTourMinimized(minimized) {
+    if(!tour.active)return;
+    tour.minimized=minimized;$('tour-card').hidden=minimized;$('tour-mini').hidden=!minimized;
+    fitTourView();updateTourPlayback();
+    $(minimized?'tour-restore':'tour-minimize').focus({preventScroll:true});
+  }
+  function toggleTourPlayback() {
+    const s=tourSteps[tour.index];if(s.start===s.end)return;
+    if(sim.t>=s.end-1e-9){loadTourStep(tour.index);return;}
+    paused=!paused;accumulator=0;updatePause();updateTourPlayback();dirty=true;
+  }
+
+  // A line label is a rest-frame angle phi. At observation time t its points are
+  // X(s,t)=q(s)+c(t-s)n(s), with s the emission time and |n|=1.
+  // Each saved point therefore moves at EXACTLY c in the laboratory frame.
+  // In relativistic mode the aberrated, Fermi-Walker-transported n satisfies
+  // dn/ds = [(1-n.beta) betaDot-(n-beta)(n.betaDot)]/(1-beta^2).
+  // Hence dX/ds is antiparallel to the full Lienard-Wiechert electric field:
+  // E ∝ (1-beta^2)(n-beta) + (t-s)[(n-beta)(n.betaDot)-(1-n.beta)betaDot].
+  // No detached radial rays, whole-scene squash, or instantaneous news updates.
+  function direction(s,ux,uy,rel=relativistic) {
+    const b2=s.bx*s.bx+s.by*s.by, root=Math.sqrt(1-b2);
+    if(rel) {
+      const cp=Math.cos(s.psi), sp=Math.sin(s.psi);
+      const rx=cp*ux-sp*uy, ry=sp*ux+cp*uy, dot=s.bx*rx+s.by*ry;
+      const f=1+dot/(1+root), den=1+dot;
+      return [(root*rx+f*s.bx)/den,(root*ry+f*s.by)/den];
+    }
+    // Educational uncontracted mode: n=beta+lambda*u, |n|=1, so a coasting
+    // charge has evenly spaced radial lines while every signal still moves at c.
+    const dot=s.bx*ux+s.by*uy;
+    const lambda=-dot+Math.sqrt(dot*dot+1-b2);
+    return [s.bx+lambda*ux,s.by+lambda*uy];
+  }
+  function linePoint(s,t,ux,uy,rel=relativistic) {
+    const [nx,ny]=direction(s,ux,uy,rel), r=C*(t-s.t);
+    return [s.x+r*nx,s.y+r*ny];
+  }
+
+  function resize() {
+    clearCanvasPointers();
+    width=innerWidth; height=innerHeight; dpr=Math.min(devicePixelRatio||1,2);
+    canvas.width=Math.round(width*dpr); canvas.height=Math.round(height*dpr);
+    if(sim && camera.follow && (Math.abs(sim.x-camera.x)*camera.zoom>width*0.33 || Math.abs(sim.y-camera.y)*camera.zoom>height*0.30)) {
+      camera.x=sim.x;camera.y=sim.y;
+    }
+    ctx.setTransform(dpr,0,0,dpr,0,0); dirty=true;
+    if(tour.active)fitTourView();
+  }
+  const toScreen=(x,y)=>[(x-camera.x)*camera.zoom+width/2,(y-camera.y)*camera.zoom+height/2];
+  function follow(dt) {
+    if(!camera.follow) return;
+    const safeX=width*0.205/camera.zoom, safeY=height*0.155/camera.zoom;
+    const dx=sim.x-camera.x, dy=sim.y-camera.y;
+    const amount=1-Math.exp(-dt*5);
+    if(Math.abs(dx)>safeX) camera.x+=(dx-Math.sign(dx)*safeX)*amount;
+    if(Math.abs(dy)>safeY) camera.y+=(dy-Math.sign(dy)*safeY)*amount;
+  }
+  function drawGrid() {
+    const z=camera.zoom;
+    const raw=85/z, power=10**Math.floor(Math.log10(raw));
+    const spacing=raw/power<2 ? 2*power : raw/power<5 ? 5*power : 10*power;
+    const pix=spacing*z;
+    const ox=((width/2-camera.x*z)%pix+pix)%pix, oy=((height/2-camera.y*z)%pix+pix)%pix;
+    ctx.strokeStyle='#5e7fa011'; ctx.lineWidth=0.7; ctx.beginPath();
+    for(let x=ox;x<width;x+=pix) {ctx.moveTo(x,0);ctx.lineTo(x,height);}
+    for(let y=oy;y<height;y+=pix) {ctx.moveTo(0,y);ctx.lineTo(width,y);}
+    ctx.stroke();
+    // A laboratory-fixed origin makes automatic camera motion legible.
+    const [x,y]=toScreen(0,0);
+    ctx.strokeStyle='#7a93ac45'; ctx.lineWidth=1; ctx.beginPath();
+    ctx.moveTo(x-5,y);ctx.lineTo(x+5,y);ctx.moveTo(x,y-5);ctx.lineTo(x,y+5);ctx.stroke();
+    if(Math.hypot(sim.x,sim.y)*z>45 && x>15 && x<width-35 && y>120 && y<height-155) {
+      ctx.font='9px system-ui';ctx.fillStyle='#61748b';ctx.fillText('origin',x+9,y+3);
+    }
+  }
+
+  function visibleSamples() {
+    const radius=Math.hypot(width,height)/(2*camera.zoom)+45/camera.zoom;
+    const samples=[];
+    // Past light spheres are nested because |v|<c. Stop only once an entire
+    // sphere encloses the viewport; older history then cannot affect this view.
+    for(let i=history.length-1;i>=0;i--) {
+      const s=history[i], age=sim.t-s.t;
+      samples.push(s);
+      if(C*age>Math.hypot(s.x-camera.x,s.y-camera.y)+radius) break;
+    }
+    if(samples[samples.length-1].t===0) {
+      const prehistoryAge=Math.max(sim.t+1,(Math.hypot(camera.x,camera.y)+radius)/C+1);
+      samples.push(state(sim.t-prehistoryAge));
+    }
+    return samples;
+  }
+  function simplifyShells(shells) {
+    if(shells.length<40) return shells;
+    // Keep the saved motion intact. Reduce ONLY the drawing geometry, using
+    // subpixel error corridors for 32 angular probes and two color features.
+    // This retains thin acceleration pulses while long straight spans collapse
+    // to single segments, including when zoomed far out after many boosts.
+    const count=32, dimensions=count*2+2, tolerance=0.28;
+    const cos=new Float64Array(count),sin=new Float64Array(count);
+    for(let k=0;k<count;k++){cos[k]=Math.cos(TAU*k/count);sin[k]=Math.sin(TAU*k/count);}
+    const features=(h,out)=>{
+      const s=h.s;
+      for(let k=0;k<count;k++) {
+        let nx,ny;
+        if(relativistic) {
+          const rx=h.cp*cos[k]-h.sp*sin[k],ry=h.sp*cos[k]+h.cp*sin[k],dot=s.bx*rx+s.by*ry;
+          const f=1+dot/(1+h.root),den=1+dot;
+          nx=(h.root*rx+f*s.bx)/den;ny=(h.root*ry+f*s.by)/den;
+        } else {
+          const dot=s.bx*cos[k]+s.by*sin[k],lambda=-dot+Math.sqrt(dot*dot+h.root*h.root);
+          nx=s.bx+lambda*cos[k];ny=s.by+lambda*sin[k];
+        }
+        out[k*2]=h.x+h.r*nx;out[k*2+1]=h.y+h.r*ny;
+      }
+      const a=Math.hypot(s.ax,s.ay),r=h.age/(h.root*h.root),heat=16*r/(1+r*a);
+      out[count*2]=s.ax*heat;out[count*2+1]=s.ay*heat;
+    };
+    let start=0;
+    const kept=[shells[0]],origin=new Float64Array(dimensions),previous=new Float64Array(dimensions),point=new Float64Array(dimensions);
+    const low=new Float64Array(dimensions).fill(-Infinity),high=new Float64Array(dimensions).fill(Infinity);
+    features(shells[0],origin);previous.set(origin);
+    for(let j=1;j<shells.length;j++) {
+      features(shells[j],point);
+      let span=shells[j].age-shells[start].age,violates=false;
+      for(let k=0;k<dimensions;k++) {
+        const slope=(point[k]-origin[k])/span;
+        if(slope<low[k] || slope>high[k]) {violates=true;break;}
+      }
+      if(violates && j>start+1) {
+        kept.push(shells[j-1]);start=j-1;origin.set(previous);
+        low.fill(-Infinity);high.fill(Infinity);span=shells[j].age-shells[start].age;
+      }
+      for(let k=0;k<dimensions;k++) {
+        low[k]=Math.max(low[k],(point[k]-origin[k]-tolerance)/span);
+        high[k]=Math.min(high[k],(point[k]-origin[k]+tolerance)/span);
+      }
+      previous.set(point);
+    }
+    if(kept[kept.length-1]!==shells[shells.length-1])kept.push(shells[shells.length-1]);
+    return kept;
+  }
+  function drawField() {
+    const samples=visibleSamples(), z=camera.zoom, now=sim.t;
+    const base=new Path2D(), warm=Array.from({length:6},()=>new Path2D());
+    const arrowPath=new Path2D(); drawnPoints=0;
+    // Precompute source quantities once per shell, shared by every line.
+    const shells=simplifyShells(samples.map(s=>{
+      const b2=s.bx*s.bx+s.by*s.by;
+      return {s,age:now-s.t,r:C*(now-s.t)*z,x:(s.x-camera.x)*z+width/2,y:(s.y-camera.y)*z+height/2,
+        root:Math.sqrt(1-b2),cp:Math.cos(s.psi),sp:Math.sin(s.psi)};
+    }));
+    const arrowRadius=Math.min(width,height)*0.185;
+    const chargeX=(sim.x-camera.x)*z+width/2,chargeY=(sim.y-camera.y)*z+height/2;
+    // Arrow tips share a circle, contracted along velocity into an ellipse in
+    // relativistic mode. The contour only places markers on the existing field.
+    const ellipseFactor=relativistic ? 1/(1-sim.bx*sim.bx-sim.by*sim.by) : 0;
+    const ellipseDot=(ax,ay,bx,by)=>ax*bx+ay*by+ellipseFactor*(ax*sim.bx+ay*sim.by)*(bx*sim.bx+by*sim.by);
+    for(let line=0;line<lineCount;line++) {
+      const angle=TAU*line/lineCount, ux=Math.cos(angle), uy=Math.sin(angle);
+      let prevX,prevY,prevHeat=0,warmBin=-1,arrowDone=false;
+      for(let j=0;j<shells.length;j++) {
+        const h=shells[j],s=h.s;
+        let nx,ny,ndx=0,ndy=0;
+        if(relativistic) {
+          const rx=h.cp*ux-h.sp*uy,ry=h.sp*ux+h.cp*uy,dot=s.bx*rx+s.by*ry;
+          const f=1+dot/(1+h.root),den=1+dot;
+          nx=(h.root*rx+f*s.bx)/den; ny=(h.root*ry+f*s.by)/den;
+          const kappa=1-nx*s.bx-ny*s.by,nda=nx*s.ax+ny*s.ay,inv=1/(h.root*h.root);
+          ndx=(kappa*s.ax-(nx-s.bx)*nda)*inv;
+          ndy=(kappa*s.ay-(ny-s.by)*nda)*inv;
+        } else {
+          const dot=s.bx*ux+s.by*uy,root=Math.sqrt(dot*dot+h.root*h.root),lambda=-dot+root;
+          nx=s.bx+lambda*ux; ny=s.by+lambda*uy;
+          const da=s.ax*ux+s.ay*uy;
+          const ld=-da+(dot*da-s.bx*s.ax-s.by*s.ay)/root;
+          ndx=s.ax+ld*ux; ndy=s.ay+ld*uy;
+        }
+        const x=h.x+h.r*nx,y=h.y+h.r*ny;
+        const radiation=h.age*Math.hypot(ndx,ndy);
+        const heat=radiation/(radiation+Math.hypot(nx-s.bx,ny-s.by)+1e-12);
+        if(j===0) base.moveTo(x,y);
+        else {
+          base.lineTo(x,y);
+          const hot=(heat+prevHeat)/2;
+          if(hot>0.015) {
+            const bin=Math.min(5,Math.floor(Math.sqrt(hot)*6));
+            if(bin!==warmBin)warm[bin].moveTo(prevX,prevY);
+            warm[bin].lineTo(x,y);warmBin=bin;
+          } else warmBin=-1;
+          // Solve the segment/ellipse intersection exactly, even on bent lines.
+          const ax=prevX-chargeX,ay=prevY-chargeY,bx=x-chargeX,by=y-chargeY;
+          const r0=ellipseDot(ax,ay,ax,ay),r1=ellipseDot(bx,by,bx,by),radius2=arrowRadius*arrowRadius;
+          if(!arrowDone && r0<radius2 && r1>=radius2) {
+            const sx=x-prevX,sy=y-prevY,A=ellipseDot(sx,sy,sx,sy),B=ellipseDot(ax,ay,sx,sy),D=r0-radius2;
+            const root=Math.sqrt(Math.max(0,B*B-A*D));
+            const frac=Math.max(0,Math.min(1,B>=0 ? -D/(B+root) : (-B+root)/A));
+            const px=prevX+sx*frac,py=prevY+sy*frac;
+            const len=Math.hypot(sx,sy),dx=sx/len,dy=sy/len;
+            arrowPath.moveTo(px-8*dx+4*dy,py-8*dy-4*dx);arrowPath.lineTo(px,py);arrowPath.lineTo(px-8*dx-4*dy,py-8*dy+4*dx);
+            arrowDone=true;
+          }
+        }
+        prevX=x;prevY=y;prevHeat=heat;drawnPoints++;
+      }
+    }
+    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.strokeStyle=lineCount>112 ? '#70dacf82' : '#70dacfab';ctx.lineWidth=1.9;ctx.stroke(base);
+    for(let k=0;k<6;k++) {
+      const alpha=(k+1)/6;
+      ctx.strokeStyle=`rgba(255,164,78,${0.035+0.065*alpha})`;ctx.lineWidth=8;ctx.stroke(warm[k]);
+      ctx.strokeStyle=`rgba(255,${177+Math.round(alpha*24)},${104+Math.round(alpha*34)},${0.20+0.78*alpha})`;ctx.lineWidth=2.1+alpha*1.1;ctx.stroke(warm[k]);
+    }
+    ctx.strokeStyle='#9ce6d5aa';ctx.lineWidth=1.9;ctx.stroke(arrowPath);
+  }
+
+  function drawFronts() {
+    if(tour.active)return;
+    const maxRadius=Math.hypot(width,height)/camera.zoom;
+    ctx.lineWidth=0.65;ctx.setLineDash([3,7]);
+    for(const f of fronts) {
+      const radius=C*(sim.t-f.t), [x,y]=toScreen(f.x,f.y);
+      if(radius<12 || radius>Math.hypot(f.x-camera.x,f.y-camera.y)+maxRadius) continue;
+      ctx.strokeStyle='#bacfdb24';ctx.beginPath();ctx.arc(x,y,radius*camera.zoom,0,TAU);ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+  function drawParticle() {
+    const [x,y]=toScreen(sim.x,sim.y), speed=Math.hypot(sim.bx,sim.by);
+    const force=Math.min(1,Math.hypot(sim.ax,sim.ay)/BOOST);
+    const glow=ctx.createRadialGradient(x,y,0,x,y,70+force*24);
+    glow.addColorStop(0,'#d5fff45e');glow.addColorStop(0.22,'#71ded220');glow.addColorStop(1,'#71ded200');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,94,0,TAU);ctx.fill();
+    if(speed>0.01) {
+      const dx=sim.bx/speed,dy=sim.by/speed,len=40+47*speed/MAX_BETA;
+      ctx.strokeStyle='#effff1b0';ctx.lineWidth=2.5;ctx.beginPath();
+      ctx.moveTo(x+dx*28,y+dy*28);ctx.lineTo(x+dx*len,y+dy*len);
+      ctx.moveTo(x+dx*(len-10)+dy*6,y+dy*(len-10)-dx*6);ctx.lineTo(x+dx*len,y+dy*len);ctx.lineTo(x+dx*(len-10)-dy*6,y+dy*(len-10)+dx*6);ctx.stroke();
+    }
+    ctx.fillStyle='#071819';ctx.strokeStyle='#bcf8e5';ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x,y,14,0,TAU);ctx.fill();ctx.stroke();
+    ctx.strokeStyle='#e2fff1';ctx.lineWidth=2.6;ctx.beginPath();ctx.moveTo(x-5,y);ctx.lineTo(x+5,y);ctx.moveTo(x,y-5);ctx.lineTo(x,y+5);ctx.stroke();
+  }
+  function drawBoostAim() {
+    const p=boostPointer();if(!p)return;
+    const [x,y]=toScreen(sim.x,sim.y),[ix,iy]=pointerBoost();
+    ctx.save();ctx.strokeStyle='#ffbe7980';ctx.lineWidth=1.2;ctx.setLineDash([4,6]);
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.setLineDash([]);
+    ctx.strokeStyle='#ffbe79cc';ctx.beginPath();ctx.arc(p.x,p.y,10,0,TAU);ctx.stroke();
+    ctx.fillStyle='#ffcf9b';ctx.font='10px system-ui';
+    const label=`Boost ${(Math.hypot(ix,iy)*boostStrength).toFixed(2)}×`;
+    ctx.fillText(label,Math.max(8,Math.min(width-ctx.measureText(label).width-8,p.x+16)),Math.max(16,p.y-17));
+    ctx.restore();
+  }
+  function drawTourRegions() {
+    if(!tour.active||tour.index<1||tour.index>5||sim.t<=TOUR_BOOST_START)return;
+    const [x,y]=toScreen(0,0),outer=C*(sim.t-TOUR_BOOST_START)*camera.zoom;
+    ctx.save();ctx.fillStyle='#ffbe7907';ctx.beginPath();ctx.arc(x,y,outer,0,TAU);ctx.fill();
+    if(sim.t>TOUR_BOOST_END) {
+      const q=tourMotion(TOUR_BOOST_END),[ix,iy]=toScreen(q.x,q.y),inner=C*(sim.t-TOUR_BOOST_END)*camera.zoom;
+      ctx.fillStyle='#71ded20b';ctx.beginPath();ctx.arc(ix,iy,inner,0,TAU);ctx.fill();
+    }
+    ctx.restore();
+  }
+  function tourTag(text,x,y,color='#c5d9e7') {
+    const r=tour.rect;
+    ctx.font=width<900?'10px system-ui':'11px system-ui';
+    const w=ctx.measureText(text).width+14,h=23;
+    x=Math.max(r.left+3,Math.min(r.left+r.width-w-3,x));y=Math.max(r.top+3,Math.min(r.top+r.height-h-3,y));
+    ctx.fillStyle='#0c1522ee';ctx.beginPath();ctx.roundRect(x,y,w,h,5);ctx.fill();
+    ctx.fillStyle=color;ctx.fillText(text,x+7,y+15);
+  }
+  function tourArrow(x,y,dx,dy,color) {
+    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash([]);
+    const length=Math.hypot(dx,dy),ux=dx/length,uy=dy/length;
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);
+    ctx.moveTo(x+dx-8*ux+4*uy,y+dy-8*uy-4*ux);ctx.lineTo(x+dx,y+dy);ctx.lineTo(x+dx-8*ux-4*uy,y+dy-8*uy+4*ux);ctx.stroke();
+  }
+  function drawTourAnnotations() {
+    if(!tour.active||!tour.rect)return;
+    const r=tour.rect,[ox,oy]=toScreen(0,0),[qx,qy]=toScreen(sim.x,sim.y);
+    ctx.save();ctx.beginPath();ctx.rect(r.left,r.top,r.width,r.height);ctx.clip();
+    const chapter=tour.index;
+    if(chapter<5) {
+      ctx.setLineDash([3,4]);ctx.strokeStyle='#c6cddd88';ctx.lineWidth=1.3;
+      ctx.beginPath();ctx.arc(ox,oy,10,0,TAU);ctx.stroke();ctx.setLineDash([]);
+      if(chapter>0)tourTag('Starting position',ox-105,oy+24,'#adbbcf');
+    }
+    if(chapter>=1&&chapter<=5&&sim.t>TOUR_BOOST_START) {
+      const radius=C*(sim.t-TOUR_BOOST_START)*camera.zoom;
+      ctx.strokeStyle='#88bccc9c';ctx.lineWidth=1.3;ctx.setLineDash([5,6]);
+      ctx.beginPath();ctx.arc(ox,oy,radius,0,TAU);ctx.stroke();ctx.setLineDash([]);
+      if(chapter<=3 && radius>25)tourTag('First news · c',ox+radius*.65,oy-radius*.76,'#a7d8e3');
+      if(sim.t>TOUR_BOOST_END && chapter<=3) {
+        const end=tourMotion(TOUR_BOOST_END),[ex,ey]=toScreen(end.x,end.y);
+        ctx.strokeStyle='#71ded24d';ctx.lineWidth=1;
+        ctx.beginPath();ctx.arc(ex,ey,C*(sim.t-TOUR_BOOST_END)*camera.zoom,0,TAU);ctx.stroke();
+      }
+    }
+    if(chapter===0) {
+      tourArrow(qx+25,qy-32,25,-32,'#a8eee3');
+      tourTag('Direction of electric force',qx+40,qy-93,'#c5e9e4');
+    }
+    if(chapter===2||chapter===3) {
+      ctx.strokeStyle='#fff1d3';ctx.lineWidth=2.8;ctx.beginPath();
+      const samples=visibleSamples();
+      samples.forEach((s,i)=>{const p=linePoint(s,sim.t,0,-1),[x,y]=toScreen(p[0],p[1]);if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();
+      if(chapter===2) {
+        const radius=C*(sim.t-TOUR_BOOST_START)*camera.zoom;
+        ctx.setLineDash([3,5]);ctx.lineWidth=1;ctx.strokeStyle='#bac8e081';ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ox,oy-radius-26);ctx.stroke();ctx.setLineDash([]);
+        tourTag('Old field',ox-90,oy-radius-27,'#cbd5e8');
+        tourTag('Updated field',qx+20,qy+8,'#91e2d5');
+      } else {
+        const emission=(TOUR_BOOST_START+TOUR_BOOST_END)/2,s=sourceAt(emission),n=direction(s,0,-1);
+        const point=linePoint(s,sim.t,0,-1),[x,y]=toScreen(point[0],point[1]);
+        const kappa=1-n[0]*s.bx-n[1]*s.by,da=n[0]*s.ax+n[1]*s.ay;
+        const ex=(n[0]-s.bx)*da-kappa*s.ax,ey=(n[1]-s.by)*da-kappa*s.ay,len=Math.hypot(ex,ey);
+        tourArrow(x,y,n[0]*39,n[1]*39,'#8bdded');
+        tourArrow(x,y,ex/len*37,ey/len*37,'#ffcb83');
+        tourTag('Travels at c',x+14,y-58,'#8bdded');
+        tourTag('Sideways field',x-127,y+12,'#ffcb83');
+      }
+    }
+    if(chapter===4)tourTag('No acceleration · speed stays 0.28c',r.left+12,r.top+r.height-39,'#96e1d3');
+    if(chapter===5)tour.detectors.forEach(p=>{
+      const [x,y]=toScreen(p.x,p.y),arrived=sim.t>=p.arrival;
+      ctx.strokeStyle=arrived?'#ffcb83':'#c4b3f0';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,10,0,TAU);ctx.stroke();
+      tourTag(`${p.label} · ${arrived?'news arrived':'waiting'}`,x+17,y-12,arrived?'#ffcb83':'#c4b3f0');
+    });
+    if(chapter!==4)tourTag(paused?'Paused · pan or zoom to inspect':'Scripted motion · pan / zoom freely',r.left+8,r.top+r.height-32,'#879fb7');
+    ctx.restore();
+  }
+  function drawProbes() {
+    if(!showProbes)return;
+    const z=camera.zoom;
+    ctx.lineCap='round';ctx.lineJoin='round';
+    for(const p of activeProbes) {
+      const [ax,ay]=toScreen(p.ax,p.ay),[x,y]=toScreen(p.x,p.y),dx=x-ax,dy=y-ay,len=Math.hypot(dx,dy);
+      if(x<-25||x>width+25||y<-25||y>height+25)continue;
+      // Color encodes displacement in lab units, independent of zoom or speed.
+      const displacement=Math.min(1,Math.hypot(p.x-p.ax,p.y-p.ay)/12);
+      const red=Math.round(200+55*displacement),green=Math.round(180-100*displacement),blue=Math.round(250-174*displacement);
+      const rgb=`${red},${green},${blue}`;
+      ctx.strokeStyle='#9b91bd70';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(ax-2.5,ay);ctx.lineTo(ax+2.5,ay);ctx.moveTo(ax,ay-2.5);ctx.lineTo(ax,ay+2.5);ctx.stroke();
+      if(len>3) {
+        const nx=-dy/len,ny=dx/len,amplitude=Math.min(2,len*0.14);
+        ctx.beginPath();ctx.moveTo(ax,ay);
+        for(let k=1;k<8;k++) {
+          const u=k/8,wiggle=(k%2?1:-1)*amplitude;
+          ctx.lineTo(ax+dx*u+nx*wiggle,ay+dy*u+ny*wiggle);
+        }
+        ctx.lineTo(x,y);ctx.stroke();
+      }
+      const motion=Math.min(1,Math.hypot(p.vx,p.vy)*z/65);
+      const dotRadius=Math.min(3.7,p.spacing*z*0.34);
+      ctx.fillStyle=`rgba(${rgb},${0.07+motion*0.11+displacement*0.08})`;ctx.beginPath();ctx.arc(x,y,dotRadius*(2.4+motion*0.8),0,TAU);ctx.fill();
+      ctx.fillStyle=`rgb(${rgb})`;ctx.strokeStyle='#100e23';ctx.lineWidth=Math.min(1.4,dotRadius*0.38);
+      ctx.beginPath();ctx.arc(x,y,dotRadius,0,TAU);ctx.fill();ctx.stroke();
+    }
+  }
+  function drawScale() {
+    if(tour.active)return;
+    if(width<690) return;
+    const length=C*camera.zoom;
+    // One light-second in simulation units; shown only when it fits comfortably.
+    if(length<28 || length>250) return;
+    const x=32,y=height-177;
+    ctx.strokeStyle='#6a819966';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,y-3);ctx.lineTo(x,y);ctx.lineTo(x+length,y);ctx.lineTo(x+length,y-3);ctx.stroke();
+    ctx.fillStyle='#72879d';ctx.font='9px system-ui';ctx.fillText('c × 1 simulation second',x,y-9);
+  }
+  function draw() {
+    const started=performance.now();
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#080e18';ctx.fillRect(0,0,width,height);
+    drawGrid();drawFronts();drawTourRegions();
+    ctx.save();if(tour.active && (tour.index===2||tour.index===3))ctx.globalAlpha=0.56;drawField();ctx.restore();
+    drawProbes();drawBoostAim();if(!tour.active)drawParticle();drawScale();
+    // Very subtle edge shade leaves the field legible behind the floating UI.
+    const topShade=ctx.createLinearGradient(0,0,0,155);topShade.addColorStop(0,'#080e18cd');topShade.addColorStop(1,'#080e1800');
+    ctx.fillStyle=topShade;ctx.fillRect(0,0,width,155);
+    drawTourAnnotations();
+    if(tour.active)drawParticle();
+    frameMs=performance.now()-started;dirty=false;
+  }
+  function updateHud() {
+    const speed=Math.hypot(sim.bx,sim.by),g=1/Math.sqrt(1-speed*speed);
+    $('velocity').textContent=speed.toFixed(3);
+    $('speed-fill').style.width=(speed/MAX_BETA*100)+'%';
+    $('gamma').textContent=relativistic ? `γ = ${g.toFixed(2)} · contraction on` : 'Uncontracted comparison';
+    const status=paused ? 'Paused' : Math.hypot(sim.ax,sim.ay)>0.004 ? 'Accelerating' : speed>0.0005 ? 'Coasting' : 'At rest';
+    $('status-text').textContent=status;$('status').dataset.state=status;
+    $('zoom').textContent=Math.round(camera.zoom*100)+'%';
+    if(tour.active)updateTourPlayback();
+  }
+  function updatePause() {
+    $('paused-badge').hidden=!paused;
+    $('pause').setAttribute('aria-label',paused?'Resume simulation':'Pause simulation');
+    $('pause-icon').innerHTML=paused?'<path d="m6 3 10 7-10 7z"/>':'<path d="M7 4v12M13 4v12"/>';
+    updateHud();
+  }
+  function togglePause() { if(tour.active){toggleTourPlayback();return;}paused=!paused;accumulator=0;updatePause();dirty=true; }
+  function syncKeyButtons() {
+    for(const b of keyButtons) b.classList.toggle('pressed',keys.has(b.dataset.key)||[...pointerKeys.values()].includes(b.dataset.key));
+  }
+  function clearKeys() {keys.clear();pointerKeys.clear();syncKeyButtons();clearCanvasPointers();}
+  function takeControl() {if(tour.active)return;automaticMotion=false;$('welcome').classList.add('used');}
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest('[data-tour-ui]')&&e.target.closest('button,input,canvas'))takeControl();},true);
+  document.addEventListener('click',e=>{if(!e.target.closest('[data-tour-ui]')&&e.target.closest('button,input'))takeControl();},true);
+  document.addEventListener('input',takeControl,true);
+  canvas.addEventListener('wheel',takeControl,{passive:true});
+  window.addEventListener('keydown',e=>{
+    if(e.ctrlKey||e.metaKey||e.altKey||$('info').open) return;
+    const key=arrows[e.code]||e.code;
+    if(tour.active && e.code==='Escape'){e.preventDefault();endTour();return;}
+    if(tour.active && ['KeyW','KeyA','KeyS','KeyD'].includes(key)){e.preventDefault();return;}
+    if(['KeyW','KeyA','KeyS','KeyD','Space'].includes(key) || e.target instanceof HTMLInputElement) takeControl();
+    if(e.code==='Space') { e.preventDefault();if(!e.repeat) togglePause();return; }
+    // Arrow keys keep their native slider behavior; WASD works after slider use.
+    if(e.code.startsWith('Arrow') && e.target instanceof HTMLInputElement) return;
+    if(['KeyW','KeyA','KeyS','KeyD'].includes(key)) {e.preventDefault();keys.add(key);syncKeyButtons();}
+  });
+  window.addEventListener('keyup',e=>{const key=arrows[e.code]||e.code;keys.delete(key);syncKeyButtons();});
+  window.addEventListener('blur',clearKeys);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden) clearKeys();lastFrame=0;accumulator=0;});
+  for(const b of keyButtons) {
+    b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);pointerKeys.set(e.pointerId,b.dataset.key);syncKeyButtons();});
+    const release=e=>{pointerKeys.delete(e.pointerId);syncKeyButtons();};
+    b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);
+  }
+  function boostPointer() {
+    if(tour.active)return null;
+    return gesture?.kind==='boost' ? canvasPointers.get(gesture.id) : null;
+  }
+  function pointerBoost() {
+    const p=boostPointer();if(!p)return [0,0];
+    const [x,y]=toScreen(sim.x,sim.y),scale=Math.max(1,Math.min(width,height)*0.30);
+    return [(p.x-x)/scale,(p.y-y)/scale];
+  }
+  function pointerPosition(e) {
+    const r=canvas.getBoundingClientRect();
+    return {x:(e.clientX-r.left)*width/r.width,y:(e.clientY-r.top)*height/r.height};
+  }
+  function manualView() {camera.follow=false;$('recenter').textContent='Follow charge';}
+  function touchPair(ids) {
+    const a=canvasPointers.get(ids[0]),b=canvasPointers.get(ids[1]);
+    return {x:(a.x+b.x)/2,y:(a.y+b.y)/2,distance:Math.max(1,Math.hypot(b.x-a.x,b.y-a.y))};
+  }
+  function rebuildGesture() {
+    const touches=[...canvasPointers.values()].filter(p=>p.type==='touch');
+    if(touches.length>=2) {
+      touchNavigation=true;manualView();
+      const ids=touches.slice(0,2).map(p=>p.id),pair=touchPair(ids);
+      gesture={kind:'touch-pan',ids,distance:pair.distance,zoom:camera.zoom,
+        worldX:camera.x+(pair.x-width/2)/camera.zoom,worldY:camera.y+(pair.y-height/2)/camera.zoom};
+    } else if(touches.length) {
+      // A remaining finger after a pinch stays neutral until both are lifted.
+      gesture=touchNavigation?{kind:'touch-wait'}:{kind:'boost',id:touches[0].id};
+    } else {
+      touchNavigation=false;
+      const p=[...canvasPointers.values()].find(p=>p.button===2)||canvasPointers.values().next().value;
+      gesture=p?{kind:p.button===2?'mouse-pan':'boost',id:p.id}:null;
+      if(gesture?.kind==='mouse-pan')manualView();
+    }
+    canvas.classList.toggle('dragging',gesture?.kind==='mouse-pan'||gesture?.kind==='touch-pan');dirty=true;
+  }
+  function clearCanvasPointers() {
+    const ids=[...canvasPointers.keys()];canvasPointers.clear();gesture=null;touchNavigation=false;
+    for(const id of ids)if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id);
+    canvas.classList.remove('dragging');dirty=true;
+  }
+  function releaseCanvasPointer(e) {
+    if(!canvasPointers.delete(e.pointerId))return;
+    if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+    rebuildGesture();
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    if(e.pointerType!=='touch' && e.button!==0 && e.button!==2)return;
+    e.preventDefault();canvas.focus({preventScroll:true});canvas.setPointerCapture(e.pointerId);
+    canvasPointers.set(e.pointerId,{id:e.pointerId,type:e.pointerType,button:e.button,...pointerPosition(e)});
+    rebuildGesture();
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=canvasPointers.get(e.pointerId);if(!p)return;
+    e.preventDefault();
+    const previous={x:p.x,y:p.y};Object.assign(p,pointerPosition(e));
+    if(p.type!=='touch') {
+      if(!(e.buttons&3)){releaseCanvasPointer(e);return;}
+      const button=e.buttons&2?2:0;
+      if(button!==p.button){p.button=button;rebuildGesture();return;}
+    }
+    if(gesture?.kind==='mouse-pan' && gesture.id===p.id) {
+      camera.x-=(p.x-previous.x)/camera.zoom;camera.y-=(p.y-previous.y)/camera.zoom;
+    } else if(gesture?.kind==='touch-pan') {
+      const pair=touchPair(gesture.ids),next=Math.max(0.045,Math.min(3.5,gesture.zoom*pair.distance/gesture.distance));
+      camera.zoom=next;
+      camera.x=gesture.worldX-(pair.x-width/2)/next;camera.y=gesture.worldY-(pair.y-height/2)/next;
+      updateHud();
+    }
+    dirty=true;
+  });
+  canvas.addEventListener('pointerup',releaseCanvasPointer);
+  canvas.addEventListener('pointercancel',releaseCanvasPointer);
+  canvas.addEventListener('lostpointercapture',releaseCanvasPointer);
+  canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  canvas.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?height:1);
+    const next=Math.max(0.045,Math.min(3.5,camera.zoom*Math.exp(-Math.max(-500,Math.min(500,delta))*0.0014)));
+    const dx=e.clientX-width/2,dy=e.clientY-height/2;
+    camera.x+=dx/camera.zoom-dx/next;camera.y+=dy/camera.zoom-dy/next;camera.zoom=next;
+    $('welcome').classList.add('used');dirty=true;updateHud();
+  },{passive:false});
+  $('recenter').addEventListener('click',()=>{camera.x=sim.x;camera.y=sim.y;camera.follow=true;$('recenter').textContent='Recenter';dirty=true;});
+  $('test-particles').addEventListener('click',()=>{showProbes=!showProbes;$('test-particles').setAttribute('aria-pressed',String(showProbes));$('test-particles').textContent=showProbes?'Test particles: on':'Test particles: off';dirty=true;});
+  $('pause').addEventListener('click',togglePause);$('reset').addEventListener('click',()=>tour.active?loadTourStep(tour.index):reset());
+  $('guided-tour').addEventListener('click',startTour);
+  $('tour-minimize').addEventListener('click',()=>setTourMinimized(true));
+  $('tour-restore').addEventListener('click',()=>setTourMinimized(false));
+  $('tour-exit').addEventListener('click',()=>endTour());$('tour-mini-exit').addEventListener('click',()=>endTour());
+  $('tour-back').addEventListener('click',()=>loadTourStep(tour.index-1));
+  $('tour-replay').addEventListener('click',()=>loadTourStep(tour.index));
+  $('tour-next').addEventListener('click',()=>tour.index===6?endTour(true):loadTourStep(tour.index+1));
+  $('tour-play').addEventListener('click',toggleTourPlayback);
+  function styleRange(input) {input.style.setProperty('--fill',100*(Number(input.value)-Number(input.min))/(Number(input.max)-Number(input.min))+'%');}
+  $('sim-speed').addEventListener('input',e=>{simSpeed=Number(e.target.value);$('sim-speed-value').textContent=simSpeed.toFixed(2)+'×';styleRange(e.target);});
+  $('boost-strength').addEventListener('input',e=>{boostStrength=Number(e.target.value);$('boost-strength-value').textContent=boostStrength.toFixed(2)+'×';styleRange(e.target);});
+  $('contraction').addEventListener('click',()=>{
+    relativistic=!relativistic;$('contraction').setAttribute('aria-checked',String(relativistic));
+    $('mode-note').textContent=relativistic?'On · field crowds sideways':'Off · even radial spacing';dirty=true;updateHud();
+  });
+  let pausedBeforeInfo=false;
+  $('about').addEventListener('click',()=>{pausedBeforeInfo=paused;paused=true;clearKeys();updatePause();$('info').showModal();});
+  $('close-info').addEventListener('click',()=>$('info').close());
+  $('info').addEventListener('click',e=>{if(e.target===$('info')) {const r=$('info').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('info').close();}});
+  $('info').addEventListener('close',()=>{paused=pausedBeforeInfo;accumulator=0;updatePause();});
+  window.addEventListener('resize',resize);
+  function frame(now) {
+    const wallDt=lastFrame?Math.min((now-lastFrame)/1000,0.10):0;lastFrame=now;
+    if(!paused && !document.hidden) {
+      accumulator+=wallDt*simSpeed;
+      while(accumulator>=DT && !paused) {accumulator-=DT;step(DT);}
+      follow(wallDt);dirty=true;
+    }
+    if(dirty) draw();
+    if(now-lastHud>80) {updateHud();lastHud=now;}
+    requestAnimationFrame(frame);
+  }
+  reset();resize();styleRange($('sim-speed'));styleRange($('boost-strength'));requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
