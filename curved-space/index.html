@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080f17">
+  <meta name="description" content="Explore parallel transport, step-by-step geodesic construction, geodesic deviation, and tidal forces.">
+  <title>Curved space · Geometry lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='16' fill='%230c272b' stroke='%2377d9c0'/%3E%3Cpath d='M10 28L28 10M17 10h11v11' fill='none' stroke='%23ffd397' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./css/styles.css">
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body data-mode="transport">
+  <main class="app">
+    <header class="topbar">
+      <h1><span class="brand-mark" aria-hidden="true">◎</span> Curved space</h1>
+      <div class="shape-buttons experiment-choice" role="group" aria-label="Experiment mode">
+        <button id="transport-mode" type="button" aria-pressed="true">Parallel Transport</button>
+        <button id="geodesic-mode" type="button" aria-pressed="false">Geodesic</button>
+        <button id="deviation-mode" type="button" aria-pressed="false">Geodesic deviation</button>
+        <button id="tidal-mode" type="button" aria-pressed="false">3D Tidal forces</button>
+      </div>
+      <section class="surface-toolbar" aria-label="Surface selection">
+      <div class="surface-choice"><span class="control-label">Surface</span><div class="shape-buttons" role="group" aria-label="Choose surface"><button id="sphere-mode" type="button" aria-pressed="true">Sphere</button><button id="torus-mode" type="button" aria-pressed="false">Torus</button></div></div>
+      <div id="torus-starts" class="surface-choice" hidden><span class="control-label">Start on</span><div class="shape-buttons" role="group" aria-label="Torus starting position"><button id="torus-outer" type="button" aria-pressed="true">Outside</button><button id="torus-inner" type="button" aria-pressed="false">Inside</button><button id="torus-top" type="button" aria-pressed="false">Top</button></div></div>
+      <div class="sign-legend"><span class="positive">● Positive</span><span class="negative">● Negative</span><span class="neutral">● Zero</span></div>
+      </section>
+    </header>
+    <section class="workspace" aria-label="Synchronized views of parallel transport">
+      <section class="sphere-panel" aria-labelledby="sphere-title">
+        <div class="panel-header">
+          <div><div class="panel-index">01 <span>CURVED SPACE</span></div><h2 id="sphere-title">The sphere</h2></div>
+          <span class="small-badge" id="surface-badge">UNIT RADIUS · K = 1</span>
+        </div>
+        <div class="sphere-stage" id="sphere-stage">
+          <canvas id="sphere-canvas" tabindex="0" aria-label="Interactive sphere. Use W A S D to move the vector, drag to orbit, and scroll to zoom."></canvas>
+          <span class="pole-label" id="north-label" aria-hidden="true">N</span>
+          <span class="pole-label" id="south-label" aria-hidden="true">S</span>
+          <span class="deflection-label" id="deflection-label" hidden aria-hidden="true"></span>
+          <span class="principal-label" id="principal-label-1" hidden aria-hidden="true">κ₁</span>
+          <span class="principal-label" id="principal-label-2" hidden aria-hidden="true">κ₂</span>
+          <span class="geodesic-label" id="geodesic-label-0" hidden aria-hidden="true">v₁</span>
+          <span class="geodesic-label" id="geodesic-label-1" hidden aria-hidden="true">v₂</span>
+          <span class="geodesic-label" id="geodesic-label-2" hidden aria-hidden="true">ξ</span>
+          <span class="geodesic-label" id="geodesic-label-3" hidden aria-hidden="true"></span>
+          <span class="closure-badge" id="closure-badge" hidden>LOOP CLOSED · AREA SHADED</span>
+          <div class="sphere-equation" aria-hidden="true">∇<sub>v</sub> v = 0<span>NO INTRINSIC TURNING</span></div>
+          <div class="deviation-equation deviation-only" hidden>
+            <div id="deviation-formula">∇<sub>v</sub>∇<sub>v</sub> ξ = −R(ξ, v)v</div>
+            <span id="deviation-equation-caption">Transverse separation: j̈ = −K |v|² j</span>
+          </div>
+          <aside class="deviation-readouts deviation-only comparison-only" aria-label="Geodesic separation measurements" hidden>
+            <div class="deviation-readout"><span class="metric-label">SURFACE GAP |ξ|</span><output id="gap-value">0.12 <small>u</small></output><span class="readout-caption">between the two geodesics</span></div>
+            <div class="deviation-readout"><span class="metric-label">JACOBI PREDICTION |j|</span><output id="jacobi-value">0.12 <small>u</small></output><span class="readout-caption" id="jacobi-caption">small-separation approximation</span></div>
+            <div class="deviation-readout"><span class="metric-label">GAUSSIAN CURVATURE K</span><output id="deviation-curvature">+1.00 <small>u⁻²</small></output><span class="readout-caption" id="curvature-effect">Positive curvature focuses nearby paths.</span></div>
+            <div class="deviation-readout"><span class="metric-label">RELATIVE ACCELERATION j̈</span><output id="deviation-acceleration">−0.12 <small>u/s²</small></output><span class="readout-caption">−K |v|² j · signed transverse component</span></div>
+          </aside>
+          <div class="deviation-legend deviation-only" hidden><span class="geodesic-a comparison-only">● v₁ · geodesic 1</span><span class="geodesic-b" id="orange-legend">● v₂ · geodesic 2</span><span class="separation-color comparison-only">ξ · separation</span><span id="elapsed-time">t = 0.00 s</span></div>
+          <aside id="deviation-build-panel" class="deviation-build-panel" aria-label="Deviation construction measurements" hidden>
+            <div class="build-heading"><strong>Deviation construction</strong><span id="deviation-build-step">Step 1</span></div>
+            <div class="construction-phases"><span id="deviation-phase-move">1 · Move</span><span id="deviation-phase-transport">2 · Transport v₁ → v₂</span></div>
+            <p id="deviation-build-instruction">Advance both geodesics, then carry teal v₁ to yellow v₂.</p>
+            <div class="build-separations"><div class="build-old"><span>|ξ old|</span><output><span id="build-old">—</span> <small>u</small></output></div><div class="build-current"><span>|ξ new|</span><output><span id="build-xi">—</span> <small>u</small></output></div></div>
+            <table aria-label="Velocities compared at the yellow point"><tbody>
+              <tr class="geodesic-a"><th>|v₁| = |Pv₁| <small>u/s</small></th><td id="build-velocity-1">—</td></tr>
+              <tr class="geodesic-b"><th>|v₂| <small>u/s</small></th><td id="build-velocity-2">—</td></tr>
+              <tr><th>|Δv new| <small>u/s</small></th><td id="build-velocity-difference">—</td></tr>
+              <tr class="build-old"><th>|Pₜ Δv old| <small>u/s</small></th><td id="build-previous-difference">—</td></tr>
+              <tr class="build-difference"><th>|δv extra| <small>u/s</small></th><td id="build-extra-difference">—</td></tr>
+              <tr><th>Velocity angle <small>rad</small></th><td id="build-velocity-angle">—</td></tr>
+            </tbody></table>
+            <div class="build-area"><span>Swept area</span><output id="deviation-build-area">0.00 u²</output></div>
+            <div class="build-area"><span>Δt</span><output id="deviation-build-dt">0.00 s</output></div>
+            <p class="build-formula">Δv new = <span class="geodesic-a">Pv₁</span> − <span class="geodesic-b">v₂</span><br>Δv new = <span class="build-old">Pₜ Δv old</span> + <span class="build-difference">δv</span><br><span class="build-difference">δv</span> ≈ (∇<sub class="geodesic-b">v</sub>∇<sub class="geodesic-b">v</sub><span class="build-current">ξ</span>) Δt</p>
+            <p class="build-note">ξ: yellow → teal. P: back along connector.<br>Pₜ: along yellow. Approx.: small gap, short step.</p>
+            <p id="deviation-build-scale" class="build-note"></p>
+          </aside>
+          <div class="construction-status geodesic-only" hidden>
+            <div><span id="construction-step">Step 1</span><strong id="construction-phase">Ready to move</strong></div>
+            <div class="construction-phases" aria-label="Construction phases"><span id="phase-move">1 · Move</span><span id="phase-resolve">2 · Resolve</span><span id="phase-project">3 · Project</span></div>
+            <p id="construction-instruction">Move in the current velocity direction.</p>
+          </div>
+          <aside class="projection-card geodesic-only" aria-label="Velocity projection components" hidden>
+            <span class="metric-label">AT THE TANGENT PLANE</span>
+            <svg class="projection-diagram" viewBox="0 0 220 145" role="img" aria-label="Old velocity resolved into a tangent component and a normal component">
+              <defs>
+                <marker id="old-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z"/></marker>
+                <marker id="tangent-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z"/></marker>
+                <marker id="component-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z"/></marker>
+                <marker id="normal-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z"/></marker>
+              </defs>
+              <path class="diagram-plane" d="M12 96H210"/>
+              <path class="diagram-normal" d="M24 96V14" marker-end="url(#normal-head)"/>
+              <text class="diagram-normal" x="31" y="20">n</text>
+              <path id="diagram-old" class="diagram-old" marker-end="url(#old-head)"/>
+              <path id="diagram-tangent" class="diagram-tangent" marker-end="url(#tangent-head)"/>
+              <path id="diagram-component" class="diagram-component" marker-end="url(#component-head)"/>
+              <path id="diagram-drop" class="diagram-component diagram-drop"/>
+              <path id="diagram-corner" class="diagram-tangent diagram-corner"/>
+              <path id="diagram-current" class="diagram-tangent" marker-end="url(#tangent-head)"/>
+              <circle cx="24" cy="96" r="3" class="diagram-origin"/>
+              <text x="98" y="137" class="diagram-caption">tangent plane</text>
+            </svg>
+            <div class="component-readout old-component"><span>Old vector |v|</span><output id="construction-old">1.00</output></div>
+            <div class="component-readout tangent-component"><span>Tangent |v<sub>T</sub>|</span><output id="construction-tangent">1.00</output></div>
+            <div class="component-readout normal-component"><span>Normal v · n</span><output id="construction-normal">0.00</output></div>
+            <p class="construction-formula">v<sub>T</sub> = v − (v · n)n<br>v<sub>next</sub> = v<sub>T</sub> / |v<sub>T</sub>|</p>
+            <span class="readout-caption">Remove the normal component, then restore unit speed.</span>
+          </aside>
+          <div class="construction-equation geodesic-only" hidden><div>∇<sub>v</sub> v = 0</div><span>Small tangent steps + projection → geodesic</span><span class="normal-direction">Blue n: surface normal · red: removed component</span></div>
+          <div class="tidal-clock tidal-only" hidden>
+            <span class="metric-label">SIMULATION TIME</span>
+            <div><span class="clock-symbol">t</span><output id="tidal-clock">0.00</output><span class="clock-unit">s</span></div>
+            <span id="tidal-clock-state">Initially at rest</span>
+            <span id="tidal-fall-readout">r = 120.00 u · mass below ↓</span>
+            <span id="tidal-grid-note">Spherical grid rises ↑ · radial lines converge</span>
+          </div>
+          <aside class="tidal-axis-readouts tidal-only" aria-label="Principal separation vectors" hidden>
+            <div class="tidal-axis" id="tidal-axis-0"><span>ξ₁ · stretching</span><output id="tidal-length-0">1.00 u</output><small id="tidal-eigenvalue-0">λ₁ = +0.90 ×10⁻³ s⁻²</small></div>
+            <div class="tidal-axis" id="tidal-axis-1"><span>ξ₂ · compression</span><output id="tidal-length-1">1.00 u</output><small id="tidal-eigenvalue-1">λ₂ = −0.45 ×10⁻³ s⁻²</small></div>
+            <div class="tidal-axis" id="tidal-axis-2"><span>ξ₃ · compression</span><output id="tidal-length-2">1.00 u</output><small id="tidal-eigenvalue-2">λ₃ = −0.45 ×10⁻³ s⁻²</small></div>
+          </aside>
+          <div class="tidal-equation tidal-only" hidden><div>∇<sub>v</sub>∇<sub>v</sub> ξ = −R(ξ, v)v</div><span>ξ̈ = T(r)ξ · tides strengthen as the shell falls</span><span>Local point-mass tides · particles released from rest</span></div>
+        </div>
+        <div class="curvature-strip" aria-label="Principal curvatures at the vector">
+          <div class="curvature-values"><span id="k1-label">κ₁ <output id="k1-value">+1.00</output></span><span id="k2-label">κ₂ <output id="k2-value">+1.00</output></span><span>K = κ₁κ₂ <output id="gaussian-value">+1.00</output></span></div>
+          <p id="principal-note">All tangent directions are principal on a sphere.</p>
+        </div>
+        <div class="sphere-footer">
+          <span id="camera-help">Drag to orbit · Scroll to zoom</span>
+          <div class="view-controls">
+            <button id="deviation-construction" class="text-button deviation-only" type="button" aria-pressed="false" hidden>Deviation construction</button>
+            <label class="deviation-only" hidden><input id="show-other-path" type="checkbox" checked> Show other path</label>
+            <button id="side-view" class="text-button" type="button" title="Level view of the tangent plane, perpendicular to the velocity" hidden>Side view</button>
+            <button id="first-person" class="text-button" type="button" aria-pressed="false" title="Follow the orange point; drag to orbit, scroll to zoom, double-click to reset" hidden>First person</button>
+            <button id="top-view" class="text-button" type="button" aria-pressed="false" title="Look straight down at the point with a parallel-transported camera orientation; click again to restore the previous view">Top View</button>
+            <div class="visibility-controls transport-only" role="group" aria-label="Parallel transport visibility"><label><input id="show-trail" type="checkbox" checked> Trail</label><label><input id="show-history" type="checkbox" checked> Past vectors</label><label><input id="show-tangent" type="checkbox" checked> Tangent plane</label></div>
+            <button id="follow-camera" class="text-button" type="button" aria-pressed="true">◎ Follow vector</button>
+            <button id="tidal-camera-reset" class="text-button tidal-only" type="button" hidden>Reset view</button>
+            <label class="tidal-only" hidden><input id="show-tidal-grid" type="checkbox" checked> Background grid</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="map-panel" aria-labelledby="map-title">
+        <div class="panel-header">
+          <div><div class="panel-index">02 <span>FLAT COORDINATES</span></div><h2 id="map-title">The map</h2></div>
+          <div class="map-view-controls"><span class="small-badge" id="map-badge">LOCAL DIRECTIONS</span><button id="polar-view" class="text-button" type="button" aria-pressed="false" title="Show an angle-preserving polar map centered on the nearer pole">Polar view</button></div>
+        </div>
+        <div class="map-content">
+          <div class="position-row"><div><span class="metric-label" id="latitude-label">LATITUDE</span><output id="latitude-value">0.0°</output></div><div><span class="metric-label" id="longitude-label">LONGITUDE</span><output id="longitude-value">0.0°</output></div><span class="coordinate-tag" id="coordinate-tag">λ / φ</span></div>
+          <div class="map-surround">
+            <div class="map-stage" id="map-stage"><canvas id="map-canvas" tabindex="0" aria-label="Longitude latitude map with local east/north direction arrows. Use W A S D to move."></canvas><span id="polar-center-label" class="polar-center-label" hidden>N</span></div>
+            <div class="latitude-labels" aria-hidden="true"><span>90° N</span><span>0°</span><span>90° S</span></div>
+            <div class="longitude-labels" aria-hidden="true"><span>180° W</span><span>90° W</span><span>0°</span><span>90° E</span><span>180° E</span></div>
+          </div>
+          <p class="projection-note" id="projection-note">Arrows show local east/north direction, independent of the map's stretching.</p>
+          <div class="readout-card">
+            <div class="direction-readout">
+              <svg class="compass" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="29"/><path class="compass-grid" d="M36 5v62M5 36h62"/><g id="compass-vector"><path class="compass-arrow" d="M22 36h28m-8-7 8 7-8 7"/></g><circle class="compass-origin" cx="36" cy="36" r="2.5"/></svg>
+              <div><span class="metric-label" id="direction-label">DIRECTION FROM EAST</span><output class="big-number" id="direction-value">30.0<span>°</span></output><span class="readout-caption">in the local tangent plane</span></div>
+            </div>
+            <div class="area-readout"><span class="metric-label" id="area-title">SIGNED AREA A</span><output id="area-value" class="big-number subdued" title="Signed curvature contribution: positive red, negative blue.">—</output><span id="area-caption" class="readout-caption">on the unit sphere</span></div>
+            <div class="loop-readout"><span class="metric-label">DEFLECTION θ</span><output id="holonomy-value" class="big-number subdued">—</output><span id="holonomy-caption" class="readout-caption">Return to start to compare</span></div>
+          </div>
+          <p class="loop-relation" id="loop-relation">Close a loop to compare its area with the vector's deflection.</p>
+        </div>
+        <div class="map-legend"><span><i class="legend-line active"></i> Transported vector</span><span><i class="legend-line path"></i> Path</span><span><i class="legend-line start"></i> Initial vector</span></div>
+      </section>
+    </section>
+
+    <section class="transport-controls transport-only" aria-label="Parallel transport controls">
+      <div class="control-group shape-control">
+        <span class="control-label">Loop shape</span>
+        <div class="shape-buttons" role="group" aria-label="Choose loop type">
+          <button id="rectangle-mode" type="button" aria-pressed="true"><span aria-hidden="true">▱</span> Rectangle</button>
+          <button id="circle-mode" type="button" aria-pressed="false"><span aria-hidden="true">○</span> Circle</button>
+        </div>
+      </div>
+      <div class="control-group loop-dimension" id="rectangle-height-control">
+        <div class="control-heading"><label for="loop-height">Rectangle height</label><output for="loop-height" id="loop-height-output">60°</output></div>
+        <input id="loop-height" type="range" aria-describedby="loop-geometry-help">
+        <p class="control-help" id="height-help">Latitude span from the starting point</p>
+      </div>
+      <div class="control-group loop-dimension" id="rectangle-width-control">
+        <div class="control-heading"><label for="loop-width">Rectangle width</label><output for="loop-width" id="loop-width-output">90°</output></div>
+        <input id="loop-width" type="range" aria-describedby="loop-geometry-help">
+        <p class="control-help" id="width-help">Longitude span along the equator</p>
+      </div>
+      <div class="control-group loop-dimension" id="circle-size-control" hidden>
+        <div class="control-heading"><label for="loop-radius">Circle size</label><output for="loop-radius" id="loop-radius-output">35° radius</output></div>
+        <input id="loop-radius" type="range" aria-describedby="circle-size-help loop-geometry-help">
+        <p class="control-help" id="circle-size-help">Angular radius on the sphere</p>
+      </div>
+      <div class="control-group circle-explanation" id="circle-explanation" hidden><span class="circle-formula" id="circle-formula">A = 2π(1 − cos ρ)</span><p class="control-help" id="circle-note">A circle on the sphere stretches on the map.</p></div>
+      <p class="loop-geometry-help" id="loop-geometry-help">Adjust the outline, then run the loop. Completed loops update as you resize.</p>
+      <div class="control-group direction-control">
+        <div class="control-heading"><label for="direction">Initial direction</label><output for="direction" id="direction-output">30°</output></div>
+        <input id="direction" type="range" min="0" max="360" step="1" value="30" aria-describedby="direction-help">
+        <p id="direction-help" class="control-help">0° east <span>90° north</span><span>Updates without clearing your path</span></p>
+      </div>
+      <div class="control-group speed-control">
+        <div class="control-heading"><label for="speed">Travel speed</label><output for="speed" id="speed-output">24°/s</output></div>
+        <input id="speed" type="range" min="6" max="70" step="1" value="24">
+      </div>
+      <div class="control-group action-control">
+        <div class="actions"><button id="demo" class="primary-button" type="button"><span id="demo-icon">▷</span><span id="demo-text">Run closed loop</span></button><button id="reset" class="secondary-button" type="button" title="Reset path (R)">↺ <span>Reset</span></button></div>
+        <p class="control-help demo-help" id="demo-help">One loop. Equal area and angle.</p>
+      </div>
+    </section>
+
+    <section class="deviation-controls deviation-only" aria-label="Geodesic deviation controls" hidden>
+      <div class="control-group comparison-only"><div class="control-heading"><label for="separation">Initial separation</label><output id="separation-output" for="separation">0.12 u</output></div><input id="separation" type="range" aria-describedby="separation-help"><p class="control-help" id="separation-help">Perpendicular to the initial velocities</p></div>
+      <div class="control-group"><div class="control-heading"><label for="launch-direction">Launch direction</label><output id="launch-direction-output" for="launch-direction">0°</output></div><input id="launch-direction" type="range" min="0" max="360" step="1" value="0"><p class="control-help" id="launch-direction-help">0° east · 90° north</p></div>
+      <div class="control-group"><div class="control-heading"><label for="deviation-speed">Animation speed</label><output id="deviation-speed-output" for="deviation-speed">1.00×</output></div><input id="deviation-speed" type="range" min="0.1" max="4" step="0.05" value="1"><p class="control-help">Playback rate · same geodesics</p></div>
+      <div id="deviation-step-control" class="control-group" hidden><div class="control-heading"><label for="deviation-step-size">Step length</label><output id="deviation-step-output">0.20 u</output></div><input id="deviation-step-size" type="range"><p class="control-help">Distance along each geodesic</p></div>
+      <div class="control-group action-control"><div id="deviation-progression" class="shape-buttons" role="group" aria-label="Deviation construction progression" hidden><button id="deviation-build-manual" type="button" aria-pressed="true">Manual</button><button id="deviation-build-auto" type="button" aria-pressed="false">Automatic</button></div><div class="actions"><button id="launch-geodesics" class="primary-button" type="button">▷ Launch geodesics</button><button id="restart-geodesics" class="secondary-button" type="button">↺ Restart</button></div><p class="control-help demo-help" id="geodesic-speed">Equal speeds · initially parallel velocities</p></div>
+    </section>
+    <section class="construction-controls geodesic-only" aria-label="Geodesic construction controls" hidden>
+      <div class="control-group"><div class="control-heading"><label for="construction-direction">Initial direction</label><output id="construction-direction-output">35°</output></div><input id="construction-direction" type="range" min="0" max="360" step="1" value="35"><p class="control-help">Drag to set the start · remains paused</p></div>
+      <div class="control-group"><div class="control-heading"><label for="construction-step-size">Step size</label><output id="construction-step-size-output">0.20 u</output></div><input id="construction-step-size" type="range" min="0.01" max="0.35" step="0.005" value="0.2"><p class="control-help">Tangent step = arrow length · smaller is more accurate</p></div>
+      <div class="control-group"><div class="control-heading"><label for="construction-speed">Animation speed</label><output id="construction-speed-output">1.00×</output></div><input id="construction-speed" type="range" min="0.1" max="4" step="0.05" value="1"><p class="control-help">Pace of movement and projection</p></div>
+      <div class="control-group action-control"><div class="shape-buttons construction-progression" role="group" aria-label="Progression mode"><button id="construction-manual" type="button" aria-pressed="true">Manual</button><button id="construction-auto" type="button" aria-pressed="false">Automatic</button></div><div class="actions"><button id="construction-next" class="primary-button" type="button">▷ Move to next point</button><button id="construction-reset" class="secondary-button" type="button">↺ Reset</button></div></div>
+    </section>
+    <section class="tidal-controls tidal-only" aria-label="Tidal forces controls" hidden>
+      <div class="control-group"><div class="control-heading"><label for="tidal-shells">Concentric shells</label><output id="tidal-shells-output" for="tidal-shells">1 shell</output></div><input id="tidal-shells" type="range" min="1" max="4" step="1" value="1" aria-describedby="tidal-particle-count"><div class="shell-ticks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span></div><p class="control-help" id="tidal-particle-count">600 small test masses per shell</p></div>
+      <div class="control-group"><div class="control-heading"><label for="tidal-time">Time</label><output id="tidal-time-output" for="tidal-time">0.00 / 40.00 s</output></div><input id="tidal-time" type="range" min="0" max="40" step="0.01" value="0" aria-describedby="tidal-time-help"><p class="control-help" id="tidal-time-help">Drag to inspect a moment · playback pauses</p></div>
+      <div class="control-group"><div class="control-heading"><label for="tidal-speed">Simulation speed</label><output id="tidal-speed-output" for="tidal-speed">1.00×</output></div><input id="tidal-speed" type="range" min="0.1" max="4" step="0.05" value="1" aria-describedby="tidal-speed-help"><p class="control-help" id="tidal-speed-help">Slower or faster playback of the same fall</p></div>
+      <div class="control-group action-control"><div class="actions"><button id="play-tidal" class="primary-button" type="button">▷ Start time</button><button id="reset-tidal" class="secondary-button" type="button">↺ Reset</button></div><p class="control-help demo-help">Observer falls with the shell's center</p></div>
+    </section>
+    <footer class="page-footer"><div class="keyboard-guide transport-only"><span class="key-cluster"><kbd>W</kbd><span><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></span><span><span id="movement-help">Move north / west / south / east</span> <span class="footer-secondary">· Shift to go faster · R to reset</span></span></div><span class="deviation-only" hidden>Space to pause / resume · R to reset</span><span class="tidal-only" hidden>Space to pause / resume · R to reset time</span><span id="status" role="status" aria-live="polite">Ready. Move the vector or run a loop.</span></footer>
+    <div class="touch-controls transport-only" aria-label="On-screen movement controls"><button data-move="KeyW" aria-label="Move north">↑</button><div><button data-move="KeyA" aria-label="Move west">←</button><button data-move="KeyS" aria-label="Move south">↓</button><button data-move="KeyD" aria-label="Move east">→</button></div></div>
+    <div id="error" class="error-overlay" hidden role="alert"><div><h2>Could not start the experiment</h2><p id="error-message"></p><p>Open this folder in VS Code, then right-click <strong>index.html</strong> and choose <strong>Open with Live Server</strong>.</p></div></div>
+    <noscript>This experiment needs JavaScript and a browser with WebGL2.</noscript>
+  </main>
+</body>
+</html>
