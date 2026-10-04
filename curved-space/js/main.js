@@ -480,12 +480,14 @@ function changeMode(next) {
   }
   mode = next;
   const isDeviation = mode === 'deviation';
-  // Reuse the same controls and event handlers in the compact deviation layout.
-  // Other experiments keep their panel heading and footer.
+  // Reuse the same heading, controls, and event handlers across compact views.
+  const compactView = mode !== 'transport';
+  document.body.dataset.compactView = String(compactView);
   const heading = $('surface-heading'), viewControls = document.querySelector('.view-controls');
-  if (isDeviation) {
-    document.querySelector('.surface-toolbar').insertBefore(heading, document.querySelector('.sign-legend'));
-    $('deviation-sidebar').append(viewControls);
+  if (compactView) {
+    if (mode === 'tidal') document.querySelector('.topbar').append(heading);
+    else document.querySelector('.surface-toolbar').insertBefore(heading, document.querySelector('.sign-legend'));
+    $(`${mode}-sidebar`).append(viewControls);
   } else {
     document.querySelector('.sphere-panel').prepend(heading);
     document.querySelector('.sphere-footer').append(viewControls);

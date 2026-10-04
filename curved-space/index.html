@@ -50,7 +50,7 @@
             <span id="deviation-equation-caption">Transverse separation: j̈ = −K |v|² j</span>
           </div>
           <div class="deviation-legend deviation-only" hidden><span class="geodesic-a comparison-only">● v₁ · geodesic 1</span><span class="geodesic-b" id="orange-legend">● v₂ · geodesic 2</span><span class="separation-color comparison-only">ξ · separation</span><span id="elapsed-time">t = 0.00 s</span></div>
-          <div id="deviation-sidebar" class="deviation-sidebar deviation-only" hidden>
+          <div id="deviation-sidebar" class="view-sidebar deviation-sidebar deviation-only" hidden>
           <aside class="deviation-readouts deviation-only comparison-only" aria-label="Geodesic separation measurements" hidden>
             <div class="deviation-readout"><span class="metric-label">SURFACE GAP |ξ|</span><output id="gap-value">0.12 <small>u</small></output><span class="readout-caption">between the two geodesics</span></div>
             <div class="deviation-readout"><span class="metric-label">JACOBI PREDICTION |j|</span><output id="jacobi-value">0.12 <small>u</small></output><span class="readout-caption" id="jacobi-caption">small-separation approximation</span></div>
@@ -82,6 +82,7 @@
             <div class="construction-phases" aria-label="Construction phases"><span id="phase-move">1 · Move</span><span id="phase-resolve">2 · Resolve</span><span id="phase-project">3 · Project</span></div>
             <p id="construction-instruction">Move in the current velocity direction.</p>
           </div>
+          <div id="geodesic-sidebar" class="view-sidebar geodesic-sidebar geodesic-only" hidden>
           <aside class="projection-card geodesic-only" aria-label="Velocity projection components" hidden>
             <span class="metric-label">AT THE TANGENT PLANE</span>
             <svg class="projection-diagram" viewBox="0 0 220 145" role="img" aria-label="Old velocity resolved into a tangent component and a normal component">
@@ -109,6 +110,7 @@
             <p class="construction-formula">v<sub>T</sub> = v − (v · n)n<br>v<sub>next</sub> = v<sub>T</sub> / |v<sub>T</sub>|</p>
             <span class="readout-caption">Remove the normal component, then restore unit speed.</span>
           </aside>
+          </div>
           <div class="construction-equation geodesic-only" hidden><div>∇<sub>v</sub> v = 0</div><span>Small tangent steps + projection → geodesic</span><span class="normal-direction">Blue n: surface normal · red: removed component</span></div>
           <div class="tidal-clock tidal-only" hidden>
             <span class="metric-label">SIMULATION TIME</span>
@@ -117,11 +119,13 @@
             <span id="tidal-fall-readout">r = 120.00 u · mass below ↓</span>
             <span id="tidal-grid-note">Spherical grid rises ↑ · radial lines converge</span>
           </div>
+          <div id="tidal-sidebar" class="view-sidebar tidal-sidebar tidal-only" hidden>
           <aside class="tidal-axis-readouts tidal-only" aria-label="Principal separation vectors" hidden>
             <div class="tidal-axis" id="tidal-axis-0"><span>ξ₁ · stretching</span><output id="tidal-length-0">1.00 u</output><small id="tidal-eigenvalue-0">λ₁ = +0.90 ×10⁻³ s⁻²</small></div>
             <div class="tidal-axis" id="tidal-axis-1"><span>ξ₂ · compression</span><output id="tidal-length-1">1.00 u</output><small id="tidal-eigenvalue-1">λ₂ = −0.45 ×10⁻³ s⁻²</small></div>
             <div class="tidal-axis" id="tidal-axis-2"><span>ξ₃ · compression</span><output id="tidal-length-2">1.00 u</output><small id="tidal-eigenvalue-2">λ₃ = −0.45 ×10⁻³ s⁻²</small></div>
           </aside>
+          </div>
           <div class="tidal-equation tidal-only" hidden><div>∇<sub>v</sub>∇<sub>v</sub> ξ = −R(ξ, v)v</div><span>ξ̈ = T(r)ξ · tides strengthen as the shell falls</span><span>Local point-mass tides · particles released from rest</span></div>
         </div>
         <div class="curvature-strip" aria-label="Principal curvatures at the vector">
@@ -211,20 +215,20 @@
       </div>
     </section>
 
-    <section class="deviation-controls deviation-only" aria-label="Geodesic deviation controls" hidden>
+    <section class="deviation-controls compact-controls deviation-only" aria-label="Geodesic deviation controls" hidden>
       <div class="control-group comparison-only"><div class="control-heading"><label for="separation">Initial separation</label><output id="separation-output" for="separation">0.12 u</output></div><input id="separation" type="range" aria-describedby="separation-help"><p class="control-help" id="separation-help">Perpendicular to the initial velocities</p></div>
       <div class="control-group"><div class="control-heading"><label for="launch-direction">Launch direction</label><output id="launch-direction-output" for="launch-direction">0°</output></div><input id="launch-direction" type="range" min="0" max="360" step="1" value="0" aria-describedby="launch-direction-help"><p class="control-help" id="launch-direction-help">0° east · 90° north</p></div>
       <div class="control-group"><div class="control-heading"><label for="deviation-speed">Animation speed</label><output id="deviation-speed-output" for="deviation-speed">1.00×</output></div><input id="deviation-speed" type="range" min="0.1" max="4" step="0.05" value="1" aria-describedby="deviation-speed-help"><p class="control-help" id="deviation-speed-help">Playback rate · same geodesics</p></div>
       <div id="deviation-step-control" class="control-group" hidden><div class="control-heading"><label for="deviation-step-size">Step length</label><output id="deviation-step-output">0.20 u</output></div><input id="deviation-step-size" type="range" aria-describedby="deviation-step-help"><p class="control-help" id="deviation-step-help">Distance along each geodesic</p></div>
       <div class="control-group action-control"><div id="deviation-progression" class="shape-buttons" role="group" aria-label="Deviation construction progression" hidden><button id="deviation-build-manual" type="button" aria-pressed="true">Manual</button><button id="deviation-build-auto" type="button" aria-pressed="false">Automatic</button></div><div class="actions"><button id="launch-geodesics" class="primary-button" type="button">▷ Launch geodesics</button><button id="restart-geodesics" class="secondary-button" type="button">↺ Restart</button></div><p class="control-help demo-help" id="geodesic-speed">Equal speeds · initially parallel velocities</p></div>
     </section>
-    <section class="construction-controls geodesic-only" aria-label="Geodesic construction controls" hidden>
-      <div class="control-group"><div class="control-heading"><label for="construction-direction">Initial direction</label><output id="construction-direction-output">35°</output></div><input id="construction-direction" type="range" min="0" max="360" step="1" value="35"><p class="control-help">Drag to set the start · remains paused</p></div>
-      <div class="control-group"><div class="control-heading"><label for="construction-step-size">Step size</label><output id="construction-step-size-output">0.20 u</output></div><input id="construction-step-size" type="range" min="0.01" max="0.35" step="0.005" value="0.2"><p class="control-help">Tangent step = arrow length · smaller is more accurate</p></div>
-      <div class="control-group"><div class="control-heading"><label for="construction-speed">Animation speed</label><output id="construction-speed-output">1.00×</output></div><input id="construction-speed" type="range" min="0.1" max="4" step="0.05" value="1"><p class="control-help">Pace of movement and projection</p></div>
+    <section class="construction-controls compact-controls geodesic-only" aria-label="Geodesic construction controls" hidden>
+      <div class="control-group"><div class="control-heading"><label for="construction-direction">Initial direction</label><output id="construction-direction-output">35°</output></div><input id="construction-direction" type="range" min="0" max="360" step="1" value="35" aria-describedby="construction-direction-help"><p class="control-help" id="construction-direction-help">Drag to set the start · remains paused</p></div>
+      <div class="control-group"><div class="control-heading"><label for="construction-step-size">Step size</label><output id="construction-step-size-output">0.20 u</output></div><input id="construction-step-size" type="range" min="0.01" max="0.35" step="0.005" value="0.2" aria-describedby="construction-step-help"><p class="control-help" id="construction-step-help">Tangent step = arrow length · smaller is more accurate</p></div>
+      <div class="control-group"><div class="control-heading"><label for="construction-speed">Animation speed</label><output id="construction-speed-output">1.00×</output></div><input id="construction-speed" type="range" min="0.1" max="4" step="0.05" value="1" aria-describedby="construction-speed-help"><p class="control-help" id="construction-speed-help">Pace of movement and projection</p></div>
       <div class="control-group action-control"><div class="shape-buttons construction-progression" role="group" aria-label="Progression mode"><button id="construction-manual" type="button" aria-pressed="true">Manual</button><button id="construction-auto" type="button" aria-pressed="false">Automatic</button></div><div class="actions"><button id="construction-next" class="primary-button" type="button">▷ Move to next point</button><button id="construction-reset" class="secondary-button" type="button">↺ Reset</button></div></div>
     </section>
-    <section class="tidal-controls tidal-only" aria-label="Tidal forces controls" hidden>
+    <section class="tidal-controls compact-controls tidal-only" aria-label="Tidal forces controls" hidden>
       <div class="control-group"><div class="control-heading"><label for="tidal-shells">Concentric shells</label><output id="tidal-shells-output" for="tidal-shells">1 shell</output></div><input id="tidal-shells" type="range" min="1" max="4" step="1" value="1" aria-describedby="tidal-particle-count"><div class="shell-ticks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span></div><p class="control-help" id="tidal-particle-count">600 small test masses per shell</p></div>
       <div class="control-group"><div class="control-heading"><label for="tidal-time">Time</label><output id="tidal-time-output" for="tidal-time">0.00 / 40.00 s</output></div><input id="tidal-time" type="range" min="0" max="40" step="0.01" value="0" aria-describedby="tidal-time-help"><p class="control-help" id="tidal-time-help">Drag to inspect a moment · playback pauses</p></div>
       <div class="control-group"><div class="control-heading"><label for="tidal-speed">Simulation speed</label><output id="tidal-speed-output" for="tidal-speed">1.00×</output></div><input id="tidal-speed" type="range" min="0.1" max="4" step="0.05" value="1" aria-describedby="tidal-speed-help"><p class="control-help" id="tidal-speed-help">Slower or faster playback of the same fall</p></div>

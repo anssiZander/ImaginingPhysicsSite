@@ -177,8 +177,8 @@ input[type=checkbox] { width: 11px; height: 11px; margin: 0; accent-color: var(-
 .transport-controls .actions button { min-height: 30px; padding: 6px 9px; font-size: 10px; gap: 5px; }
 /* Keep descriptions available to assistive technology without extra rows. */
 .transport-controls :is(.control-help, .control-label, .loop-geometry-help, .circle-explanation),
-.deviation-controls .control-help,
-body[data-mode=deviation] #surface-heading > div { position: absolute; left: 0; top: 0; min-width: 0; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.compact-controls .control-help,
+body[data-compact-view=true] #surface-heading > div { position: absolute; left: 0; top: 0; min-width: 0; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 body[data-mode=transport] .sphere-footer { flex-wrap: wrap; }
 body[data-mode=transport] .view-controls { gap: 8px; flex-wrap: wrap; margin-left: auto; }
 .view-controls .visibility-controls { gap: 10px; margin: 0; }
@@ -310,29 +310,33 @@ body[data-deviation-construction=true] .area-relation-label { white-space: pre; 
 #separation::-webkit-slider-thumb { background: var(--separation); }
 #separation::-moz-range-thumb { background: var(--separation); }
 #separation-output { color: var(--separation); }
-/* Give deviation the full panel height; secondary controls float over the scene. */
-body[data-mode=deviation] .app { min-height: 560px; gap: 6px; }
-body[data-mode=deviation] .workspace { min-height: 320px; }
-body[data-mode=deviation] #surface-heading { padding: 0; flex: 0 0 auto; }
-body[data-mode=deviation] #surface-badge { border: 0; padding: 0; }
-body[data-mode=deviation] .sphere-footer { position: absolute; left: 22px; bottom: 10px; max-width: calc(100% - 210px); padding: 0; pointer-events: none; font-size: 9px; }
-body[data-mode=deviation] .deviation-equation { bottom: 38px; }
-.deviation-sidebar { position: absolute; top: 12px; right: 12px; bottom: 12px; width: 260px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; pointer-events: none; z-index: 2; }
-.deviation-sidebar > :is(.deviation-readouts, .deviation-build-panel) { position: static; flex: 0 1 auto; min-height: 0; max-height: none; margin: 0; overflow: auto; pointer-events: auto; scrollbar-width: thin; scrollbar-color: #42606a transparent; }
-.deviation-sidebar > .view-controls { flex: 0 0 auto; flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 4px; width: 164px; margin: auto 0 0; padding: 6px; background: #0b1822ed; border: 1px solid #2b414a; border-radius: 7px; pointer-events: auto; }
-.deviation-sidebar .view-controls :is(button, label) { min-height: 28px; padding: 5px 8px; font-size: 10px; }
-.deviation-sidebar .view-controls label { justify-content: center; }
-body[data-mode=deviation] .deviation-controls { display: flex; align-items: center; min-height: 54px; padding: 8px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #395361 transparent; }
-.deviation-controls > .control-group { flex: 1 0 140px; min-width: 140px; padding: 0 12px; }
-.deviation-controls .control-heading { gap: 8px; margin-bottom: 10px; white-space: nowrap; }
-.deviation-controls input[type=range] { margin-bottom: 5px; }
-.deviation-controls > .action-control { flex: 0 0 auto; flex-direction: row; align-items: center; gap: 8px; padding-right: 0; }
-.deviation-controls #deviation-progression { flex: 0 0 auto; margin: 0; }
-.deviation-controls #deviation-progression button { padding: 6px 8px; }
-.deviation-controls .actions { gap: 6px; }
-.deviation-controls .actions button { min-height: 32px; padding: 6px 10px; font-size: 10px; }
-body[data-mode=deviation] .page-footer { min-height: 14px; font-size: 9px; }
-body[data-mode=deviation] #status { font-size: 9px; }
+/* Keep the scene tall: one header, compact playback controls, floating view options. */
+body[data-compact-view=true] .app { min-height: 560px; gap: 6px; }
+body[data-compact-view=true] .workspace { min-height: 320px; }
+body[data-compact-view=true] #surface-heading { padding: 0; flex: 0 0 auto; }
+body[data-mode=tidal] #surface-heading { margin-left: auto; }
+body[data-compact-view=true] #surface-badge { border: 0; padding: 0; }
+body[data-compact-view=true] .sphere-footer { position: absolute; left: 22px; bottom: 10px; max-width: calc(100% - 210px); padding: 0; pointer-events: none; font-size: 9px; }
+body[data-compact-view=true] :is(.deviation-equation, .construction-equation, .tidal-equation) { bottom: 38px; }
+.view-sidebar { position: absolute; top: 12px; right: 12px; bottom: 12px; width: 260px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; pointer-events: none; z-index: 2; }
+.geodesic-sidebar { width: 230px; }
+.tidal-sidebar { width: 170px; }
+.view-sidebar > :is(.deviation-readouts, .deviation-build-panel, .projection-card, .tidal-axis-readouts) { position: static; flex: 0 1 auto; min-height: 0; max-height: none; margin: 0; overflow: auto; pointer-events: auto; scrollbar-width: thin; scrollbar-color: #42606a transparent; }
+.view-sidebar > .view-controls { flex: 0 0 auto; flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 4px; width: 164px; margin: auto 0 0; padding: 6px; background: #0b1822ed; border: 1px solid #2b414a; border-radius: 7px; pointer-events: auto; }
+.view-sidebar .view-controls :is(button, label) { min-height: 28px; padding: 5px 8px; font-size: 10px; }
+.view-sidebar .view-controls label { justify-content: center; }
+body[data-compact-view=true] .compact-controls { display: flex; align-items: center; min-height: 54px; padding: 8px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: #395361 transparent; }
+.compact-controls > .control-group { flex: 1 0 140px; min-width: 140px; padding: 0 12px; }
+.compact-controls .control-heading { gap: 8px; margin-bottom: 10px; white-space: nowrap; }
+.compact-controls input[type=range] { margin-bottom: 5px; }
+.compact-controls .shell-ticks { display: none; }
+.compact-controls > .action-control { flex: 0 0 auto; flex-direction: row; align-items: center; gap: 8px; padding-right: 0; }
+.compact-controls :is(#deviation-progression, .construction-progression) { flex: 0 0 auto; margin: 0; }
+.compact-controls :is(#deviation-progression, .construction-progression) button { padding: 6px 8px; }
+.compact-controls .actions { gap: 6px; }
+.compact-controls .actions button { min-height: 32px; padding: 6px 10px; font-size: 10px; }
+body[data-compact-view=true] .page-footer { min-height: 14px; font-size: 9px; }
+body[data-compact-view=true] #status { font-size: 9px; }
 @media (max-width: 1450px) {
   .readout-card .compass { display: none; }
   .readout-card .big-number { font-size: 24px; }
@@ -359,13 +363,15 @@ body[data-mode=deviation] #status { font-size: 9px; }
   body[data-mode=geodesic] .app { height: 100svh; min-height: 800px; }
   body[data-mode=geodesic] .workspace { flex: 1; grid-template-rows: minmax(0, 1fr); min-height: 480px; }
   body[data-mode=geodesic] .sphere-stage { display: grid; grid-template-columns: 1fr; grid-template-rows: auto minmax(230px, 1fr) auto; height: auto; min-height: 0; flex: 1; }
-  body[data-mode=geodesic] #sphere-canvas { grid-row: 2; min-height: 0; }
+  body[data-mode=geodesic] #sphere-canvas { grid-row: 2; grid-column: 1; min-height: 0; }
+  .geodesic-sidebar { display: contents; }
+  .geodesic-sidebar > .view-controls { position: relative; grid-row: 2; grid-column: 1; align-self: end; justify-self: end; margin: 0 10px 10px 0; width: 150px; z-index: 2; }
   .construction-status { position: relative; grid-row: 1; left: auto; top: auto; padding: 8px 12px 0; }
   #construction-instruction { display: none; }
   #construction-phase { font-size: 14px; }
   .construction-phases { margin: 6px 0 0; }
   .construction-phases span { padding: 3px 8px; }
-  .projection-card { position: relative; grid-row: 3; right: auto; top: auto; width: auto; margin: 5px 10px; padding: 6px 10px; display: grid; grid-template-columns: 42% 1fr; gap: 0 12px; }
+  .geodesic-sidebar > .projection-card { position: relative; grid-row: 3; grid-column: 1; right: auto; top: auto; width: auto; margin: 5px 10px; padding: 6px 10px; display: grid; grid-template-columns: 42% 1fr; gap: 0 12px; }
   .projection-card > .metric-label { grid-column: 1 / -1; font-size: 8px; }
   .projection-diagram { grid-row: 2 / 6; height: 85px; align-self: center; }
   .component-readout { grid-column: 2; font-size: 9px; padding: 2px 0; }
@@ -373,23 +379,11 @@ body[data-mode=deviation] #status { font-size: 9px; }
   .construction-formula { grid-column: 2; font-size: 11px; margin: 2px 0; line-height: 1.35; }
   .projection-card > .readout-caption { grid-column: 1 / -1; font-size: 8px; margin-top: 2px; }
   .construction-equation { display: none; }
-  .construction-controls { grid-template-columns: 1fr 1fr; row-gap: 10px; }
-  .construction-controls .control-group:nth-child(3) { border-left: 0; }
-  .construction-controls .action-control { display: flex; flex-direction: column; gap: 6px; }
-  .construction-progression { margin: 0; }
-  .construction-progression button { font-size: 9px; padding: 5px; }
-  .construction-controls .actions { flex: 1; gap: 5px; }
-  .construction-controls .actions button { font-size: 9px; padding-left: 6px; padding-right: 6px; }
+  body[data-mode=geodesic] .sphere-footer { display: none; }
   body[data-mode=geodesic] #status { max-width: none; text-align: left; font-size: 9px; }
   body[data-mode=tidal] .app { height: 100svh; min-height: 740px; }
   body[data-mode=tidal] .workspace { flex: 1; grid-template-rows: minmax(0, 1fr); min-height: 430px; }
   body[data-mode=tidal] .sphere-stage { height: auto; min-height: 0; flex: 1; }
-  .tidal-controls { grid-template-columns: 1fr 1fr; row-gap: 12px; }
-  .tidal-controls .control-group:nth-child(3) { border-left: 0; }
-  .tidal-controls .action-control { grid-column: auto; }
-  .tidal-controls .action-control .actions { flex-direction: column; gap: 4px; }
-  .tidal-controls .action-control button { padding: 7px; font-size: 10px; }
-  .tidal-controls .action-control .control-help { display: none; }
   .tidal-clock { left: 14px; top: 10px; padding-left: 9px; }
   .tidal-clock output { font-size: 32px; }
   #tidal-fall-readout, #tidal-grid-note { max-width: 170px; font-size: 9px; }
@@ -431,13 +425,12 @@ body[data-mode=deviation] #status { font-size: 9px; }
   .deviation-legend { left: 14px; top: 12px; gap: 10px; font-size: 10px; }
   .deviation-equation { left: 14px; bottom: 12px; }
   .deviation-equation div { font-size: 18px; }
-  body[data-mode=deviation] .deviation-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 0; padding: 8px 0; overflow: visible; }
-  .deviation-controls > .control-group { min-width: 0; }
-  .deviation-controls .control-group:nth-child(3) { border-left: 0; }
-  .deviation-controls > .action-control { justify-content: flex-end; padding-right: 12px; }
+  body[data-compact-view=true] .compact-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 0; padding: 8px 0; overflow: visible; }
+  .compact-controls > .control-group { min-width: 0; }
+  .compact-controls .control-group:nth-child(3) { border-left: 0; }
+  .compact-controls > .action-control { justify-content: flex-end; padding-right: 12px; grid-column: 1 / -1; border-left: 0; }
   .deviation-build-panel { right: 12px; top: 34px; width: 225px; padding: 10px; }
   body[data-mode=deviation][data-other-path=false] .deviation-controls { grid-template-columns: 1fr 1fr; }
-  .deviation-controls .action-control { grid-column: 1 / -1; border-left: 0; }
 }
 @media (max-width: 500px) {
   .experiment-choice { display: grid; grid-template-columns: 1fr 1fr; }
@@ -464,7 +457,9 @@ body[data-mode=deviation] #status { font-size: 9px; }
   .deviation-sidebar > .deviation-build-panel { position: relative; grid-row: 2; grid-column: 1; top: auto; right: auto; width: auto; max-height: none; margin: 0 12px; }
   .deviation-sidebar > .view-controls { position: absolute; bottom: 60px; right: 10px; width: 150px; z-index: 2; }
   body[data-mode=deviation] .sphere-footer { display: none; }
-  .deviation-controls > .action-control { justify-content: space-between; flex-wrap: wrap; }
+  .compact-controls > .action-control { justify-content: space-between; flex-wrap: wrap; }
+  body[data-mode=tidal] .sphere-footer { display: none; }
+  body[data-mode=tidal] .tidal-equation { bottom: 98px; }
   body[data-mode=deviation] #sphere-canvas { grid-row: 3; grid-column: 1; min-height: 0; }
   body[data-mode=deviation][data-other-path=false] .sphere-stage { grid-template-rows: 20px minmax(0, 1fr) 42px; }
   body[data-mode=deviation][data-other-path=false] #sphere-canvas { grid-row: 2; }
