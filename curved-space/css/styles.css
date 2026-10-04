@@ -287,20 +287,11 @@ body[data-deviation-construction=true] .deviation-controls { grid-template-colum
 .build-heading span { color: #94aab5; font: 10px var(--mono); }
 .deviation-build-panel .construction-phases { gap: 5px; margin-top: 11px; }
 .deviation-build-panel .construction-phases span { padding: 4px 6px; font-size: 9px; }
-#deviation-build-instruction { color: #aac0cc; font-size: 10px; line-height: 1.4; margin: 7px 0; }
-.deviation-build-panel table { width: 100%; border-collapse: collapse; margin: 6px 0; font: 11px var(--mono); }
-.deviation-build-panel th { text-align: left; font-weight: normal; padding: 3px 0; }
-.deviation-build-panel td, .deviation-build-panel thead th { text-align: right; }
-.deviation-build-panel thead { color: #8fa8b7; font-size: 9px; }
-.deviation-build-panel small { color: #849aa6; font-size: 8px; }
-.build-separations { display: flex; gap: 20px; margin: 8px 0; font: 11px var(--mono); }
-.build-separations > div { display: flex; align-items: baseline; gap: 8px; }
 .build-old { color: var(--build-old); } .build-current { color: var(--build-current); }
 .build-area { display: flex; justify-content: space-between; font: 10px var(--mono); padding: 5px 0; border-top: 1px solid #253946; }
 .build-formula { font: italic 11px Georgia, serif; color: #d4dce1; line-height: 1.45; margin: 2px 0; }
 .build-formula sup { font-size: 8px; }
 .build-formula sub, .geodesic-label sub { font-size: 0.75em; line-height: 0; }
-.build-note { color: #8aa3b0; font-size: 9px; line-height: 1.35; margin: 6px 0 0; }
 .deviation-build-panel { scrollbar-width: thin; scrollbar-color: #42606a transparent; }
 body[data-deviation-construction=true] .geodesic-label { font-size: 12px; white-space: nowrap; }
 body[data-deviation-construction=true] .area-relation-label { white-space: pre; text-align: center; line-height: 1.3; padding: 2px 5px; background: #0b19242e; text-shadow: 0 1px 3px #08131c, 0 0 2px #08131c; }

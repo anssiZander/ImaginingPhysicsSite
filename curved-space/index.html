@@ -60,21 +60,9 @@
           <aside id="deviation-build-panel" class="deviation-build-panel" aria-label="Deviation construction measurements" hidden>
             <div class="build-heading"><strong>Deviation construction</strong><span id="deviation-build-step">Step 1</span></div>
             <div class="construction-phases"><span id="deviation-phase-move">1 · Move</span><span id="deviation-phase-transport">2 · Transport v₁ → v₂</span></div>
-            <p id="deviation-build-instruction">Advance both geodesics, then carry teal v₁ to yellow v₂.</p>
-            <div class="build-separations"><div class="build-old"><span>|ξ old|</span><output><span id="build-old">—</span> <small>u</small></output></div><div class="build-current"><span>|ξ new|</span><output><span id="build-xi">—</span> <small>u</small></output></div></div>
-            <table aria-label="Velocities compared at the yellow point"><tbody>
-              <tr class="geodesic-a"><th>|v₁| = |Pv₁| <small>u/s</small></th><td id="build-velocity-1">—</td></tr>
-              <tr class="geodesic-b"><th>|v₂| <small>u/s</small></th><td id="build-velocity-2">—</td></tr>
-              <tr><th>|Δv new| <small>u/s</small></th><td id="build-velocity-difference">—</td></tr>
-              <tr class="build-old"><th>|Pₜ Δv old| <small>u/s</small></th><td id="build-previous-difference">—</td></tr>
-              <tr class="build-difference"><th>|δv extra| <small>u/s</small></th><td id="build-extra-difference">—</td></tr>
-              <tr><th>Velocity angle <small>rad</small></th><td id="build-velocity-angle">—</td></tr>
-            </tbody></table>
             <div class="build-area"><span>Swept area</span><output id="deviation-build-area">0.00 u²</output></div>
             <div class="build-area"><span>Δt</span><output id="deviation-build-dt">0.00 s</output></div>
             <p class="build-formula">Δv new = <span class="geodesic-a">Pv₁</span> − <span class="geodesic-b">v₂</span><br>Δv new = <span class="build-old">Pₜ Δv old</span> + <span class="build-difference">δv</span><br><span class="build-difference">δv</span> ≈ (∇<sub class="geodesic-b">v</sub>∇<sub class="geodesic-b">v</sub><span class="build-current">ξ</span>) Δt</p>
-            <p class="build-note">ξ: yellow → teal. P: back along connector.<br>Pₜ: along yellow. Approx.: small gap, short step.</p>
-            <p id="deviation-build-scale" class="build-note"></p>
           </aside>
           </div>
           <div class="construction-status geodesic-only" hidden>

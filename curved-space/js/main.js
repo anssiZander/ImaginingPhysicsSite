@@ -128,27 +128,11 @@ function updateDeviationConstructionReadout() {
   const b = deviationConstruction;
   $('deviation-build-step').textContent = `Step ${b.completedSteps + (b.phase === 'transport' && b.phaseComplete ? 0 : 1)}`;
   for (const phase of ['move', 'transport']) $(`deviation-phase-${phase}`).setAttribute('aria-current', b.phase === phase ? 'step' : 'false');
-  $('deviation-build-instruction').textContent = {
-    ready: 'Advance both geodesics, then carry teal v₁ to yellow v₂.',
-    move: 'Both points advance along their geodesics. Their new velocities remain tangent.',
-    transport: 'Carry teal v₁ along the new connector to yellow v₂, keeping its length.',
-  }[b.phase];
-  $('build-old').textContent = b.start ? formatNumber(b.start.connector.length) : '—';
-  $('build-xi').textContent = formatNumber(deviation.gap);
-  $('build-velocity-1').textContent = formatNumber(CONFIG.deviation.speed);
-  $('build-velocity-2').textContent = formatNumber(CONFIG.deviation.speed);
-  const compared = b.comparisonReveal > 0 ? b.comparison : null;
-  const split = compared ? b.velocityDecomposition : null;
-  $('build-velocity-difference').textContent = compared ? formatNumber(compared.magnitude) : '—';
-  $('build-previous-difference').textContent = split ? formatNumber(Math.hypot(...split.transportedPrevious)) : '—';
-  $('build-extra-difference').textContent = split ? formatNumber(Math.hypot(...split.extra)) : '—';
-  $('build-velocity-angle').textContent = compared ? formatNumber(Math.abs(compared.angle)) : '—';
   const differenceColor = signedColor(b.strip?.curvatureIntegral ?? deviation.surface.principal(deviation.particles[1].latitude).gaussian);
   document.querySelectorAll('.build-difference').forEach(element => { element.style.color = differenceColor; });
   $('deviation-build-area').textContent = `${formatNumber(b.strip?.area ?? 0)} u²`;
   $('deviation-build-area').style.color = signedColor(b.strip?.curvatureIntegral ?? deviation.curvature);
   $('deviation-build-dt').textContent = `${formatNumber(b.start ? deviation.time - b.start.time : 0)} s`;
-  $('deviation-build-scale').textContent = 'One scale · cyan + red/blue = new Δv.';
   $('deviation-step-output').textContent = `${formatNumber(b.stepSize)} u`;
   $('deviation-step-size').setAttribute('aria-valuetext', `${formatNumber(b.stepSize)} surface units`);
   updateRange($('deviation-step-size'));
