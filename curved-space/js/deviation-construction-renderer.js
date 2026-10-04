@@ -80,7 +80,7 @@ export function drawDeviationConstruction(renderer, batch, model) {
     if (i % 2) line(renderer.world(points[i - 1], velocityOffset), renderer.world(points[i], velocityOffset), rgba(teal, c.transportPathOpacity), c.transportPathWidthPx);
   }
   view.gl.disable(view.gl.DEPTH_TEST); view.drawBatch(batch); batch.vertices.length = 0;
-  renderer.globeArrow(carried, carried.angle, arrowScale, rgba(teal), velocityOffset, CONFIG.deviation.velocityArrowThickness);
+  renderer.globeArrow(carried, carried.angle, arrowScale, rgba(teal), velocityOffset, CONFIG.deviation.velocityArrowThickness, true);
   const arrowLength = CONFIG.geometry.arrowLength * arrowScale * radius;
   const tip = add(base, scale(tangentVector(carried.latitude, carried.longitude, carried.angle), arrowLength));
   label(tip, 'Pv₁', teal, -c.velocityLabelGapPx, -2 * c.velocityLabelGapPx, false);

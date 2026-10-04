@@ -28,7 +28,7 @@
     </header>
     <section class="workspace" aria-label="Synchronized views of parallel transport">
       <section class="sphere-panel" aria-labelledby="sphere-title">
-        <div class="panel-header">
+        <div class="panel-header" id="surface-heading">
           <div><div class="panel-index">01 <span>CURVED SPACE</span></div><h2 id="sphere-title">The sphere</h2></div>
           <span class="small-badge" id="surface-badge">UNIT RADIUS · K = 1</span>
         </div>
@@ -49,13 +49,14 @@
             <div id="deviation-formula">∇<sub>v</sub>∇<sub>v</sub> ξ = −R(ξ, v)v</div>
             <span id="deviation-equation-caption">Transverse separation: j̈ = −K |v|² j</span>
           </div>
+          <div class="deviation-legend deviation-only" hidden><span class="geodesic-a comparison-only">● v₁ · geodesic 1</span><span class="geodesic-b" id="orange-legend">● v₂ · geodesic 2</span><span class="separation-color comparison-only">ξ · separation</span><span id="elapsed-time">t = 0.00 s</span></div>
+          <div id="deviation-sidebar" class="deviation-sidebar deviation-only" hidden>
           <aside class="deviation-readouts deviation-only comparison-only" aria-label="Geodesic separation measurements" hidden>
             <div class="deviation-readout"><span class="metric-label">SURFACE GAP |ξ|</span><output id="gap-value">0.12 <small>u</small></output><span class="readout-caption">between the two geodesics</span></div>
             <div class="deviation-readout"><span class="metric-label">JACOBI PREDICTION |j|</span><output id="jacobi-value">0.12 <small>u</small></output><span class="readout-caption" id="jacobi-caption">small-separation approximation</span></div>
             <div class="deviation-readout"><span class="metric-label">GAUSSIAN CURVATURE K</span><output id="deviation-curvature">+1.00 <small>u⁻²</small></output><span class="readout-caption" id="curvature-effect">Positive curvature focuses nearby paths.</span></div>
             <div class="deviation-readout"><span class="metric-label">RELATIVE ACCELERATION j̈</span><output id="deviation-acceleration">−0.12 <small>u/s²</small></output><span class="readout-caption">−K |v|² j · signed transverse component</span></div>
           </aside>
-          <div class="deviation-legend deviation-only" hidden><span class="geodesic-a comparison-only">● v₁ · geodesic 1</span><span class="geodesic-b" id="orange-legend">● v₂ · geodesic 2</span><span class="separation-color comparison-only">ξ · separation</span><span id="elapsed-time">t = 0.00 s</span></div>
           <aside id="deviation-build-panel" class="deviation-build-panel" aria-label="Deviation construction measurements" hidden>
             <div class="build-heading"><strong>Deviation construction</strong><span id="deviation-build-step">Step 1</span></div>
             <div class="construction-phases"><span id="deviation-phase-move">1 · Move</span><span id="deviation-phase-transport">2 · Transport v₁ → v₂</span></div>
@@ -75,6 +76,7 @@
             <p class="build-note">ξ: yellow → teal. P: back along connector.<br>Pₜ: along yellow. Approx.: small gap, short step.</p>
             <p id="deviation-build-scale" class="build-note"></p>
           </aside>
+          </div>
           <div class="construction-status geodesic-only" hidden>
             <div><span id="construction-step">Step 1</span><strong id="construction-phase">Ready to move</strong></div>
             <div class="construction-phases" aria-label="Construction phases"><span id="phase-move">1 · Move</span><span id="phase-resolve">2 · Resolve</span><span id="phase-project">3 · Project</span></div>
@@ -211,9 +213,9 @@
 
     <section class="deviation-controls deviation-only" aria-label="Geodesic deviation controls" hidden>
       <div class="control-group comparison-only"><div class="control-heading"><label for="separation">Initial separation</label><output id="separation-output" for="separation">0.12 u</output></div><input id="separation" type="range" aria-describedby="separation-help"><p class="control-help" id="separation-help">Perpendicular to the initial velocities</p></div>
-      <div class="control-group"><div class="control-heading"><label for="launch-direction">Launch direction</label><output id="launch-direction-output" for="launch-direction">0°</output></div><input id="launch-direction" type="range" min="0" max="360" step="1" value="0"><p class="control-help" id="launch-direction-help">0° east · 90° north</p></div>
-      <div class="control-group"><div class="control-heading"><label for="deviation-speed">Animation speed</label><output id="deviation-speed-output" for="deviation-speed">1.00×</output></div><input id="deviation-speed" type="range" min="0.1" max="4" step="0.05" value="1"><p class="control-help">Playback rate · same geodesics</p></div>
-      <div id="deviation-step-control" class="control-group" hidden><div class="control-heading"><label for="deviation-step-size">Step length</label><output id="deviation-step-output">0.20 u</output></div><input id="deviation-step-size" type="range"><p class="control-help">Distance along each geodesic</p></div>
+      <div class="control-group"><div class="control-heading"><label for="launch-direction">Launch direction</label><output id="launch-direction-output" for="launch-direction">0°</output></div><input id="launch-direction" type="range" min="0" max="360" step="1" value="0" aria-describedby="launch-direction-help"><p class="control-help" id="launch-direction-help">0° east · 90° north</p></div>
+      <div class="control-group"><div class="control-heading"><label for="deviation-speed">Animation speed</label><output id="deviation-speed-output" for="deviation-speed">1.00×</output></div><input id="deviation-speed" type="range" min="0.1" max="4" step="0.05" value="1" aria-describedby="deviation-speed-help"><p class="control-help" id="deviation-speed-help">Playback rate · same geodesics</p></div>
+      <div id="deviation-step-control" class="control-group" hidden><div class="control-heading"><label for="deviation-step-size">Step length</label><output id="deviation-step-output">0.20 u</output></div><input id="deviation-step-size" type="range" aria-describedby="deviation-step-help"><p class="control-help" id="deviation-step-help">Distance along each geodesic</p></div>
       <div class="control-group action-control"><div id="deviation-progression" class="shape-buttons" role="group" aria-label="Deviation construction progression" hidden><button id="deviation-build-manual" type="button" aria-pressed="true">Manual</button><button id="deviation-build-auto" type="button" aria-pressed="false">Automatic</button></div><div class="actions"><button id="launch-geodesics" class="primary-button" type="button">▷ Launch geodesics</button><button id="restart-geodesics" class="secondary-button" type="button">↺ Restart</button></div><p class="control-help demo-help" id="geodesic-speed">Equal speeds · initially parallel velocities</p></div>
     </section>
     <section class="construction-controls geodesic-only" aria-label="Geodesic construction controls" hidden>

@@ -2,7 +2,7 @@ import { CONFIG } from './config.js';
 import { drawDeviationConstruction, drawDeviationStrip } from './deviation-construction-renderer.js';
 import { createAreaMask } from './area.js';
 import { arrowAxialDimensions, createArrowVertices } from './arrow-mesh.js';
-import { tidalCameraEye } from './camera.js';
+import { deviationConstructionFocus, tidalCameraEye } from './camera.js';
 import { createParticleSphere } from './particle-mesh.js';
 import { tidalGridMotion, tidalToWorld } from './tidal.js';
 import { drawGeodesicConstruction } from './geodesic-renderer.js';
@@ -412,10 +412,19 @@ export class Renderer {
     this.topView = !!camera.isTopView;
     this.firstPerson = !camera.isTopView && !!(model.isGeodesic ? options.geodesicFirstPerson : model.isDeviation && options.firstPerson);
     const settings = camera.isTopView ? CONFIG.topView : this.firstPerson ? { ...CONFIG.firstPerson, ...(model.isGeodesic ? CONFIG.geodesic.firstPerson : {}) } : CONFIG.camera;
+    const building = model.isDeviation && model.construction?.enabled;
     this.cameraPose = camera.isTopView ? camera.pose(model, radius) : this.firstPerson ? camera.pose(this.surface, model.isGeodesic ? model.currentPoint : model.particles[1], radius) : null;
+    if (building && !this.cameraPose) {
+      const orbitEye = camera.eye(radius), forward = normalize(scale(orbitEye, -1));
+      const focus = scale(deviationConstructionFocus(model, camera.distance, camera.config), radius);
+      // Pan the outside camera without changing its orbit orientation or depth.
+      const target = add(focus, scale(forward, -dot(focus, forward))), eye = add(orbitEye, target);
+      this.cameraPose = { eye, target, forward, up: [0, 1, 0], distance: camera.distance, view: lookAt(eye, target) };
+    }
     const eye = this.cameraPose?.eye ?? camera.eye(radius);
     const aspect = view.width / view.height;
-    const fov = 2 * Math.atan(Math.tan(radians(settings.fieldOfViewDeg) / 2) / (!this.firstPerson && CONFIG.camera.fitNarrowViews ? Math.min(1, aspect) : 1));
+    const constructionZoom = building ? model.construction.config.defaultZoom : 1;
+    const fov = 2 * Math.atan(Math.tan(radians(settings.fieldOfViewDeg) / 2) / (constructionZoom * (!this.firstPerson && CONFIG.camera.fitNarrowViews ? Math.min(1, aspect) : 1)));
     const matrix = multiply(perspective(fov, aspect, settings.near * radius, settings.far * radius), this.cameraPose?.view ?? lookAt(eye));
     this.matrix = matrix;
     this.eye = eye;
@@ -502,9 +511,10 @@ export class Renderer {
       if (marker) batch.disk(marker, this.firstPerson ? close.markerRadiusPx : CONFIG.geometry.markerRadiusPx, this.rgba(key));
       if (this.surface.isTorus && !this.firstPerson) worldLine(this.world(point), this.world(point, velocityOffset), 1, this.rgba(key, 0.5));
       if (this.firstPerson || (i === 1 && model.construction?.enabled && model.construction.phase === 'transport')) continue;
-      const labelWorld = add(this.world(point, velocityOffset + c.velocityLabelNormalOffset), scale(tangentVector(point.latitude, point.longitude, point.angle), (CONFIG.geometry.arrowLength * arrowScale + c.velocityLabelGap) * radius));
+      const building = model.construction?.enabled;
+      const labelWorld = add(this.world(point, velocityOffset + (building ? 0 : c.velocityLabelNormalOffset)), scale(tangentVector(point.latitude, point.longitude, point.angle), (CONFIG.geometry.arrowLength * arrowScale + (building ? 0 : c.velocityLabelGap)) * radius));
       const label = toScreen(labelWorld);
-      this.deviationLabels.push({ x: label[0], y: label[1] + (i ? -7 : 7), visible: this.visible(labelWorld), text: options.otherPath ? i ? 'v₂' : 'v₁' : 'v', color: CONFIG.colors[key] });
+      this.deviationLabels.push({ x: label[0], y: label[1] + (building ? -c.construction.velocityLabelGapPx : i ? -7 : 7), visible: this.visible(labelWorld), text: options.otherPath ? i ? 'v₂' : 'v₁' : 'v', color: CONFIG.colors[key] });
     }
     if (options.otherPath && model.connector.valid && !model.construction?.enabled) {
       const points = model.connector.points, end = points.at(-1);
@@ -529,7 +539,7 @@ export class Renderer {
       const build = model.construction;
       const opacity = i === 0 && build?.enabled && build.phase === 'transport'
         ? 1 - build.transportFraction * (1 - build.config.transportSourceOpacity) : 1;
-      this.globeArrow(point, point.angle, arrowScale, this.rgba(i ? 'geodesicB' : 'geodesicA', opacity), velocityOffset, c.velocityArrowThickness);
+      this.globeArrow(point, point.angle, arrowScale, this.rgba(i ? 'geodesicB' : 'geodesicA', opacity), velocityOffset, c.velocityArrowThickness, build?.enabled);
     }
     this.geodesicView = { paths: indices, velocityOffset, arrowScale, pathOffset, firstPerson: this.firstPerson };
   }
@@ -559,11 +569,26 @@ export class Renderer {
     }
   }
 
-  globeArrow(point, angle, size, color, offset = CONFIG.geometry.arrowSurfaceOffset, thickness = 1) {
+  globeArrow(point, angle, size, color, offset = CONFIG.geometry.arrowSurfaceOffset, thickness = 1, screenSized = false) {
     const origin = this.world(point, offset);
     const vector = tangentVector(point.latitude, point.longitude, angle);
     const shape = this.firstPerson ? [1, CONFIG.firstPerson.arrowWidthScale, CONFIG.firstPerson.arrowHeightScale] : [1, thickness, thickness];
-    this.arrow.draw(origin, vector, frame(point.latitude, point.longitude).normal, size, color, this.matrix, this.eye, shape);
+    let headLength = null;
+    if (screenSized) {
+      const c = CONFIG.deviation.construction, g = CONFIG.geometry, m = this.matrix;
+      const worldScale = size * g.sphereRadius;
+      const depth = p => m[3] * p[0] + m[7] * p[1] + m[11] * p[2] + m[15];
+      const tip = add(origin, scale(vector, g.arrowLength * worldScale));
+      // Use the nearer endpoint so perspective cannot thicken an approaching
+      // tip. CSS pixels keep the cap independent of device pixel ratio.
+      const unitsPerPixel = 2 * Math.max(1e-8, Math.min(depth(origin), depth(tip)))
+        / (this.sphere.height * Math.hypot(m[1], m[5], m[9]));
+      const widthScale = Math.min(1, unitsPerPixel * c.velocityShaftWidthPx
+        / (g.arrowShaftWidth * worldScale * Math.max(shape[1], shape[2])));
+      shape[1] *= widthScale; shape[2] *= widthScale;
+      headLength = Math.min(g.arrowLength * g.arrowHeadFraction, unitsPerPixel * c.velocityHeadLengthPx / worldScale);
+    }
+    this.arrow.draw(origin, vector, frame(point.latitude, point.longitude).normal, size, color, this.matrix, this.eye, shape, true, headLength);
   }
 
   drawAngleArc(batch, model, toScreen) {

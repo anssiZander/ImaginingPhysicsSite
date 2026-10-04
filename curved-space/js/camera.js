@@ -1,5 +1,5 @@
 import { CONFIG } from './config.js';
-import { add, clamp, cross, frame, lookAt, normalize, radians, scale, tangentVector, wrapPi } from './math.js';
+import { add, clamp, cross, dot, frame, lookAt, normalize, radians, scale, tangentVector, wrapPi } from './math.js';
 import { geodesicEndpoint } from './surface.js';
 
 // Use the particle's tangent frame, never a global-up orbit angle. This remains
@@ -45,6 +45,22 @@ export function tidalCameraEye(camera, aspect, radius = CONFIG.geometry.sphereRa
   const c = CONFIG.tidal.camera;
   const fit = Math.max(1, c.minimumAspect / aspect);
   return camera.eye(radius * fit);
+}
+
+// At the default zoom, frame the current strip and velocity arrows together.
+// As we zoom closer, follow the tips being compared, including the moving Pv1.
+export function deviationConstructionFocus(model, distance, camera = CONFIG.topView) {
+  const c = model.config, build = model.construction, surface = model.surface;
+  const offset = surface.isTorus ? c.deviation.torusVelocityOffset : c.geometry.arrowSurfaceOffset;
+  const length = c.geometry.arrowLength * (surface.isTorus ? c.deviation.torusVelocityArrowScale : c.deviation.velocityArrowScale);
+  const tip = p => add(surface.position(p.latitude, p.longitude, offset), scale(tangentVector(p.latitude, p.longitude, p.angle), length));
+  const tips = scale(add(tip(model.particles[1]), tip(build.sampleTransport() ?? model.particles[0])), 0.5);
+  const starts = build.start?.particles ?? model.particles;
+  const base = scale(add(...starts.map(p => surface.position(p.latitude, p.longitude, build.config.surfaceOffset))), 0.5);
+  const overview = scale(add(base, tips), 0.5);
+  const t = clamp((camera.distance - distance) / (camera.distance - camera.minDistance), 0, 1);
+  const blend = t * t * (3 - 2 * t);
+  return add(scale(overview, 1 - blend), scale(tips, blend));
 }
 
 export class OrbitCamera {
@@ -125,8 +141,22 @@ export class TopViewCamera extends OrbitCamera {
     // current eased position, using the same finite-step rule as the velocity.
     // No camera-only integration or starting-normal alignment: entering this
     // view mid-path gives exactly the same frame as following from the start.
-    const anchor = surface.position(point.latitude, point.longitude);
+    let anchor = surface.position(point.latitude, point.longitude);
     const up = tangentVector(point.latitude, point.longitude, point.angle);
+    if (model.isDeviation && model.construction?.enabled) {
+      const focus = deviationConstructionFocus(model, this.distance, c);
+      const shift = add(focus, scale(anchor, -1));
+      // Pan in the original tangent plane: retain the transported orientation
+      // and the same perspective depth, so construction magnification is 2x.
+      anchor = add(anchor, add(shift, scale(normal, -dot(shift, normal))));
+      // A translated tangent plane can cut through a concave torus patch.
+      // Lift only along the viewing normal before tracing the camera boom.
+      if (surface.isTorus) for (let i = 0; i < 8; i++) {
+        const clearance = surface.signedDistance(anchor);
+        if (clearance >= c.surfaceClearance) break;
+        anchor = add(anchor, scale(normal, c.surfaceClearance - clearance));
+      }
+    }
     // On an inner torus patch the opposite wall can obstruct the normal ray.
     // Stay before that wall while keeping the camera exactly above its point.
     let distance = surface.isTorus ? Math.min(this.distance, 2 * c.surfaceClearance) : this.distance;

@@ -169,6 +169,8 @@ export const CONFIG = {
     velocityLabelNormalOffset: 0.025,
     surfaceTintOpacity: 0.19,
     construction: {
+      defaultZoom: 2, // Magnification relative to the same camera in ordinary deviation mode.
+      velocityShaftWidthPx: 2, velocityHeadLengthPx: 12, // Screen-size caps; vector endpoints stay physical.
       stepSize: 0.2, minStep: 0.04, maxStep: 0.35, stepIncrement: 0.01,
       phaseSeconds: { move: 1.4, transport: 1.8 },
       automaticHoldSeconds: 1.0,

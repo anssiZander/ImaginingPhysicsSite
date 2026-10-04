@@ -480,6 +480,16 @@ function changeMode(next) {
   }
   mode = next;
   const isDeviation = mode === 'deviation';
+  // Reuse the same controls and event handlers in the compact deviation layout.
+  // Other experiments keep their panel heading and footer.
+  const heading = $('surface-heading'), viewControls = document.querySelector('.view-controls');
+  if (isDeviation) {
+    document.querySelector('.surface-toolbar').insertBefore(heading, document.querySelector('.sign-legend'));
+    $('deviation-sidebar').append(viewControls);
+  } else {
+    document.querySelector('.sphere-panel').prepend(heading);
+    document.querySelector('.sphere-footer').append(viewControls);
+  }
   document.body.dataset.mode = mode;
   for (const name of ['transport', 'geodesic', 'deviation', 'tidal']) {
     $(`${name}-mode`).setAttribute('aria-pressed', String(mode === name));
