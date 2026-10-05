@@ -37,6 +37,12 @@
       .shot-label { display:block; margin:0 0 .5rem; color:var(--cyan); font-size:.85rem; font-weight:700; }
       .post-equation { padding:.85rem 1rem; border-left:2px solid var(--cyan); background:rgba(88,202,214,.04); font-family:Georgia,'Times New Roman',serif; font-size:clamp(1.1rem,3.5vw,1.4rem); line-height:1.7; }
       .post-equation sub { font-size:.7em; }
+      .vacuum-equation { padding:1.2rem; border:1px solid var(--cyan); border-radius:12px; color:var(--cyan); text-align:center; font-size:clamp(2rem,6vw,3rem); }
+      .post-aside { margin:1.5rem 0; padding:1rem 0; border-block:1px solid var(--border); color:var(--text-soft); }
+      .post-aside summary { cursor:pointer; font-size:.95rem; }
+      .post-aside summary:focus-visible { outline:2px solid var(--cyan); outline-offset:5px; }
+      .post-aside .post-copy { font-size:.95rem; }
+      .field-equation { display:flex; flex-wrap:wrap; gap:0 .45rem; font-size:1.1rem; }
       .gold { color:#ffd397; } .teal { color:#7be1c3; } .red { color:#ff9290; } .blue { color:#85baff; } .purple { color:#cbb0ff; }
       .post-reference { color:var(--muted); font-size:.85rem; line-height:1.6; }
       .post a:focus-visible { outline:2px solid var(--cyan); outline-offset:5px; }
@@ -155,14 +161,26 @@
               <div><span class="shot-label">Released from rest · t = 0 s</span><a href="images/guide/tidal-start.jpg" target="_blank" rel="noopener noreferrer" aria-label="Enlarge the initial spherical shells"><img src="images/guide/tidal-start.jpg" width="584" height="657" alt="Two concentric spherical shells of test masses at rest in the freely falling frame." loading="lazy" /></a></div>
               <div><span class="shot-label">Stretched and squeezed · t = 40 s</span><a href="images/guide/tidal-fall.jpg" target="_blank" rel="noopener noreferrer" aria-label="Enlarge the deformed shells"><img src="images/guide/tidal-fall.jpg" width="584" height="657" alt="The same shells at the same camera scale, elongated vertically and compressed horizontally after forty seconds of free fall." loading="lazy" /></a></div>
             </div>
-            <figcaption>The axis scale factors become 2.11, 0.58, and 0.58. Using the unrounded values, their product gives V/V₀ ≈ 0.71. The volume has decreased.</figcaption>
+            <figcaption>The same cloud at release and after 40 seconds, viewed at the same scale. The three separation arrows follow the stretching and squeezing.</figcaption>
           </figure>
-          <p class="post-copy">Writing μ = GM/r³, Newtonian tides give relative accelerations +2μξ along the radial direction and −μξ in each transverse direction. These resemble one defocusing and two focusing directions in geodesic deviation. In relativity the corresponding tidal curvature belongs to <strong>spacetime</strong>, involving the time direction; this Newtonian simulation itself uses flat space.</p>
-          <p class="post-copy"><strong>The volume does not stay constant.</strong> What cancels is its <em>initial acceleration</em>: +2μ − μ − μ = 0. An initially comoving small cloud has V̇ = 0 and V̈ = 0 at release, even while its shape starts changing. Later, the unequal stretching rates also change its volume.</p>
-          <p class="post-copy">This gives a useful clue toward Einstein’s vacuum equation. For an infinitesimal, initially comoving freely falling ball, using proper time and the convention above,</p>
+          <p class="post-copy">There is something curious hidden in Newton’s gravity. Write μ = GM/r³. The relative acceleration is <span class="red">+2μξ radially</span> and <span class="blue">−μξ in each transverse direction</span>. The stretching balances the two squeezes exactly in the initial volume change:</p>
+          <p class="post-equation"><span class="red">2μ</span> <span class="blue">− μ − μ</span> = 0.</p>
+          <p class="post-copy">For a tiny cloud whose particles start at rest relative to one another, V̇(0) = 0 and V̈(0) = 0. <strong>Its volume is preserved through second order in time.</strong> The shape already changes at order t², yet the contributions to the volume cancel at that same order.</p>
+          <p class="post-copy">That balance singles out the <strong>inverse-square law</strong>. Among spherically symmetric attractions in three spatial dimensions, requiring this cancellation at every radius gives f′(r) + 2f(r)/r = 0, where f is the magnitude of acceleration toward the source. Hence r²f is constant: the only nonzero radial dependence is <strong>f(r) = C/r²</strong>. Newton’s familiar exponent is precisely the one with this second-order volume-preserving property.</p>
+          <p class="post-copy">Compare this with geodesic deviation: one direction defocuses while two focus. Differential geometry already has a quantity that measures their combined effect on volume: the <strong>Ricci tensor</strong>. It is a trace of the full curvature tensor. Evaluated along an observer’s motion, it sums the tidal curvature contributions from the three transverse spatial directions.</p>
+          <p class="post-copy">The precise volume test is this: release an infinitesimal ball of freely falling particles, initially at rest relative to one another. If u is the central observer’s four-velocity, then</p>
           <p class="post-equation">(V̈ / V)<sub>release</sub> = −Ric(u, u),</p>
-          <p class="post-copy">where u is the central observer’s four-velocity. Requiring this cancellation for every observer gives <strong>Ric = 0</strong>, the vacuum field equation with zero cosmological constant. Curvature can still distort the ball: Ricci vanishes, but tidal curvature need not. The Newtonian example points toward this distinction; it does not by itself derive the full field equations.</p>
-          <p class="post-reference">See Baez and Bunn on <a href="https://math.ucr.edu/home/baez/einstein/node5.html" target="_blank" rel="noopener noreferrer">tidal forces and a falling ball</a>, and Baez’s <a href="https://math.ucr.edu/home/baez/gr/outline2.html" target="_blank" rel="noopener noreferrer">Ricci curvature and initial volume acceleration</a>.</p>
+          <p class="post-copy">where the dots use the observer’s proper time. Ric(u, u) therefore measures the ball’s <em>initial fractional volume acceleration</em>. Positive values mean net focusing; zero allows stretching and squeezing whose volume effects cancel. Here the curvature is that of spacetime.</p>
+          <p class="post-copy">We can now turn Newton’s curious cancellation into a geometric law: require the same second-order volume preservation for every freely falling observer. Then Ric(u, u) = 0 for every timelike u, which means the Ricci tensor itself vanishes. We arrive at <strong>Einstein’s gravitational field equations in vacuum</strong>, with zero cosmological constant:</p>
+          <p class="post-equation vacuum-equation" aria-label="Ricci equals zero">Ric = 0</p>
+          <p class="post-copy">The spacetime can still be curved. Its tides can stretch a falling cloud into an ellipsoid. What vanishes is their combined contribution to this volume test—the same balance we found in Newton’s inverse-square law.</p>
+          <details class="post-aside">
+            <summary>Including matter and energy</summary>
+            <p class="post-copy">The remaining step is to determine how matter and energy source curvature. The full field equation is</p>
+            <p class="post-equation field-equation"><span>R<sub>μν</sub> − ½R g<sub>μν</sub> + Λg<sub>μν</sub></span><span>= (8πG/c⁴) T<sub>μν</sub>.</span></p>
+            <p class="post-copy">T<sub>μν</sub> contains energy, momentum, and stress; R<sub>μν</sub> is Ricci, R its scalar trace, g<sub>μν</sub> the metric, and Λ the cosmological constant. With T<sub>μν</sub> = 0 and Λ = 0, this reduces to Ric = 0.</p>
+          </details>
+          <p class="post-reference">Further reading: Baez and Bunn on <a href="https://math.ucr.edu/home/baez/einstein/node6a.html" target="_blank" rel="noopener noreferrer">volume changes and the inverse-square law</a>; Baez on <a href="https://math.ucr.edu/home/baez/gr/outline2.html" target="_blank" rel="noopener noreferrer">Ricci curvature and the falling-ball test</a>; Tong on <a href="https://www.damtp.cam.ac.uk/user/tong/gr/grhtml/S4.html" target="_blank" rel="noopener noreferrer">Einstein’s equations</a>.</p>
         </section>
 
         <a class="button button-primary" href="index.html" target="_blank" rel="noopener noreferrer">Try it in Curved Space &nearr;</a>
