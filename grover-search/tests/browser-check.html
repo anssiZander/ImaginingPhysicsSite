@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Grover article browser checks</title>
+<style>body{margin:0;background:#081320;color:#cce8ef;font:14px system-ui}#report{position:fixed;top:0;left:0;right:0;height:48px;padding:8px 20px;box-sizing:border-box;z-index:10;background:#133043}iframe{display:block;border:0;width:100%;height:calc(100vh - 48px);margin-top:48px}#report[data-status=passed]{background:#164c3a}#report[data-status=failed]{background:#701e31}</style></head>
+<body><div id="report" role="status" data-status="running">Loading production article…</div><iframe id="article" title="Production article under test" src="../index.html"></iframe>
+<script type="module">
+const report=document.querySelector('#report'),frame=document.querySelector('#article');
+let checks=0;
+function check(condition,message){if(!condition)throw Error(message);checks++;report.textContent=`${checks} checks passed · ${message}`;}
+const wait=async(predicate,message,timeout=12000)=>{const start=performance.now();while(!predicate()){if(performance.now()-start>timeout)throw Error(message);await new Promise(r=>setTimeout(r,50));}};
+const near=(a,b)=>Math.abs(a-b)<1e-8;
+try {
+  await wait(()=>frame.contentDocument?.querySelector('#column-lab'),'article loaded');
+  const doc=frame.contentDocument,win=frame.contentWindow,$=id=>doc.getElementById(id);
+  doc.documentElement.style.scrollBehavior='auto';
+  $('reflection-lab').scrollIntoView({block:'center'});
+  await wait(()=>$('reflection-lab').dataset.ready==='true','reflection widget ready');
+  check($('reflection-back').disabled,'vector Previous disabled at start');
+  check($('reflection-probability').textContent==='6.25%','vector starts at equal-superposition probability');
+  const vectorStep=async(step)=>{ $('reflection-next').click();await wait(()=>$('reflection-lab').dataset.step===String(step)&&$('reflection-lab').dataset.busy==='false',`vector step ${step}`); };
+  const vectorTip=()=>{
+    const data=$('reflection-lab').dataset,tip=$('reflection-current-tip');
+    check(near(Number(tip.getAttribute('cx')),Number(data.cx)+Number(data.radius)*Number(data.r))
+      &&near(Number(tip.getAttribute('cy')),Number(data.cy)-Number(data.radius)*Number(data.w)), 'drawn arrow agrees with state coordinates');
+  };
+  await vectorStep(1);
+  check($('reflection-marked').textContent==='−0.2500','vector oracle reverses marked component');
+  check($('reflection-probability').textContent==='6.25%','vector oracle preserves marked probability');
+  check(doc.querySelector('.oracle-mirror.is-active'),'oracle highlights the horizontal mirror');
+  vectorTip();
+  await vectorStep(2);
+  check($('reflection-marked').textContent==='+0.6875','vector uses conventional positive D');
+  check($('reflection-probability').textContent==='47.27%','first vector pair amplifies correctly');
+  check(doc.querySelector('.diffuser-mirror.is-active'),'diffuser highlights the tilted mirror');
+  check(doc.querySelector('.vector-round-arc'),'completed pair shows the round rotation');
+  vectorTip();
+  $('reflection-back').click();check($('reflection-lab').dataset.step==='1','vector Previous restores oracle endpoint');
+  $('reflection-reset').click();check($('reflection-lab').dataset.step==='0','vector Reset restores prepared state');
+  for(let step=1;step<=6;step++)await vectorStep(step);
+  check($('reflection-probability').textContent==='96.13%','vector reaches the first recommended peak');
+  check($('reflection-stop').classList.contains('is-reached'),'vector marks the recommended stop');
+  check(Number($('reflection-lab').dataset.r)<0,'vector passes into negative unmarked component near peak');
+  await vectorStep(7);await vectorStep(8);
+  check($('reflection-probability').textContent==='58.17%','vector allows overshooting the first peak');
+  check(!$('reflection-next').disabled,'vector can continue after overshoot');
+  vectorTip();
+  $('reflection-next').click();
+  if($('reflection-lab').dataset.busy==='true') {
+    $('reflection-back').click();check($('reflection-lab').dataset.step==='8'&&$('reflection-lab').dataset.busy==='false','Previous cancels an active vector sweep');
+    $('reflection-next').click();$('reflection-reset').click();
+    check($('reflection-lab').dataset.step==='0'&&$('reflection-lab').dataset.busy==='false','Reset cancels an active vector sweep');
+  } else $('reflection-reset').click();
+  check($('reflection-svg').getAttribute('aria-labelledby').includes('reflection-svg-description'),'vector has an accessible state description');
+  $('construction-lab').scrollIntoView({block:'center'});
+  await wait(()=>$('construction-lab').dataset.ready==='true','construction widget ready');
+  const constructionData=()=>$('construction-lab').dataset;
+  const constructionStep=async(step)=>{ $('construction-next').click();await wait(()=>constructionData().step===String(step)&&constructionData().busy==='false',`construction step ${step}`); };
+  const scrubConstruction=value=>{ $('construction-progress').value=String(value);$('construction-progress').dispatchEvent(new Event('input')); };
+  const inputAngle=20*Math.PI/180,a=Math.cos(inputAngle),b=Math.sin(inputAngle),q=Math.sqrt(15);
+  check($('construction-back').disabled,'construction Previous disabled at input');
+  check(near(Number(constructionData().x),a)&&near(Number(constructionData().y),b),'construction starts with the chosen vector');
+  $('construction-next').click();
+  if(!win.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    await wait(()=>Number(constructionData().position)>.1&&Number(constructionData().position)<1,'construction moves continuously');
+    check(constructionData().busy==='true'&&Number(constructionData().refX)>.25,'reference turns continuously toward the initial axis');
+    check(near(Number(constructionData().refX)*Number(constructionData().mirrorX)+Number(constructionData().refY)*Number(constructionData().mirrorY),0),'mirror stays perpendicular while the basis turns');
+    $('construction-pause').click();const pausedPosition=constructionData().position;
+    await new Promise(r=>setTimeout(r,100));
+    check(constructionData().paused==='true'&&constructionData().position===pausedPosition,'Pause freezes the intermediate state');
+    $('construction-pause').click();
+  }
+  await wait(()=>constructionData().step==='1'&&constructionData().busy==='false','basis alignment completes');
+  check(constructionData().step==='1','construction applies the inverse real rotation');
+  check(near(Number(constructionData().x),(a+q*b)/4)&&near(Number(constructionData().y),(-q*a+b)/4),'vector turns with the reference');
+  check(near(Number(constructionData().refX),1)&&near(Number(constructionData().refY),0),'rotation aligns the reference with the initial direction');
+  const beforeFlip={x:Number(constructionData().x),y:Number(constructionData().y),other:$('construction-other').textContent};
+  scrubConstruction(1500);
+  check(near(Number(constructionData().x),0)&&near(Number(constructionData().y),-1),'real reflection sweep crosses the mirror at its midpoint');
+  check(!$('construction-lab').querySelector('.construction-imaginary'),'construction uses only real vector geometry');
+  check($('construction-progress-value').textContent==='Sᵢ · 50%','scrubber reports the current gate progress');
+  check($('construction-mirror-line')&&$('construction-input-vector')&&$('construction-reflection-chord'),'mirror, original vector, and reflection chord are drawn');
+  await constructionStep(2);
+  check(constructionData().step==='2'&&near(Number(constructionData().x),-beforeFlip.x),'middle gate flips initial amplitude');
+  check(near(Number(constructionData().y),beforeFlip.y)&&$('construction-other').textContent===beforeFlip.other,'middle gate preserves all other amplitudes');
+  check($('construction-change').textContent.includes('Horizontal'),'middle stage explains the component flip');
+  await constructionStep(3);
+  check(constructionData().step==='3'&&$('construction-next').disabled,'three-stage construction ends after turning back');
+  check(near(Number(constructionData().x),(7*a-q*b)/8)&&near(Number(constructionData().y),(-q*a-7*b)/8),'constructed mixer retains the negative convention');
+  check(near(Number(constructionData().refX),.25)&&near(Number(constructionData().refY),q/4),'final turn restores the prepared reference');
+  check($('construction-norm').textContent==='1.000','real vector retains its length');
+  const cData=constructionData(),tip=$('construction-current-tip');
+  check(near(Number(tip.getAttribute('cx')),Number(cData.cx)+Number(cData.radius)*Number(cData.x))&&near(Number(tip.getAttribute('cy')),Number(cData.cy)-Number(cData.radius)*Number(cData.y)),'construction arrow shows the calculated vector');
+  check(near(Number(cData.inputX),a)&&near(Number(cData.inputY),b),'original vector returns to the original basis');
+  check(near((Number(cData.x)+a)*Number(cData.refX)+(Number(cData.y)+b)*Number(cData.refY),0)
+    &&near((Number(cData.x)-a)*Number(cData.mirrorX)+(Number(cData.y)-b)*Number(cData.mirrorY),0),'final input and output are symmetric across the visible mirror');
+  $('construction-back').click();
+  await wait(()=>constructionData().step==='2'&&constructionData().busy==='false','reverse construction animation completes');
+  check(constructionData().step==='2','construction Previous animates back to phase flip');
+  scrubConstruction(500);$('construction-pause').click();$('construction-reset').click();
+  check(constructionData().position==='0'&&constructionData().busy==='false','Reset cancels continuous playback');
+  $('construction-angle').value='-25';$('construction-angle').dispatchEvent(new Event('input'));
+  check(constructionData().step==='0'&&constructionData().angle==='-25','changing angle restarts the example');
+  check(near(Number(constructionData().x),Math.cos(-25*Math.PI/180))&&near(Number(constructionData().y),Math.sin(-25*Math.PI/180)),'angle changes the actual example vector');
+  $('construction-reset').click();check(constructionData().angle==='20'&&$('construction-back').disabled,'construction Reset restores the default');
+  check($('construction-svg').getAttribute('aria-labelledby').includes('construction-svg-description'),'construction has an accessible state description');
+  $('column-lab').scrollIntoView({block:'start'});
+  await wait(()=>$('column-lab').dataset.ready==='true','column renderer ready');
+  const goldGuidePixels=()=>{
+    const canvas=$('column-canvas'),scale=canvas.width/canvas.getBoundingClientRect().width;
+    const pixels=canvas.getContext('2d').getImageData(Math.round(8*scale),Math.round(38*scale),Math.round(265*scale),Math.round(22*scale)).data;
+    let gold=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]>175&&pixels[i+1]>130&&pixels[i+2]<175&&pixels[i]>pixels[i+1]+15)gold++;
+    return gold;
+  };
+  check(goldGuidePixels()>20,'mean guide is actually drawn on the canvas');
+  $('lab-mean-toggle').click();check(goldGuidePixels()===0,'mean guide toggle removes its canvas annotation');
+  $('lab-mean-toggle').click();check(goldGuidePixels()>20,'mean guide can be restored');
+  const step=async(completed)=>{ $('lab-next').click();await wait(()=>$('column-lab').dataset.completed===String(completed),`step ${completed}`); };
+  check($('lab-back').disabled,'Previous disabled at input');
+  await step(1);check($('lab-amplitude').textContent==='+0.2500','preparation gives +1/4');
+  await step(2);check($('lab-amplitude').textContent==='−0.2500','oracle gives −1/4');
+  check($('lab-probability').textContent==='6.25%','oracle preserves logical probability');
+  await step(3);check($('lab-combine').disabled,'cannot combine halfway through split mixer');
+  await step(4);await step(5);
+  check($('lab-amplitude').textContent==='−0.6875','split mixer retains the negative marked amplitude');
+  $('lab-back').click();check($('column-lab').dataset.completed==='4','Previous restores reference checkpoint');
+  $('lab-reset').click();$('lab-combine').click();
+  check($('lab-combine').getAttribute('aria-pressed')==='true','combined mode selected');
+  await step(1);await step(2);await step(5);
+  check($('lab-amplitude').textContent==='−0.6875','combined mixer has the same signed endpoint');
+  $('lab-back').click();check($('column-lab').dataset.completed==='2','Previous treats combined mixer as one step');
+  await step(5);await step(6);await step(9);await step(10);await step(13);
+  check($('lab-measure').classList.contains('recommended'),'measurement lights after three rounds');
+  check($('lab-probability').textContent==='96.13%','recommended marked probability');
+  await step(14);await step(17);
+  check($('lab-probability').textContent==='58.17%','continues through overshoot');
+  check($('lab-measure').classList.contains('recommended'),'measurement remains lit beyond optimum');
+  check(!$('lab-next').disabled,'can continue further');
+  $('lab-view').value='probability';$('lab-view').dispatchEvent(new Event('change'));
+  check($('lab-norm').textContent==='100.00%','probability view preserves norm');
+  check(goldGuidePixels()===0,'probability view hides the amplitude mean guide');
+  $('lab-view').value='real';$('lab-view').dispatchEvent(new Event('change'));
+  $('lab-level').click();$('lab-camera').click();
+  $('lab-next').click();$('lab-pause').click();
+  check($('lab-pause').textContent==='Resume','can pause active operation');
+  $('lab-back').click();check($('column-lab').dataset.completed==='17','Previous cancels active operation');
+  for(const image of doc.querySelectorAll('article img')){
+    image.loading='eager';await wait(()=>image.complete,'figure loaded');check(image.naturalWidth>0,'figure '+image.getAttribute('src'));
+  }
+  check(doc.documentElement.scrollWidth<=win.innerWidth,'desktop article fits viewport');
+  const demos=[['ordinary',.0625],['wave-hadamard',.0625],['free-box',.0625],['spin',1/32]];
+  $('explore').scrollIntoView({block:'start'});
+  for(const [key,probability] of demos){
+    doc.querySelector(`[data-load-demo="${key}"]`).click();
+    await wait(()=>{
+      const f=$('demo-host').querySelector('iframe');
+      // The recording helper also initializes on DOMContentLoaded. Wait for
+      // the complete document before a rapid switch can tear it down.
+      return f?.contentDocument?.readyState==='complete' && f?.contentWindow?.BohmianGrover2D?.isReady?.();
+    },`${key} WebGL initialization`,20000);
+    const f=$('demo-host').querySelector('iframe'),api=f.contentWindow.BohmianGrover2D;
+    check($('demo-host').querySelectorAll('iframe').length===1,`${key}: one full demo active`);
+    api.beginFrameRecording?.();api.startNext();api.advanceTime(5);
+    const state=api.state();
+    check(near(state.probabilities[state.target],probability),`${key}: correct prepared target probability`);
+    check(near(state.norm,1),`${key}: norm preserved`);
+    check($('demo-fullscreen').getAttribute('href')===`demos/${key}/index.html`,`${key}: full-page link matches`);
+    check(f.contentDocument.documentElement.dataset.webgl2!=='error',`${key}: no WebGL2 error`);
+  }
+  frame.style.width='390px';
+  $('reflection-lab').scrollIntoView({block:'start'});
+  await new Promise(r=>setTimeout(r,200));
+  check($('reflection-svg').getBoundingClientRect().right<=390,'mobile reflection diagram fits');
+  check($('reflection-next').getBoundingClientRect().right<=390,'mobile reflection controls fit');
+  const svgRect=$('reflection-svg').getBoundingClientRect();
+  check([...$('reflection-svg').querySelectorAll('text')].every(t=>{const r=t.getBoundingClientRect();return r.left>=svgRect.left&&r.right<=svgRect.right;}),'mobile vector labels fit inside the diagram');
+  $('construction-lab').scrollIntoView({block:'start'});
+  await new Promise(r=>setTimeout(r,200));
+  check($('construction-svg').getBoundingClientRect().right<=390,'mobile construction diagram fits');
+  check($('construction-next').getBoundingClientRect().right<=390,'mobile construction controls fit');
+  check($('construction-progress').getBoundingClientRect().right<=390,'mobile construction scrubber fits');
+  const constructionRect=$('construction-svg').getBoundingClientRect();
+  let constructionLabelsFit=true;
+  for(const position of [0,500,1500,2500,3000]) {
+    scrubConstruction(position);
+    constructionLabelsFit&&=[...$('construction-svg').querySelectorAll('text')].every(t=>{const r=t.getBoundingClientRect();return r.left>=constructionRect.left&&r.right<=constructionRect.right;});
+  }
+  check(constructionLabelsFit,'mobile vector and mirror labels fit');
+  $('column-lab').scrollIntoView({block:'start'});
+  await new Promise(r=>setTimeout(r,200));
+  check(doc.documentElement.scrollWidth<=win.innerWidth,'390px article fits viewport');
+  check($('column-canvas').getBoundingClientRect().width<=390,'mobile canvas fits viewport');
+  check($('lab-next').getBoundingClientRect().right<=390,'mobile controls remain reachable');
+  report.dataset.status='passed';report.textContent=`PASS · ${checks} browser checks · vector reflections, three-gate construction, columns, four demos, desktop and mobile layout`;
+}catch(error){report.dataset.status='failed';report.textContent=`FAIL after ${checks} checks · ${error.stack}`;console.error(error);}
+</script></body></html>

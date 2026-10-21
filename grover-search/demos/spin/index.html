@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Grover with Spin — 32 States · Free Mixing</title>
+  <link rel="icon" href="data:,"/>
+  <link rel="stylesheet" href="./styles.css?v=20261014-particles"/>
+</head>
+<body>
+<div id="wrap">
+  <aside id="ui" class="panel">
+    <div class="head"><h3 id="appTitle">Grover 4×4 × spin</h3><button id="minui" class="mini" aria-expanded="true" aria-label="Collapse controls">−</button></div>
+    <div id="uibody">
+      <div class="row"><label for="gridSize">Grid size</label><input id="gridSize" type="range" min="2" max="5" step="1" value="4" list="gridSizes" aria-describedby="gridSummary"/><span id="gridSizeValue" class="val">4×4</span></div>
+      <datalist id="gridSizes"><option value="2" label="2"></option><option value="3" label="3"></option><option value="4" label="4"></option><option value="5" label="5"></option></datalist>
+      <p id="gridSummary" class="note">16 positions × 2 spin states = 32 states. Changing size resets the search.</p>
+      <div class="section">Gates</div>
+      <div class="ops">
+        <button id="next">Apply next operation</button>
+        <button id="full" class="full">Run full search</button>
+      </div>
+      <div id="progressTrack"><div id="progressBar"></div></div>
+      <div id="stageStatus" class="status" role="status"></div>
+      <div class="section">Playback &amp; wave</div>
+      <div class="row"><label for="waveView">Wave view</label><select id="waveView"><option value="0">Total · spin colors</option><option value="1">↑ component · phase</option><option value="2">↓ component · phase</option></select></div>
+      <div class="row"><label for="speed">Gate speed</label><input id="speed" type="range" min="0.1" max="3" step="0.05" value="1"/><span id="speedValue" class="val">1.00×</span></div>
+      <div class="row"><label for="brightness">Brightness</label><input id="brightness" type="range" min="0.1" max="2" step="0.05" value="0.65"/><span id="brightnessValue" class="val">0.65</span></div>
+      <div class="row"><span>Grid labels</span><button id="gridToggle" aria-pressed="true">ON</button></div>
+      <details class="flowSettings" open><summary>Flow settings</summary>
+        <div class="row"><label for="currentMode">Arrows</label><select id="currentMode"><option value="0">Total current</option><option value="1">Transport current</option><option value="2">Spin current</option></select></div>
+        <p class="note">Arrow selection changes the display. Particles always follow the full current.</p>
+        <div class="row"><label for="arrowGrid">Arrow grid</label><input id="arrowGrid" type="range" min="8" max="36" step="2" value="20"/><span id="arrowGridValue" class="val">20</span></div>
+        <div class="row"><label for="currentGain">Arrow gain</label><input id="currentGain" type="range" min="0.25" max="10" step="0.25" value="2.5"/><span id="currentGainValue" class="val">2.5</span></div>
+        <div class="row"><label for="particleSize">Dot size</label><input id="particleSize" type="range" min="1.5" max="8" step="0.5" value="3.5"/><span id="particleSizeValue" class="val">3.5</span></div>
+        <div class="row"><label for="trailHalfLife">Trail length</label><input id="trailHalfLife" type="range" min="0.1" max="12" step="0.1" value="1.5" aria-describedby="trailLengthHelp"/><span id="trailHalfLifeValue" class="val">1.5 s</span></div>
+        <p id="trailLengthHelp" class="note">Trail fading half-life, in gate time. Longer values keep more of each path. Pause holds the trails.</p>
+        <div class="row"><label for="particleCount">Particles</label><input id="particleCount" type="range" min="0" max="1000" step="1" value="301" aria-valuetext="4,000 particles" aria-describedby="particleCountHelp"/><span id="particleCountValue" class="val">4,000</span></div>
+        <p id="particleCountHelp" class="note">1,000–100,000 particles on a logarithmic scale. Changing the count resets the search. Hidden particles keep moving.</p>
+      </details>
+    </div>
+    <div class="btnrow"><button id="reset">Reset (R)</button><button id="pause">Pause</button></div>
+  </aside>
+
+  <main id="stage">
+    <header id="waveHeader"><div class="waveHeading"><span class="eyebrow" id="stateCountLabel">16 SPATIAL MODES × SPIN ½ · 32 STATES</span><h1>Grover with spin</h1></div><div class="stateBadges"><div class="initialBadge"><span id="waveInitial">INITIAL |0,0,↑⟩</span></div><div class="targetBadge"><span id="waveTarget">MARKED |3,3,↑⟩</span><b id="waveProbability">0.0%</b></div></div>
+    <div id="selectionGuide" data-step="initial">
+      <div class="selectionMessage" role="status" aria-live="polite"><strong id="selectionTitle">1 · Initial state (green)</strong><p id="selectionHint">Click a square; click again to flip spin. Or run with the current choices.</p></div>
+      <div class="selectionActions"><button id="selectionBack" type="button" hidden>Back: initial</button><button id="selectionNext" type="button">Next: choose goal</button></div>
+    </div>
+    </header>
+    <div id="waveArea"><canvas id="c" aria-label="Two-component spinor wave: 16 spatial regions, each with spin up and down"></canvas><div id="waveLabels" aria-hidden="true"></div><div id="loading">Preparing the wave…</div><div id="error" role="alert" hidden></div></div>
+    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="spinToggle" aria-pressed="true">Spin directions</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Particles</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Color = local spin: cyan ↑ · magenta ↓ · violet balanced. Gold dots follow the total current.</span></footer>
+  </main>
+
+  <aside id="rightColumn">
+    <section id="circuitPanel" class="panel" aria-label="Grover circuit with position and spin registers">
+      <div class="head"><h3>Quantum gate circuit</h3><button id="circuitToggle" class="mini" type="button" aria-expanded="true" title="Minimize circuit diagram">−</button></div>
+      <div class="circuitBody">
+        <svg class="circuitSvg" viewBox="0 0 840 216" role="img" aria-labelledby="circuitTitle circuitDescription">
+          <title id="circuitTitle">Grover circuit with position and spin registers</title><desc id="circuitDescription">Preparation runs once. Oracle, inverse mixer, reference phase, and forward mixer repeat four times. The active gate is highlighted.</desc>
+          <line class="circuitWireGlow" x1="90" y1="48" x2="812" y2="48"/><line class="circuitWire" x1="90" y1="48" x2="812" y2="48"/><text class="circuitInput" id="circuitInputX" x="6" y="54">|0⟩</text><text class="circuitBit" id="circuitXLabel" x="45" y="52">x (4)</text>
+          <line class="circuitWireGlow" x1="90" y1="92" x2="812" y2="92"/><line class="circuitWire" x1="90" y1="92" x2="812" y2="92"/><text class="circuitInput" id="circuitInputY" x="6" y="98">|0⟩</text><text class="circuitBit" id="circuitYLabel" x="45" y="96">y (4)</text>
+          <line class="circuitWireGlow" x1="90" y1="136" x2="812" y2="136"/><line class="circuitWire" x1="90" y1="136" x2="812" y2="136"/><text class="circuitInput" id="circuitInputSpin" x="6" y="142">|↑⟩</text><text class="circuitBit" x="45" y="140">spin</text>
+          <g class="circuitGate future" data-circuit-kind="prepare"><rect class="gateBox" x="112" y="23" width="82" height="139" rx="9"/><text class="gateText" x="153" y="99">A</text><text class="gateCaption" x="153" y="180">PREPARE</text><text class="gateTick" x="179" y="39">✓</text></g>
+<g class="circuitGate future" data-circuit-kind="oracle"><rect class="gateBox" x="231" y="23" width="82" height="139" rx="9"/><text class="gateText" x="272" y="99">Oω</text><text class="gateCaption" x="272" y="180">ORACLE</text><text class="gateTick" x="298" y="39">✓</text></g>
+<g class="circuitGate future" data-circuit-kind="inverse"><rect class="gateBox" x="367" y="23" width="82" height="139" rx="9"/><text class="gateText" x="408" y="99">A†</text><text class="gateCaption" id="inverseCaption" x="408" y="180">WAIT 7T</text><text class="gateTick" x="434" y="39">✓</text></g>
+<g class="circuitGate future" data-circuit-kind="reference"><rect class="gateBox" x="486" y="23" width="82" height="139" rx="9"/><text class="gateText" x="527" y="99">Sᵢ</text><text class="gateCaption" x="527" y="180">REF. PHASE</text><text class="gateTick" x="553" y="39">✓</text></g>
+<g class="circuitGate future" data-circuit-kind="forward"><rect class="gateBox" x="605" y="23" width="82" height="139" rx="9"/><text class="gateText" x="646" y="99">A</text><text class="gateCaption" x="646" y="180">FORWARD</text><text class="gateTick" x="672" y="39">✓</text></g>
+          <path class="diffuserBrace" d="M355 190v6h344v-6"/><text class="diffuserLabel" x="527" y="211">DIFFUSER D = A Sᵢ A†</text>
+          <g id="circuitReadout" class="readoutNode"><circle cx="777" cy="80" r="33"/><path d="M756 89a24 24 0 0 1 42 0M777 86l15-18"/><text x="777" y="180">ANSWER</text></g>
+        </svg>
+        <div id="circuitMeta"><span id="circuitTarget">w = |3,3,↑⟩</span><span id="circuitStatus">Ready</span></div>
+        <div id="iterationTrack" aria-label="Marked probability after each iteration"><span data-iteration="1">Iteration 1<b>—</b></span><span data-iteration="2">Iteration 2<b>—</b></span><span data-iteration="3">Iteration 3<b>—</b></span><span data-iteration="4">Iteration 4<b>—</b></span></div>
+      </div>
+    </section>
+    <section id="info" class="panel">
+      <div class="head"><h3>State diagnostics</h3></div>
+      <div class="metrics"><div>Marked mode + spin<b id="modeProbability">0.0%</b></div><div>Inside goal box<b id="boxProbability">0.0%</b></div></div>
+      <div class="normLine">Total probability <b id="normValue">1.000000</b></div>
+      <div class="particleMetric">Particles inside goal box <b id="particleProbability">—</b></div>
+      <div class="spinMetrics"><div class="spinUp">Total ↑ <b id="spinUpProbability">100.0%</b></div><div class="spinDown">Total ↓ <b id="spinDownProbability">0.0%</b></div></div>
+      <div class="normLine">Spin purity <b id="spinPurity">1.000</b></div>
+      <p class="note">Spin purity drops below 1 when spin and spatial modes are entangled. Spin glyphs: arrows show in-plane direction; circles ○ point out of the screen and crosses × point into it.</p>
+      <div id="flowStatus" class="note">Conserved probability flow</div>
+      <details id="groverGeometry" class="groverGeometry" open>
+      <summary>Effective Grover Bloch sphere</summary>
+      <figure>
+        <div class="geometryMeta"><span data-geometry="target">Target |3,3,↑⟩</span><b data-geometry="status">Input |0,0,↑⟩</b></div>
+        <svg class="blochSphere" data-geometry="sphere" viewBox="0 0 360 312" role="img" tabindex="0" aria-labelledby="groverGeometryTitle groverGeometryDescription">
+          <title id="groverGeometryTitle">Effective Bloch sphere for the marked and unmarked subspace</title>
+          <desc id="groverGeometryDescription" data-geometry="liveDescription">A gold unit vector shows the normalized projection. The marked state is at the north pole and the unmarked superposition at the south pole. Drag or use arrow keys to rotate the view.</desc>
+          <defs>
+            <radialGradient id="blochGlass" cx="35%" cy="25%" r="78%"><stop offset="0" stop-color="#234b75" stop-opacity=".5"/><stop offset=".7" stop-color="#10243f" stop-opacity=".3"/><stop offset="1" stop-color="#416985" stop-opacity=".3"/></radialGradient>
+            <radialGradient id="blochTipGlow"><stop offset="0" stop-color="#ffe392" stop-opacity=".6"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient>
+            <marker id="blochHead" viewBox="0 0 11 8" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L11 4L0 8L2 4Z" fill="#ffd36b"/></marker>
+          </defs>
+          <circle cx="180" cy="153" r="108" fill="url(#blochGlass)" stroke="#709fc7" stroke-opacity=".46"/>
+          <path data-geometry="backGrid" fill="none" stroke="#75a7d0" stroke-opacity=".2" stroke-width=".7" stroke-dasharray="2 4"/>
+          <path data-geometry="axes" fill="none" stroke="#6c8bab" stroke-opacity=".48" stroke-width=".8"/>
+          <path data-geometry="backTrace" fill="none" stroke="#ffce69" stroke-opacity=".38" stroke-width="1.6" stroke-dasharray="3 3"/>
+          <path data-geometry="frontGrid" fill="none" stroke="#83bce4" stroke-opacity=".32" stroke-width=".8"/>
+          <path data-geometry="frontTrace" fill="none" stroke="#ffdc89" stroke-opacity=".8" stroke-width="2"/>
+          <circle data-geometry="northDot" fill="#a4d8ff"/><circle data-geometry="southDot" fill="#a4d8ff"/>
+          <circle data-geometry="gateStart" fill="none" stroke="#c4d3e5" stroke-width="1.1"/>
+          <circle data-geometry="preparedDot" fill="none" stroke="#67ccf0" stroke-width="1.5"/>
+          <text data-geometry="preparedLabel" class="geometryLabel" style="fill:#67ccf0">|s⟩</text>
+          <path data-geometry="vector" fill="none" stroke="#ffd36b" stroke-width="3" marker-end="url(#blochHead)"/>
+          <circle data-geometry="tipHalo" fill="url(#blochTipGlow)"/>
+          <circle data-geometry="tip" fill="#ffedb6" stroke="#ffcf69" stroke-width=".8"/>
+          <circle cx="180" cy="153" r="2.8" fill="#dbeafc"/>
+          <text data-geometry="northLabel" class="blochLabel">|ω⟩ · marked</text>
+          <text data-geometry="southLabel" class="blochLabel">|s′⟩ · unmarked</text>
+          <text data-geometry="xLabel" class="blochAxisLabel">X</text><text data-geometry="yLabel" class="blochAxisLabel">Y</text>
+        </svg>
+        <div class="blochTools"><span>Drag to orbit · <b data-geometry="normValue">|r| = 1</b></span><button type="button" data-geometry="resetView" title="Reset sphere view (Home when focused)">Reset view</button></div>
+        <div class="geometryLegend"><span style="--color:#ffd36b">State &amp; path</span><span style="--color:#67ccf0">Prepared |s⟩</span><span style="--color:#c4d3e5">Gate input</span></div>
+        <div class="geometryMeasures">
+          <div class="blochWeight">In Grover subspace <b data-geometry="weightValue">0.0%</b><div class="bar"><i data-geometry="weightBar"></i></div><div class="blochOutside">Outside: <b data-geometry="outsideValue">0.0%</b></div></div>
+          <div>Marked · full state <b data-geometry="markedValue">0.0%</b><div class="bar"><i data-geometry="markedBar"></i></div></div>
+          <div class="blochConditional">Marked within subspace<b data-geometry="conditionalValue">0.0%</b></div>
+        </div>
+        <figcaption>
+          <p data-geometry="description">Start in |0,0,↑⟩. Preparation will create the balanced search state |s⟩.</p>
+          <p class="note">The arrow has unit length in 3D; its tip stays on the sphere. It represents the normalized marked/unmarked projection. The weight bar shows how much of the full state is represented.</p>
+        </figcaption>
+      </figure>
+    </details>
+      <div id="phaseLegendPanel" class="phaseLegend" hidden aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
+      <details class="theory"><summary>Wave, spin &amp; guidance</summary>
+<p>One spinor Ψ = (ψ↑, ψ↓) has N×N orthogonal spatial packets in each spin channel. Labels are |x,y,spin⟩, with x and y from 0 to N−1. Choose the input |i⟩ first and the goal |w⟩ second on the main wave grid, following the guide above it, or run with the current selections. Each colored box contains overlapping tails, so its spatial probability differs from its logical-mode probability.</p>
+<div class="math">A = U<sub>box</sub>(T) ⊗ R<sub>y</sub>(π/2)<br>A† = U<sub>box</sub>((2N−1)T) ⊗ R<sub>y</sub>(−π/2)</div>
+<p>The spatial mixer uses exact free-box evolution. T = T<sub>rev</sub>/(2N). The imposed uniform spin-only drive is reversed during the forward (2N−1)T wait. The oracle phases the red goal |w⟩; the reference phases the selected green input |i⟩. Thus D = A Sᵢ A† reflects about A|i⟩. The search uses the first optimal Grover peak: 2, 3, 4 or 5 iterations for grids of size 2, 3, 4 or 5.</p>
+<div class="math">ρ = |ψ↑|² + |ψ↓|²<br>j<sub>P</sub> = (ℏ/m) Im(Ψ†∇Ψ) + (1/m) ∇×(ρs)<br>∇×(ρs) = ∇ρ × s + ρ ∇×s<br>v = j<sub>total</sub> / ρ</div>
+<p>The full spinor gradients include spin-texture effects. This planar model uses the in-plane magnetization current (ℏ/2m)(∂ᵧM<sub>z</sub>, −∂ₓM<sub>z</sub>), with M<sub>z</sub> = |ψ↑|² − |ψ↓|². It describes reduced planar flow, not all possible transverse motion in a three-dimensional trap.</p>
+<p>Free intervals use the Pauli current. Ideal mode-selective phase pulses are spatially nonlocal: we choose j<sub>total</sub> = j<sub>P</sub> + ∇u, with Δu = −∂ₜρ − ∇·j<sub>P</sub> and zero wall flux. This generalized guidance conserves density and retains spin circulation; it is not a unique local-Pauli implementation of those gates.</p>
+<p>Particles sample total position density; they have no permanently assigned up/down label. Compare their fraction inside the box with the spatial probability, not the joint marked-mode probability. Changing wave or arrow views leaves their motion unchanged. Pause and gate checkpoints freeze the simulation clock.</p>
+</details>
+    </section>
+  </aside>
+</div>
+<script src="./recording.js"></script>
+<script type="module" src="./main.js?v=20261014-particles"></script>
+</body>
+</html>

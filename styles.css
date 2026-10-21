@@ -381,6 +381,7 @@ h1, h2, h3 {
   width: 100%;
 }
 .demo-thumbnail { height: auto; }
+.grover-thumbnail { object-fit: contain; background: #081725; }
 .placeholder-thumb {
   aspect-ratio: 16 / 9;
   display: grid;

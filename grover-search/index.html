@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A visual journey through Grover's algorithm: signed amplitudes, two reflections, spatial wave packets, free evolution in a box, and spin. Four interactive simulations." />
+  <title>Grover search, from columns to a quantum box | Imagining Physics</title>
+  <link rel="canonical" href="https://imaginingphysics.com/grover-search/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Grover search, from columns to a quantum box" />
+  <meta property="og:description" content="Start with sixteen amplitudes. Watch two reflections amplify a marked state. Then let a wave in a box do the mixing." />
+  <meta property="og:url" content="https://imaginingphysics.com/grover-search/" />
+  <meta property="og:image" content="https://imaginingphysics.com/grover-search/images/hero.png" />
+  <meta property="og:image:alt" content="Signed Grover amplitudes on a four by four grid, beside the corresponding wave in a box." />
+  <meta property="article:published_time" content="2026-10-15" />
+  <link rel="stylesheet" href="../styles.css?v=20261015-grover" />
+  <link rel="stylesheet" href="../comments.css" />
+  <link rel="stylesheet" href="article.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="logo" href="../index.html">Imagining Physics</a>
+      <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="site-nav" aria-label="Main navigation"><ul>
+        <li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li>
+        <li><a href="../blog.html" class="active">Blog Posts</a></li><li><a href="../videos.html">Videos</a></li>
+        <li><a href="../shorts.html">Shorts</a></li><li><a href="../interactive.html">Interactive demos</a></li>
+        <li><a href="../shadertoy.html">Shadertoy</a></li><li><a href="../games.html">Games</a></li>
+      </ul></nav>
+    </div>
+  </header>
+  <main id="main-content" class="post">
+    <a class="post-back" href="../blog.html">← All blog posts</a>
+    <article>
+      <header class="post-header">
+        <p class="eyebrow">Quantum computing · An illustrated experiment</p>
+        <h1>Grover search<span>From columns to a quantum box</span></h1>
+        <p class="post-meta"><time datetime="2026-10-15">15 October 2026</time> · By Anssi</p>
+        <p class="standfirst">Two reflections turn a quantum state toward the answer. Follow the vector, unpack the gates, and watch the same search unfold in a grid of amplitudes and a wave in a box.</p>
+      </header>
+      <figure class="hero-figure">
+        <a class="figure-link" href="images/hero.svg" target="_blank" rel="noopener noreferrer"><img src="images/hero.svg" width="1200" height="540" alt="Sixteen signed amplitude columns after one Grover round, and the spatial wave formed from those same coefficients. The marked state has probability 47.27 percent." fetchpriority="high" /></a>
+        <figcaption>One search, two representations. The columns show logical amplitudes; the wave shows those amplitudes multiplying spatial packets. The red outline marks the target.</figcaption>
+      </figure>
+      <div class="prose">
+        <p><strong>Grover’s search can use free evolution in a box as its mixer.</strong> The useful interference comes from the box’s own energy spectrum. We will still need to prepare an input and apply selective phase operations, but the mixing itself can be ordinary Schrödinger evolution between hard walls.</p>
+        <p>That is where we are going. First, we will draw the search as two reflections of a vector, without opening up the gates. Then we will construct those gates and watch their effect on individual amplitudes. Finally, we will give the amplitudes a spatial form, starting with an explicitly controlled mixer whose motion is easier to follow, before replacing it with free evolution.</p>
+      </div>
+      <nav class="post-toc" aria-label="In this article">
+        <a href="#problem"><span>01</span> The search problem</a>
+        <a href="#reflections"><span>02</span> Two vector reflections</a>
+        <a href="#preparation"><span>03</span> Build the mixer</a>
+        <a href="#columns"><span>04</span> Watch the columns</a>
+        <a href="#encoding"><span>05</span> Give the states a shape</a>
+        <a href="#controlled"><span>06</span> Controlled wave mixing</a>
+        <a href="#free"><span>07</span> Let the box mix</a>
+        <a href="#spin"><span>08</span> Add spin</a>
+        <a href="#explore"><span>↗</span> All four demos</a>
+      </nav>
+
+      <section id="problem" class="chapter" aria-labelledby="problem-title">
+        <p class="chapter-number">01 / Ordinary Grover</p>
+        <h2 id="problem-title">Find one answer among sixteen</h2>
+        <div class="prose">
+          <p>Imagine sixteen possible answers. Exactly one satisfies a condition, and we can test a proposed answer without already knowing which one will pass. Grover’s algorithm turns this ability to <em>recognize</em> the answer into an efficient way to <em>find</em> it.</p>
+          <p>Write the candidates as orthonormal basis states |j⟩, with j = 0, …, 15, and call the unknown marked state |w⟩. A quantum state assigns an amplitude to each candidate:</p>
+          <div class="equation" aria-label="The state is the sum of a j times ket j; the sum of the squared magnitudes is one.">|ψ⟩ = ∑<sub>j=0</sub><sup>15</sup> a<sub>j</sub>|j⟩, <span class="eq-gap">∑<sub>j</sub> |a<sub>j</sub>|² = 1.</span></div>
+          <p>A measurement gives j with probability |a<sub>j</sub>|². Amplitudes themselves can be negative or complex: their relative phases determine how they interfere. For now, assume we start with an equal, real superposition,</p>
+          <div class="equation">|s⟩ = <span class="fraction"><span>1</span><span>4</span></span> ∑<sub>j=0</sub><sup>15</sup>|j⟩.</div>
+          <p>Every candidate initially has probability 1/16 = 6.25%. We are given an <em>oracle</em> that recognizes the answer by reversing its amplitude’s sign, without measuring the state. We will explain how to prepare |s⟩ and build the other reflection later. First, what do these two reflections achieve?</p>
+          <p>In the oracle model, one marked item among N candidates needs order N classical queries for a fixed high success probability; Grover needs order √N. This counts calls to the test. The cost of constructing the oracle and accessing any data still belongs to the physical problem. <a class="cite" href="https://arxiv.org/abs/quant-ph/9605043">[Grover, 1996]</a></p>
+        </div>
+      </section>
+
+      <section id="reflections" class="chapter" aria-labelledby="reflections-title">
+        <p class="chapter-number">02 / The mechanism</p>
+        <h2 id="reflections-title">Two mirrors make a rotation</h2>
+        <div class="prose">
+          <p>Sixteen amplitudes sound difficult to draw. But the unmarked states all start alike, and these two operations treat them alike. Their amplitudes remain equal. Combine those fifteen states into one normalized direction, perpendicular to the marked direction:</p>
+          <div class="equation">|r⟩ = <span class="fraction"><span>1</span><span>√15</span></span> ∑<sub>j≠w</sub>|j⟩,<br />|s⟩ = cos θ |r⟩ + sin θ |w⟩, <span class="eq-gap">sin θ = 1/4.</span></div>
+          <p>The entire search now fits in the plane spanned by |r⟩ and |w⟩. Draw |r⟩ horizontally and |w⟩ vertically. A unit arrow represents the state; its vertical coordinate is the marked amplitude, and the square of that coordinate is the success probability. The starting arrow |s⟩ sits only θ ≈ 14.48° above the horizontal. These are directions in state space, not positions inside a box.</p>
+          <h3>First mirror: reverse the marked component</h3>
+          <div class="equation">O<sub>w</sub> = I − 2|w⟩⟨w|.</div>
+          <p>The projector |w⟩⟨w| extracts the marked component. Subtracting twice that component reverses it while leaving the unmarked component alone. In our plane, the oracle mirrors the arrow across the horizontal |r⟩ line: an angle α becomes −α. <strong>The marked probability is unchanged.</strong></p>
+          <h3>Second mirror: reflect about the starting direction</h3>
+          <div class="equation">D = 2|s⟩⟨s| − I, <span class="eq-gap">D|ψ⟩ = 2|s⟩⟨s|ψ⟩ − |ψ⟩.</span></div>
+          <p>This reflection preserves the component parallel to |s⟩ and reverses the perpendicular component. Its mirror is the tilted |s⟩ line. Applied after the oracle, it takes the angle −α to 2θ + α. Together the two mirrors advance the original arrow by <strong>2θ per round</strong>. Starting at θ, we reach 3θ, then 5θ, then 7θ.</p>
+        </div>
+        <div id="reflection-lab" class="reflection-lab" aria-label="Step through Grover's two vector reflections">
+          <div class="reflection-toolbar"><div><span class="eyebrow">16 candidates · one marked state</span><h3>Follow the state vector</h3></div><span class="reflection-convention">Conventional diffuser D</span></div>
+          <div class="reflection-layout">
+            <div class="reflection-plot">
+              <svg id="reflection-svg" viewBox="0 0 600 490" role="img" aria-labelledby="reflection-svg-title reflection-svg-description">
+                <title id="reflection-svg-title">Grover in the marked–unmarked plane</title>
+                <desc id="reflection-svg-description">The initial unit vector has unmarked coordinate square root of fifteen over four and marked coordinate one quarter. The oracle mirrors it across the horizontal axis; the diffuser mirrors it across the tilted starting direction.</desc>
+                <g id="reflection-drawing">
+                  <circle class="vector-circle" cx="300" cy="245" r="180" />
+                  <path class="vector-axis" d="M100 245H500 M300 445V45" />
+                  <path class="vector-mirror diffuser-mirror" d="M103 296L497 194" />
+                  <path class="vector-current" d="M300 245L474.284 200" />
+                  <circle class="vector-tip" cx="474.284" cy="200" r="5" />
+                  <text class="vector-label" x="505" y="265">|r⟩</text><text class="vector-label" x="310" y="43">|w⟩</text>
+                  <text class="vector-label" x="497" y="182">|s⟩</text><text class="vector-label" x="408" y="196">|ψ⟩</text>
+                </g>
+              </svg>
+              <div class="reflection-legend"><span><i class="legend-current"></i>Current state</span><span><i class="legend-before"></i>Before this reflection</span><span><i class="legend-mirror"></i>Diffuser mirror |s⟩</span></div>
+            </div>
+            <div class="reflection-sidebar">
+              <p id="reflection-status" role="status" aria-live="polite" aria-atomic="true">Start · equal superposition</p>
+              <p id="reflection-explanation">The starting arrow is θ ≈ 14.48° above the unmarked direction. Apply the oracle to begin.</p>
+              <div class="reflection-probability"><span>Marked probability</span><strong id="reflection-probability">6.25%</strong></div>
+              <p class="reflection-components">|ψ⟩ = <span id="reflection-unmarked">+0.9682</span>|r⟩<br /><span class="reflection-second"><span id="reflection-marked">+0.2500</span>|w⟩</span></p>
+              <p id="reflection-stop" class="reflection-stop">First recommended stop: 3 rounds</p>
+              <div class="reflection-controls"><button id="reflection-back" type="button" disabled>Previous</button><button id="reflection-next" type="button" disabled>Apply oracle O<sub>w</sub></button><button id="reflection-reset" type="button" disabled>Reset</button></div>
+            </div>
+          </div>
+          <p class="reflection-note">Each click applies one exact reflection. The moving arrow illustrates the geometry between endpoints; it does not depict a gate’s physical time evolution. Continue past three rounds to see the probability fall again.</p>
+          <noscript><p class="reflection-note">Enable JavaScript to step through the reflections. The diagram shows the starting state; the equations below give every completed round.</p></noscript>
+        </div>
+        <div class="prose">
+          <p>After k complete oracle–diffuser pairs, the conventional state and its success probability are</p>
+          <div class="equation">(D O<sub>w</sub>)<sup>k</sup>|s⟩ = cos((2k+1)θ)|r⟩ + sin((2k+1)θ)|w⟩,<br />P<sub>w</sub>(k) = sin²((2k+1)θ).</div>
+          <p>The first three rounds give 47.27%, 90.84%, and 96.13%. At three rounds the vector is close to the marked axis; a fourth round carries it farther past that axis and drops the probability to 58.17%. The operation is reversible, so it cannot keep pushing probability upward forever. For N candidates, sin θ = 1/√N, which makes the number of useful rounds proportional to √N.</p>
+          <p>The horizontal coordinate belongs to the <em>normalized sum</em> of all fifteen unmarked states, not to one candidate. Each individual unmarked amplitude is that coordinate divided by √15. This will connect the two-dimensional arrow to the sixteen columns below.</p>
+        </div>
+      </section>
+
+      <section id="preparation" class="chapter" aria-labelledby="preparation-title">
+        <p class="chapter-number">03 / Open up the gates</p>
+        <h2 id="preparation-title">Prepare once. Undo, flip, and return.</h2>
+        <div class="prose">
+          <p>We now know what the reflections should do. How can we build them? Four qubits give us the sixteen basis states. Initialize them in the known input |i⟩ = |0000⟩, and apply a Hadamard to each qubit. The single-qubit gate and the whole-register operator are</p>
+          <div class="equation equation-row">
+            <span>H<sub>1</sub> = <span class="fraction"><span>1</span><span>√2</span></span><span class="matrix"><span>1</span><span>1</span><span>1</span><span>−1</span></span>,</span>
+            <span>H = H<sub>1</sub><sup>⊗4</sup> = H<sup>†</sup>, <span class="nowrap">H² = I.</span></span>
+          </div>
+          <div class="equation">H|i⟩ = |s⟩ = <span class="fraction"><span>1</span><span>4</span></span> ∑<sub>j=0</sub><sup>15</sup>|j⟩.</div>
+          <p>This supplies the equal starting vector used above. Preparation is performed once, before the repeated search rounds. We also assume a coherent oracle, a known phase flip on |i⟩, and a final measurement in the computational basis. There are no measurements between gates.</p>
+          <p>For the oracle, define f(j) = 1 for the solution and 0 otherwise. A reversible test |j,b⟩ ↦ |j,b ⊕ f(j)⟩ becomes a phase oracle when the auxiliary qubit is |−⟩ = (|0⟩ − |1⟩)/√2. It leaves that auxiliary state unchanged and kicks a sign onto the tested register: O<sub>w</sub>|j⟩ = (−1)<sup>f(j)</sup>|j⟩. We can therefore omit the auxiliary qubit from the diagram. Selecting a goal in a demo programs this test; the search algorithm is given the oracle, not the answer’s index.</p>
+          <h3 id="build-reflection">Build a reflection from a known phase flip</h3>
+          <p>It is easier to reverse one known basis component than to directly address a tilted superposition. Define</p>
+          <div class="equation">S<sub>i</sub> = I − 2|i⟩⟨i|.</div>
+          <ol class="mixer-steps">
+            <li><strong>Undo preparation, H<sup>†</sup>.</strong> Bring the prepared direction |s⟩ back to the input direction |i⟩, carrying every component of the current state along with it.</li>
+            <li><strong>Flip the initial-state component, S<sub>i</sub>.</strong> Reverse the amplitude along |i⟩ and leave every component perpendicular to it unchanged.</li>
+            <li><strong>Apply preparation again, H.</strong> Carry the reference direction back from |i⟩ to |s⟩.</li>
+          </ol>
+          <p>This is the “rotate back, flip, rotate forward” idea. More precisely, we conjugate a simple reflection by the preparation unitary. Undoing preparation sends |s⟩ to |i⟩; it does <em>not</em> reset an arbitrary search state to |i⟩. The intermediate states can leave the two-dimensional search plane, and H itself need not be a literal rotation within that plane.</p>
+          <p>In time order the gates are H<sup>†</sup> → S<sub>i</sub> → H. Since H<sup>†</sup> = H, the same Hadamard appears on both sides. Matrix multiplication acts from right to left:</p>
+          <div class="equation">M = H S<sub>i</sub> H = I − 2|s⟩⟨s| = −D.</div>
+          <p><strong>This particular construction introduces the overall minus.</strong> S<sub>i</sub> reverses the component parallel to |i⟩. After changing the reference direction, M reverses the component parallel to |s⟩. The conventional D above instead preserves that parallel component and reverses the perpendicular ones. The two outputs point in opposite directions but represent the same physical state, differing only by a global phase.</p>
+          <p>There is no requirement that Grover use the negative convention: H(−S<sub>i</sub>)H gives D exactly. Its middle gate would leave the initial component fixed and flip all the others. <strong>Here we keep the phase flip of the initial state and display the resulting M = −D faithfully.</strong> This is a choice of gates, not a consequence of the later box geometry. <a class="cite" href="https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.circuit.library.grover_operator">[Operator conventions]</a></p>
+          <p>Here is the sandwich as simple real-vector geometry. The gold arrow is the reference |s⟩; the violet line perpendicular to it is the mirror for our M. Turn the whole picture until the reference lines up with the horizontal initial-state axis, perform the simple reflection, then turn back.</p>
+          <p>Call the turn R, with R|i⟩ = |s⟩. The construction is <strong>R S<sub>i</sub> R<sup>T</sup></strong>: the rightmost operation acts first. This illustrates the same complete reflection as H S<sub>i</sub> H. Choose an example vector and watch the reference and mirror travel with it.</p>
+        </div>
+        <div id="construction-lab" class="reflection-lab construction-lab" aria-label="A real change-of-basis sandwich">
+          <div class="reflection-toolbar"><div><span class="eyebrow">Real vector geometry</span><h3>Turn, reflect, turn back</h3></div><span class="reflection-convention">M = R S<sub>i</sub> R<sup>T</sup></span></div>
+          <ol class="construction-stages" aria-label="Change-of-basis stages in time order">
+            <li data-construction-stage="0" class="is-current" aria-current="step"><strong>|v<sub>0</sub>⟩</strong><span>Input vector</span></li>
+            <li data-construction-stage="1"><strong>R<sup>T</sup></strong><span>1 · Align reference</span></li>
+            <li data-construction-stage="2"><strong>S<sub>i</sub></strong><span>2 · Reflect</span></li>
+            <li data-construction-stage="3"><strong>R</strong><span>3 · Turn back</span></li>
+          </ol>
+          <div class="reflection-layout">
+            <div class="reflection-plot">
+              <svg id="construction-svg" viewBox="0 0 600 450" role="img" aria-labelledby="construction-svg-title construction-svg-description">
+                <title id="construction-svg-title">Turn the basis, reflect, and turn back</title>
+                <desc id="construction-svg-description">A real vector and a gold reference arrow. The violet mirror is perpendicular to the reference. Turn them together, reflect across the vertical mirror, then turn everything back.</desc>
+                <g id="construction-drawing"><circle class="vector-circle" cx="300" cy="225" r="175" /><path class="vector-axis" d="M110 225H490 M300 415V35" /><path class="construction-mirror" d="M117 178L483 272" /><path class="construction-reference" d="M300 225L343.75 55.55" /><path class="vector-current" d="M300 225L464.45 165.15" /><circle class="vector-tip" cx="464.45" cy="165.15" r="4" /><text class="vector-label" x="495" y="245">|i⟩</text><text class="vector-label" x="312" y="28">|u⟩</text></g>
+              </svg>
+              <div class="reflection-legend construction-legend"><span><i class="legend-current"></i>Vector v</span><span><i class="legend-before"></i>Original v₀</span><span><i class="legend-reference"></i>Reference s</span><span><i class="legend-guide"></i>Mirror line</span></div>
+              <p id="construction-components" class="construction-components">v = +0.940|i⟩ +0.342|u⟩</p>
+              <div class="construction-playback"><label for="construction-progress">Sandwich progress <output id="construction-progress-value" for="construction-progress">Input</output></label><input id="construction-progress" type="range" min="0" max="3000" step="1" value="0" disabled /><div class="construction-progress-labels" aria-hidden="true"><span>Input</span><span>R<sup>T</sup></span><span>S<sub>i</sub></span><span>R</span></div></div>
+            </div>
+            <div class="construction-sidebar">
+              <p id="construction-status" role="status" aria-live="polite" aria-atomic="true">Start · a tilted reference</p>
+              <p id="construction-explanation">The gold arrow is the reference. Its perpendicular violet line is the mirror. We will build that reflection by changing basis.</p>
+              <p id="construction-reference" class="construction-reference-text">Mirror perpendicular to |s⟩</p>
+              <dl class="construction-values"><div><dt>Horizontal component</dt><dd id="construction-initial">+0.940</dd></div><div><dt>Vertical component</dt><dd id="construction-other">+0.342</dd></div><div><dt>Vector length</dt><dd id="construction-norm">1.000</dd></div></dl>
+              <p id="construction-change">The reference and mirror turn with the vector.</p>
+              <label class="construction-angle-label" for="construction-angle">Starting angle from |i⟩ <output id="construction-angle-value" for="construction-angle">20°</output></label>
+              <input id="construction-angle" type="range" min="-180" max="180" step="1" value="20" disabled />
+              <p class="construction-angle-hint">Changing the angle starts again.</p>
+              <div class="reflection-controls construction-controls"><button id="construction-back" type="button" disabled>Previous</button><button id="construction-next" type="button" disabled>Turn to initial axis</button><button id="construction-pause" type="button" disabled>Resume</button><button id="construction-reset" type="button" disabled>Reset</button></div>
+            </div>
+          </div>
+          <p class="reflection-note">Turn the basis → reflect → turn back. Pause or scrub to follow the picture; Previous plays backward. The grey arrow keeps the original vector in the current basis. This real geometric sweep illustrates the sandwich; the Hadamard circuit implements the same complete M = −D.</p>
+          <noscript><p class="reflection-note">Enable JavaScript to choose a vector and step through the construction.</p></noscript>
+        </div>
+        <div class="prose"><details><summary>How the real picture connects to the Hadamard circuit</summary><p>For the sixteen-state example, |u⟩ is the normalized sum of the fifteen states other than |i⟩, and |s⟩ = (|i⟩ + √15|u⟩)/4. In this real plane we choose the rotation</p><div class="equation">R = <span class="fraction"><span>1</span><span>4</span></span><span class="matrix"><span>1</span><span>−√15</span><span>√15</span><span>1</span></span>, <span class="eq-gap">R|i⟩ = |s⟩.</span></div><p>Both R and H send the initial direction to |s⟩. Conjugating S<sub>i</sub> with either gives the same complete reflection:</p><div class="equation">R S<sub>i</sub> R<sup>T</sup> = H S<sub>i</sub> H = I − 2|s⟩⟨s| = −D.</div><p>The widget uses R to make the change of basis visible as a simple turn. Its moving arrows illustrate the geometry between stages. The circuit and column demo retain their actual Hadamard gates.</p></details></div>
+        <figure class="circuit-figure">
+          <a class="figure-link" href="images/circuit.svg" target="_blank" rel="noopener noreferrer"><img src="images/circuit.svg" width="1100" height="320" alt="Four qubits start at zero. Apply H to each once, then repeat oracle O w, H on each, reference phase S i, and H on each. The final three gates form M equals H S i H equals minus D. Measure after three rounds for sixteen states." loading="lazy" /></a>
+          <figcaption>The circuit used here. O<sub>w</sub> and S<sub>i</sub> act on the full four-qubit register. The three-gate bracket is M = −D. Replacing S<sub>i</sub> by −S<sub>i</sub> would give the conventional D.</figcaption>
+        </figure>
+        <div class="prose">
+          <p>After k full rounds, (M O<sub>w</sub>)<sup>k</sup>|s⟩ = (−1)<sup>k</sup>(D O<sub>w</sub>)<sup>k</sup>|s⟩. Thus every odd completed round points opposite to the vector in the opening diagram. Every measurement probability and relative phase still agrees. The columns below retain this overall sign, so the first complete mixer puts them below zero.</p>
+          <p>Only O<sub>w</sub> and S<sub>i</sub> are selective sign-flip gates. Hadamard mixing adds and subtracts contributions, so other amplitudes can become negative between those two H gates. These intermediate signs are already present in abstract qubit Grover; they do not come from the wave encoding.</p>
+        </div>
+      </section>
+
+      <section id="columns" class="chapter" aria-labelledby="columns-title">
+        <p class="chapter-number">04 / Try the abstract search</p>
+        <h2 id="columns-title">Follow the amplitudes, gate by gate</h2>
+        <div class="prose">
+          <p>Now separate the vector into its sixteen basis amplitudes. Arrange the states on a 4×4 grid: the first two bits label column x and the last two label row y, so j = 4x + y. The lower-left state is our input |0000⟩; the upper-right state is our example target |1111⟩. This grid arranges labels, with no physical distance between them yet. Column heights show real amplitudes, so a column below zero does not mean negative probability.</p>
+          <p>The vector reflection has a useful expression in these coordinates. Since |s⟩ is uniform, D reflects each amplitude about the arithmetic mean μ, while our M gives the global negative of that result:</p>
+          <div class="equation">μ = <span class="fraction"><span>1</span><span>16</span></span>∑<sub>j</sub>a<sub>j</sub>,<br />D: a′<sub>j</sub> = 2μ − a<sub>j</sub>, <span class="eq-gap">M: a′<sub>j</sub> = a<sub>j</sub> − 2μ.</span></div>
+          <p>After the first oracle, fifteen amplitudes are +1/4 and the marked amplitude is −1/4. Their mean is 7/32. The conventional D gives +3/16 and +11/16 respectively; our M gives −3/16 and −11/16. Both give marked probability (11/16)² = 47.265625%. No gate needs to measure the mean: these are fixed linear operators.</p>
+        </div>
+        <figure>
+          <a class="figure-link" href="images/reflection.svg" target="_blank" rel="noopener noreferrer"><img src="images/reflection.svg" width="1100" height="430" alt="The oracle leaves fifteen amplitudes at one quarter and reverses the marked one to minus one quarter. Reflection about the mean 7/32 gives unmarked amplitudes 3/16 and marked amplitude 11/16. Our displayed mixer has the opposite overall sign." loading="lazy" /></a>
+          <figcaption>The marked amplitude starts far below the mean. The conventional diffuser reflects it far above the mean. Our demo’s mixer produces the global negative of that result.</figcaption>
+        </figure>
+        <div class="prose">
+          <p>Start with one column. Press <strong>Next step</strong> to prepare the equal superposition, then apply the oracle. Leave <strong>Combine</strong> off to see each of the three mixer gates. After the first H inside that mixer, the input amplitude is +7/8, while the others are ±1/8. S<sub>i</sub> flips +7/8 to −7/8, and the final H collects these contributions into the amplified result.</p>
+          <p>Turn <strong>Combine</strong> on before entering a mixer to go straight from its input to its output. This uses the same complete operator M, with a direct continuous unitary animation between its endpoints. It does not visit the hidden H–S<sub>i</sub>–H checkpoints. During animations the state can be complex; choose the imaginary view to see the part that real column heights leave out.</p>
+        </div>
+        <div id="column-lab" class="column-lab" aria-label="Interactive ordinary Grover walkthrough">
+          <div class="lab-toolbar">
+            <div><span class="eyebrow">4×4 · input 0000 · target 1111</span><h3>Sixteen amplitudes</h3></div>
+            <a href="demos/ordinary/index.html" target="_blank" rel="noopener noreferrer">Full column demo ↗</a>
+          </div>
+          <div class="lab-layout">
+            <div class="lab-plot">
+              <canvas id="column-canvas" tabindex="0" aria-label="Signed amplitude grid. Drag or use arrow keys to orbit, plus and minus to zoom."></canvas>
+              <p id="lab-fallback">Loading the column view. The figures and table below also show the exact checkpoint values.</p>
+              <div class="camera-tools"><button id="lab-level" type="button">Level view · 0°</button><button id="lab-camera" type="button">Reset view</button></div>
+            </div>
+            <div class="lab-sidebar">
+              <div class="lab-circuit" aria-label="Circuit, in time order">
+                <button id="lab-combine" type="button" aria-pressed="false" disabled>Combine mixer</button>
+                <div class="mini-gates"><span data-gate="prepare">H</span><span data-gate="oracle">O<sub>w</sub></span><span data-gate="inverse">H</span><span data-gate="reference">S<sub>i</sub></span><span data-gate="forward">H</span><span id="lab-measure" aria-label="Recommended measurement point not yet reached">◴</span></div>
+                <p class="mixer-bracket">M = H S<sub>i</sub> H = −D</p>
+              </div>
+              <p id="lab-status" role="status">Initial basis state</p>
+              <div class="lab-metric"><span>Marked probability</span><strong id="lab-probability">0.00%</strong></div>
+              <dl class="lab-values"><div><dt>Marked amplitude</dt><dd id="lab-amplitude">0</dd></div><div><dt>Mean amplitude</dt><dd id="lab-mean">+0.0625</dd></div><div><dt>Total probability</dt><dd id="lab-norm">100.00%</dd></div></dl>
+              <label for="lab-view">Column heights</label>
+              <select id="lab-view"><option value="real">Real amplitude</option><option value="imaginary">Imaginary amplitude</option><option value="probability">Probability</option></select>
+              <label class="lab-check"><input id="lab-mean-toggle" type="checkbox" checked /> Show mean plane</label>
+              <div class="lab-buttons"><button id="lab-back" type="button" disabled>Previous step</button><button id="lab-next" type="button" disabled>Next step</button><button id="lab-reset" type="button" disabled>Reset</button><button id="lab-pause" type="button" disabled>Pause</button></div>
+            </div>
+          </div>
+          <p class="lab-hint">Drag to orbit; scroll or pinch to zoom. The measurement symbol lights at the recommended stop. You can keep stepping.</p>
+          <noscript><p class="lab-hint">Enable JavaScript for the interactive columns, or follow the static figures and checkpoint table.</p></noscript>
+        </div>
+        <div class="prose">
+          <p>The gold mean plane travels with the columns in the combined animation. All real column tips shift by −2μ, which is −7/16 in the first round, and their mean moves from +7/32 to −7/32. The solid plane shows the <em>current mean</em>; the dashed destination marks its final value. For conventional D, the plane of reflection would stay at the input mean.</p>
+          <h3>Why repeating works—and why to stop</h3>
+          <p>Return to the two-dimensional picture at complete round boundaries. Using the same |r⟩ and θ as the opening diagram, our gate convention gives</p>
+          <div class="equation">|ψ<sub>k</sub>⟩ = (−1)<sup>k</sup>[sin((2k+1)θ)|w⟩ + cos((2k+1)θ)|r⟩],<br />P<sub>w</sub>(k) = sin²((2k+1)θ), <span class="eq-gap">θ = arcsin(1/4).</span></div>
+          <p>After three rounds we are close to the marked direction. Another round carries us past it. The algorithm is a reversible rotation, so it cannot keep increasing the marked probability forever.</p>
+        </div>
+        <figure>
+          <a class="figure-link" href="images/iterations.svg" target="_blank" rel="noopener noreferrer"><img src="images/iterations.svg" width="1100" height="330" alt="Marked probability oscillates with the number of Grover rounds. It is 6.25 percent after preparation, 47.27 after one round, 90.84 after two, 96.13 after three, then drops to 58.17 after four." loading="lazy" /></a>
+          <figcaption>The first recommended stop is three rounds. The curve joins the analytic formula; the points are the integer rounds we can actually perform.</figcaption>
+        </figure>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Exact amplitudes at completed rounds">
+          <table><caption>The column demo’s signed amplitudes at completed rounds</caption><thead><tr><th scope="col">Checkpoint</th><th scope="col">Marked a<sub>w</sub></th><th scope="col">Each unmarked a<sub>j</sub></th><th scope="col">P<sub>w</sub></th></tr></thead><tbody>
+            <tr><th scope="row">Prepared</th><td>+0.250000</td><td>+0.250000</td><td>6.25%</td></tr>
+            <tr><th scope="row">Round 1</th><td>−0.687500</td><td>−0.187500</td><td>47.27%</td></tr>
+            <tr><th scope="row">Round 2</th><td>+0.953125</td><td>+0.078125</td><td>90.84%</td></tr>
+            <tr class="recommended"><th scope="row">Round 3 · measure</th><td>−0.980469</td><td>+0.050781</td><td>96.13%</td></tr>
+            <tr><th scope="row">Round 4 · overshoot</th><td>+0.762695</td><td>−0.166992</td><td>58.17%</td></tr>
+          </tbody></table>
+        </div>
+        <div class="prose">
+          <p>Even at the recommended stop the unmarked amplitudes need not have the same sign as the marked one. Signs record the full rotation; probability is their squared magnitude. In the full demo, <strong>Run full search</strong> stops at the first recommended peak. <strong>Next step</strong> continues beyond it, and <strong>Previous step</strong> returns to the preceding checkpoint.</p>
+          <details><summary>What exactly is interpolated in the column animation?</summary><p>For any Hermitian reflection G with G² = I, the animation uses U(p) = (I+G)/2 + e<sup>−iπp</sup>(I−G)/2, for 0 ≤ p ≤ 1. At the endpoints it is I and G, and it preserves the norm throughout. For a real input to a combined mixer, the real heights follow a<sub>j</sub>(p) = a<sub>j</sub>(0) − 2μ sin²(πp/2). Their imaginary parts are −μ sin(πp). This is a chosen path for visualizing a discrete gate, not a claim about how every quantum device executes it. The article’s compact viewer uses the Ordinary-Grover branch’s state-vector and 3D rendering code.</p><p>The arithmetic-mean formula assumes our input |0000⟩. Choosing another input in the full demo prepares H|i⟩ with different signs. The general rule then subtracts 2s<sub>j</sub>⟨s|ψ⟩ from each amplitude; the reference guide becomes a set of per-column tiles.</p></details>
+        </div>
+      </section>
+
+      <section id="encoding" class="chapter" aria-labelledby="encoding-title">
+        <p class="chapter-number">05 / From coefficients to space</p>
+        <h2 id="encoding-title">Give each basis state a wave packet</h2>
+        <div class="prose">
+          <p>Now put one quantum particle in a square with hard outer walls. We need sixteen distinguishable states, but they do not have to be four separate physical qubits. We can encode them in sixteen orthonormal spatial wave packets.</p>
+          <p>Take four sine modes along each axis. On a box of side L, the one-dimensional modes are u<sub>n</sub>(x) = √(2/L) sin(nπx/L), n = 1, …, 4. Combine them into four packets f<sub>x</sub>, each with its main peak near the center of a different quarter of the interval. Products of two such packets give our 4×4 basis:</p>
+          <div class="equation">|x,y⟩ ↔ φ<sub>xy</sub>(X,Y) = f<sub>x</sub>(X) f<sub>y</sub>(Y),<br />ψ(X,Y) = ∑<sub>x,y=0</sub><sup>3</sup> c<sub>xy</sub> φ<sub>xy</sub>(X,Y).</div>
+          <p>The integers x,y label packets; the capital X,Y denote continuous physical coordinates. The coefficients c<sub>xy</sub> play exactly the role of the sixteen amplitudes in our column picture. Orthonormality makes ∫|ψ|² dX dY = ∑|c<sub>xy</sub>|².</p>
+        </div>
+        <figure>
+          <a class="figure-link" href="images/encoding.svg" target="_blank" rel="noopener noreferrer"><img src="images/encoding.svg" width="1100" height="520" alt="Four overlapping orthonormal packets formed from sine modes. Their products define a four by four grid. The initial packet is concentrated near the lower left, and the equal-coefficient superposition has a structured spatial density." loading="lazy" /></a>
+          <figcaption>Top: the four one-dimensional packets, including their signed tails. Bottom: the initial packet density and the density after Hadamard preparation. Equal logical probabilities do not mean a flat spatial density.</figcaption>
+        </figure>
+        <div class="prose">
+          <p>The inner grid lines are labels, <strong>not additional walls</strong>. The packets overlap in space while remaining orthogonal as functions. Consequently, the probability of the logical outcome |x,y⟩ is |c<sub>xy</sub>|², whereas the probability of finding the particle inside the corresponding drawn square is the integral of |ψ|² over that square. The two readouts are different.</p>
+          <p>A measurement that distinguishes the packet modes would read out the logical search result. A simple position measurement reads out position instead. This distinction matters when comparing a grid percentage with the fraction of displayed particles inside a square.</p>
+          <details><summary>The precise packet basis</summary><p>For a g×g grid, f<sub>j</sub>(X) = ∑<sub>n=1</sub><sup>g</sup> T<sub>jn</sub>u<sub>n</sub>(X), where T<sub>jn</sub> = √(2/g) sin[(j+½)nπ/g] for n &lt; g, and T<sub>jg</sub> = sin[(j+½)π]/√g. This real orthogonal transform preserves normalization. The figures use g = 4 and L = 1. Every packet vanishes at the outer walls; finite sums of sine modes do not have compact support inside one cell.</p></details>
+        </div>
+      </section>
+
+      <section id="controlled" class="chapter" aria-labelledby="controlled-title">
+        <p class="chapter-number">06 / The simplest wave picture</p>
+        <h2 id="controlled-title">Keep the Hadamard. Watch the wave.</h2>
+        <div class="prose">
+          <p>In the first wave version, called <strong>MultiRegion</strong>, we apply the same four-qubit Hadamard to these packet coefficients. Begin with φ<sub>00</sub>, prepare with H, mark φ<sub>33</sub>, then apply H<sup>†</sup>, S<sub>i</sub>, H. At every completed gate, the coefficient vector agrees with ordinary Grover. We have changed its representation, not the search rule.</p>
+          <p>To show a continuously moving wave between gates, this model uses an ideal coupling Hamiltonian, written ℋ<sub>mix</sub> to distinguish it from the gate H:</p>
+          <div class="equation">ℋ<sub>mix</sub> = <span class="fraction"><span>πℏ</span><span>2τ</span></span>(I − H),<br />U(p) = <span class="fraction"><span>I + H</span><span>2</span></span> + e<sup>−iπp</sup><span class="fraction"><span>I − H</span><span>2</span></span>, <span class="eq-gap">p = t/τ.</span></div>
+          <p>At p = 1 this gives H exactly. The inverse interval follows U(−p): the endpoint is again H, but the continuous path runs with the opposite coupling. The sine modes give us a spatial basis here; their free kinetic-energy phases are not added during these controlled gates.</p>
+          <p>Oracle and input-reference pulses rotate only one logical coefficient through half a turn:</p>
+          <div class="equation">U<sub>q</sub>(p) = I + (e<sup>−iπp</sup> − 1)|q⟩⟨q|,<br /><span class="equation-note">q = w for the oracle, q = i for the reference.</span></div>
+          <p>Although a single coefficient changes phase, spatial density can change because its packet overlaps other packets. The phase creates a changing interference pattern. A mode projector is therefore not equivalent to painting a local potential onto one square.</p>
+        </div>
+        <figure>
+          <a class="figure-link" href="images/wave-hadamard.svg" target="_blank" rel="noopener noreferrer"><img src="images/wave-hadamard.svg" width="1100" height="410" alt="Three exact wave states in the non-free Hadamard model: prepared, after the oracle, and after one complete mixer. The marked-mode probability rises from 6.25 to 47.27 percent." loading="lazy" /></a>
+          <figcaption>The controlled wave model at gate boundaries. The wave palette uses red for phase 0 and cyan for ±π; brightness denotes density. The oracle leaves the logical probabilities unchanged but changes spatial interference.</figcaption>
+        </figure>
+        <div class="prose">
+          <p>The golden dots visualize probability transport. Their initial positions sample |ψ|². For this nonlocal coupling, the demo chooses a current j = ∇χ satisfying ∇²χ = −∂<sub>t</sub>ρ and zero normal current at the walls, where ρ = |ψ|². Moving dots with v = j/ρ carries that density consistently. This is a specified curl-free transport rule; ordinary phase-gradient Bohmian guidance does not automatically apply to an arbitrary nonlocal gate. <a class="cite" href="https://arxiv.org/abs/0808.0290">[Generalized guidance]</a></p>
+          <p><a class="demo-link" data-demo="wave-hadamard" href="#explore">Explore the controlled wave model →</a> Start with phase colors on. Step through the first oracle and compare the changing density with the unchanged marked-mode percentage.</p>
+        </div>
+      </section>
+
+      <section id="free" class="chapter" aria-labelledby="free-title">
+        <p class="chapter-number">07 / The box becomes the mixer</p>
+        <h2 id="free-title">Replace H with free evolution</h2>
+        <div class="prose">
+          <p>Nothing in amplitude amplification requires the preparation operator to be a Hadamard. Let A be any unitary preparation and |s<sub>A</sub>⟩ = A|i⟩. Undo it, flip the input state, and apply it again:</p>
+          <div class="equation">M<sub>A</sub> = A S<sub>i</sub> A<sup>†</sup> = I − 2|s<sub>A</sub>⟩⟨s<sub>A</sub>|.</div>
+          <p>We again have the negative of a reflection about the prepared state. If preparation gives marked probability 1/16, the same Grover amplification curve follows—even if the sixteen prepared amplitudes have different phases. This is the bridge from the qubit circuit to our free box. <a class="cite" href="https://arxiv.org/abs/quant-ph/0005055">[Amplitude amplification]</a></p>
+          <p>Inside the square, set the potential to zero and keep the hard walls. The Hamiltonian and sine-mode energies are</p>
+          <div class="equation">ℋ<sub>box</sub> = −<span class="fraction"><span>ℏ²</span><span>2m</span></span>∇²,<br />E<sub>nℓ</sub> = E<sub>1</sub>(n² + ℓ²), <span class="eq-gap">E<sub>1</sub> = <span class="fraction"><span>π²ℏ²</span><span>2mL²</span></span>.</span></div>
+          <p>Here n and ℓ are positive integer mode numbers and m is the particle mass. Each sine coefficient simply acquires its own phase, b<sub>nℓ</sub>(t) = e<sup>−iE<sub>nℓ</sub>t/ℏ</sup>b<sub>nℓ</sub>(0). The reconstruction in the packet basis can look complicated, but its evolution is known exactly.</p>
+          <p>For four packets per axis, wait T = πℏ/(4E<sub>1</sub>). The first four one-axis energy phases are (z, −1, z, 1), with z = e<sup>−iπ/4</sup>. In our packet basis the resulting one-dimensional matrix is</p>
+          <div class="equation equation-row"><span>U<sub>1D</sub>(T) = ½</span><span class="matrix matrix-four"><span>z</span><span>−1</span><span>1</span><span>z</span><span>−1</span><span>z</span><span>z</span><span>1</span><span>1</span><span>z</span><span>z</span><span>−1</span><span>z</span><span>1</span><span>−1</span><span>z</span></span>, <span>A = U<sub>1D</sub>(T) ⊗ U<sub>1D</sub>(T).</span></div>
+          <p>Every entry of A has magnitude 1/4. A localized input therefore evolves into equal logical probabilities, with definite relative phases. <strong>The box itself performs balanced preparation and mixing.</strong> We do not replace its wave by a Hadamard-shaped interpolation.</p>
+        </div>
+        <figure>
+          <a class="figure-link" href="images/free-evolution.svg" target="_blank" rel="noopener noreferrer"><img src="images/free-evolution.svg" width="1100" height="410" alt="Exact free-box wave evolution from the initial packet, through half the preparation interval, to T. The final logical probabilities are all 1/16, while the spatial wave has a nonuniform phase pattern." loading="lazy" /></a>
+          <figcaption>Free preparation at 0, T/2, and T. All frames come from the sine-mode energy phases. The phase-rich prepared state differs from the equal-real Hadamard state.</figcaption>
+        </figure>
+        <div class="prose">
+          <h3>Undoing the mixer by waiting forwards</h3>
+          <p>Unlike H, this A is not its own inverse. But the full box spectrum revives at T<sub>rev</sub> = 2πℏ/E<sub>1</sub> = 8T. Every mode then returns with exactly its original phase. We can implement A<sup>†</sup> with positive-time free evolution:</p>
+          <div class="equation">A<sup>†</sup> = U<sub>box</sub>(7T), <span class="eq-gap">U<sub>box</sub>(7T)U<sub>box</sub>(T) = I.</span></div>
+          <p>The inverse really takes seven times as long as the forward mixer. No time reversal is needed. Preparation is one wait of T; a round is oracle → wait 7T → input phase flip → wait T. At 1× playback, T is 2.4 seconds and the inverse interval is 16.8 seconds.</p>
+        </div>
+        <figure>
+          <a class="figure-link" href="images/free-circuit.svg" target="_blank" rel="noopener noreferrer"><img src="images/free-circuit.svg" width="1100" height="260" alt="Prepare by waiting T. One amplification round has an oracle pulse, a forward wait of seven T, an input-reference pulse, and a forward wait of T. The two waits and reference pulse form A S i A dagger." loading="lazy" /></a>
+          <figcaption>The same circuit structure, with A and A<sup>†</sup> supplied by the box. The longer wait is drawn longer; both waits use the same positive kinetic Hamiltonian.</figcaption>
+        </figure>
+        <div class="prose">
+          <p>After each complete round, the marked-mode probabilities are again 47.27%, 90.84%, and 96.13%. The intermediate wave is different, and a plain horizontal arithmetic-mean plane is no longer the right picture: the reflection is about the actual complex vector |s<sub>A</sub>⟩.</p>
+          <p>During these free intervals the arrows show the usual scalar Schrödinger current, and the particles follow ordinary Bohmian guidance:</p>
+          <div class="equation">ρ = |ψ|², <span class="eq-gap">j = <span class="fraction"><span>ℏ</span><span>m</span></span>Im(ψ*∇ψ),</span> <span class="eq-gap">v = j/ρ.</span></div>
+          <p>The dots are an ensemble of possible initial positions, not extra search registers or little agents checking different answers. More particles make the distribution easier to see; they do not change the quantum algorithm. Their paths make the transfer of density visible.</p>
+          <aside class="callout"><h3>What “free evolution” supplies</h3><p>The mixing intervals are exact free evolution in the hard-wall box. The oracle and reference remain ideal <em>mode-selective phase pulses</em>; during them the kinetic Hamiltonian is omitted. Their displayed trajectories use the chosen continuity-preserving transport rule. Implementing those projectors experimentally is a separate control problem. The result here is that free evolution supplies the required A and A<sup>†</sup>, given those phase operations.</p></aside>
+          <p><a class="demo-link" data-demo="free-box" href="#explore">Explore the free box →</a> Compare preparation with the controlled version, then watch the much longer inverse wait. The same final search probabilities emerge from a different interference pattern.</p>
+          <details><summary>Changing the grid size</summary><p>The full demos support 2×2 through 5×5. Write g for the number of packets per axis, so the scalar search has N = g² states. Free preparation uses T = T<sub>rev</sub>/(2g) and its inverse waits (2g−1)T, with the box and mass fixed. The 3×3 and 5×5 controlled versions use a balanced Hermitian transform B<sub>(x,y),(u,v)</sub> = e<sup>2πi(xv−yu)/g</sup>/g instead of a qubit Hadamard. They are amplitude amplification on 9 or 25 modes, rather than whole registers of qubits.</p></details>
+          <p>The query advantage and the encoding’s physical resources are separate questions. Representing N candidates by N spatial modes does not by itself provide a scalable replacement for a log₂N-qubit device: preparing, controlling, resolving, and measuring those modes also requires resources.</p>
+        </div>
+      </section>
+
+      <section id="spin" class="chapter" aria-labelledby="spin-title">
+        <p class="chapter-number">08 / One more degree of freedom</p>
+        <h2 id="spin-title">Two amplitudes at every position</h2>
+        <div class="prose">
+          <p>Finally, give the particle spin ½. Every spatial packet can now carry an up and a down amplitude. Our 4×4 grid encodes 32 joint states |x,y,σ⟩, and the wave becomes a two-component spinor:</p>
+          <div class="equation">Ψ(X,Y) = <span class="matrix matrix-column"><span>ψ<sub>↑</sub>(X,Y)</span><span>ψ<sub>↓</sub>(X,Y)</span></span>, <span class="eq-gap">ρ = |ψ<sub>↑</sub>|² + |ψ<sub>↓</sub>|².</span></div>
+          <p>Mix position with the same free-box propagator and mix spin with a uniform rotation. With R<sub>y</sub>(α) = e<sup>−iασ<sub>y</sub>/2</sup>, where σ<sub>y</sub> is the Pauli y matrix, preparation and its inverse are</p>
+          <div class="equation">A = U<sub>box</sub>(T) ⊗ R<sub>y</sub>(π/2),<br />A<sup>†</sup> = U<sub>box</sub>(7T) ⊗ R<sub>y</sub>(−π/2).</div>
+          <p>The spin rotation is an imposed spin-only drive. The spatial motion during mixing is still free; the entire operation also includes this drive. The oracle flips one <em>joint</em> position–spin mode, and S<sub>i</sub> flips the chosen input position–spin mode. The reflection argument is unchanged.</p>
+        </div>
+        <figure>
+          <a class="figure-link" href="images/spin.svg" target="_blank" rel="noopener noreferrer"><img src="images/spin.svg" width="1100" height="410" alt="Up and down channel densities after four spinful Grover rounds, for a marked upper-right up state. The marked joint-mode probability is 99.92 percent. The total-spin view uses local up/down polarization rather than a scalar wave phase." loading="lazy" /></a>
+          <figcaption>After four rounds, with |3,3,↑⟩ marked. The two channel densities share a common brightness scale. The third panel colors the total density by local z polarization, as in the spin demo.</figcaption>
+        </figure>
+        <div class="prose">
+          <p>Preparation gives 1/32 in every joint mode. The first recommended stop is now four rounds, at approximately 99.9182% marked-mode probability. A position measurement alone does not distinguish up from down. The demo therefore separates joint-mode probabilities from the spatial probability inside the goal box, which includes both spin components.</p>
+          <h3>Spin changes the current, too</h3>
+          <p>For a spinor, density no longer tells the whole story of the flow. The position current used during free evolution with the uniform spin drive includes the convective term and a spin contribution:</p>
+          <div class="equation">j = <span class="fraction"><span>ℏ</span><span>m</span></span>Im(Ψ<sup>†</sup>∇Ψ) + <span class="fraction"><span>1</span><span>m</span></span>∇ × (ρs),<br />s = <span class="fraction"><span>ℏ</span><span>2</span></span><span class="fraction"><span>Ψ<sup>†</sup>σΨ</span><span>ρ</span></span>.</div>
+          <p>In the planar model, the spin term is (ℏ/2m)(∂<sub>Y</sub>M<sub>z</sub>, −∂<sub>X</sub>M<sub>z</sub>), with M<sub>z</sub> = |ψ<sub>↑</sub>|² − |ψ<sub>↓</sub>|². It is divergence-free: it can add circulation and change particle trajectories without changing the density’s continuity equation. After a selective oracle, position and spin can become entangled; a particle is not assigned a permanent little “up” or “down” tag.</p>
+          <p><strong>Total · spin colors</strong> uses cyan and magenta for opposite local z polarizations. A spinor has no single scalar phase, so that total view has a different legend from the individual up/down phase views. Switch the current arrows between total, transport, and spin current to see which part produces which flow.</p>
+          <details><summary>The scope of the spin trajectories</summary><p>The simulation uses the planar components of the Pauli current; it does not simulate a transverse wavefunction or claim that arbitrary three-dimensional trajectories remain in the plane. During ideal nonlocal phase pulses it adds a gradient correction ∇u satisfying ∇²u = −∂<sub>t</sub>ρ − ∇·j<sub>P</sub>, with zero normal derivative at the walls. This retains spin circulation while enforcing continuity. It is a specified extension for these ideal gates, rather than a unique experimental realization of an oracle. The wave coefficients evolve exactly in the retained mode space; particle integration and sampled current fields have numerical error.</p></details>
+          <p><a class="demo-link" data-demo="spin" href="#explore">Explore the spin version →</a> Select a joint goal, run four rounds, and compare the spin-resolved result with the total spatial density.</p>
+        </div>
+      </section>
+
+      <section id="explore" class="chapter" aria-labelledby="explore-title">
+        <p class="chapter-number">The experiments</p>
+        <h2 id="explore-title">Explore all four representations</h2>
+        <div class="prose"><p>The search structure stays the same: prepare once, then alternate an oracle with a reflection built from preparation and its inverse. What changes is the representation of the states and the operation that mixes them.</p></div>
+        <div class="demo-picker" role="group" aria-label="Choose a full simulation">
+          <button data-load-demo="ordinary" type="button" aria-pressed="false"><span>01</span> Ordinary columns</button>
+          <button data-load-demo="wave-hadamard" type="button" aria-pressed="false"><span>02</span> Controlled wave</button>
+          <button data-load-demo="free-box" type="button" aria-pressed="false"><span>03</span> Free box</button>
+          <button data-load-demo="spin" type="button" aria-pressed="false"><span>04</span> Free box + spin</button>
+        </div>
+        <div class="demo-heading"><p id="demo-description" role="status">Choose a simulation to load it here. The wave demos need WebGL2.</p><a id="demo-fullscreen" href="demos/ordinary/index.html" target="_blank" rel="noopener noreferrer">Open full column demo ↗</a></div>
+        <div id="demo-host" class="demo-host"><div class="demo-placeholder"><span aria-hidden="true">H → O → M</span><p>Choose a view above to start exploring.</p></div></div>
+        <p class="small-note">Changing the view starts that simulation afresh. Each full demo keeps its own controls and gate implementation. On a small screen, use the full-page link for more room.</p>
+        <noscript><p>Open a full simulation: <a href="demos/ordinary/index.html">ordinary columns</a>, <a href="demos/wave-hadamard/index.html">controlled wave</a>, <a href="demos/free-box/index.html">free box</a>, or <a href="demos/spin/index.html">free box with spin</a>.</p></noscript>
+      </section>
+      <section class="chapter reading" aria-labelledby="reading-title">
+        <h2 id="reading-title">Sources and further reading</h2>
+        <p>The packet basis, free-box matrix, numerical figures, and four demos in this article come from <a href="https://github.com/anssiZander/BohmianGrover2D">the Grover visualization project</a>. The free-box result above follows directly from its sine spectrum and the displayed packet transform. The local copies preserve the distinct branch implementations.</p>
+        <ul>
+          <li>Lov K. Grover, <a href="https://arxiv.org/abs/quant-ph/9605043">A fast quantum mechanical algorithm for database search</a> (1996): the original search algorithm and inversion about the average.</li>
+          <li>Gilles Brassard, Peter Høyer, Michele Mosca, and Alain Tapp, <a href="https://arxiv.org/abs/quant-ph/0005055">Quantum Amplitude Amplification and Estimation</a> (2000): preparation by a general unitary A.</li>
+          <li><a href="https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.circuit.library.grover_operator">IBM Quantum’s Grover operator documentation</a>: circuit decomposition and the global sign of the zero-state reflection.</li>
+          <li>Ward Struyve and Antony Valentini, <a href="https://arxiv.org/abs/0808.0290">De Broglie–Bohm Guidance Equations for Arbitrary Hamiltonians</a> (2008): constructing conserved currents beyond the usual local Hamiltonian.</li>
+        </ul>
+      </section>
+    </article>
+    <section class="comments-section" aria-labelledby="comments-title">
+      <div class="comments-heading"><h2 id="comments-title">Comments and questions</h2><p>Share a thought about this post or ask a question.</p></div>
+      <div class="comments-widget" data-comments data-theme="github-dark"><noscript>JavaScript is required to load the comment section.</noscript></div>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container footer-grid"><div><strong>Imagining Physics</strong><p>Visualizing physics through videos, simulations, shaders, and small games.</p></div><nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="../blog.html">Blog Posts</a></li><li><a href="../interactive.html">Interactive demos</a></li><li><a href="../about.html">About</a></li><li><a href="https://www.youtube.com/@imaginingPhysics" target="_blank" rel="noopener noreferrer">YouTube</a></li></ul></nav></div></footer>
+  <script src="../main.js"></script>
+  <script type="module" src="reflections.js"></script>
+  <script type="module" src="construction.js"></script>
+  <script type="module" src="article.js"></script>
+</body>
+</html>

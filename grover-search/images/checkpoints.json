@@ -1,0 +1,41 @@
+{
+  "ordinaryRounds": [
+    {
+      "round": 0,
+      "marked": 0.25,
+      "unmarked": 0.25,
+      "probability": 0.0625
+    },
+    {
+      "round": 1,
+      "marked": -0.6875,
+      "unmarked": -0.1875,
+      "probability": 0.47265625
+    },
+    {
+      "round": 2,
+      "marked": 0.953125,
+      "unmarked": 0.078125,
+      "probability": 0.908447265625
+    },
+    {
+      "round": 3,
+      "marked": -0.98046875,
+      "unmarked": 0.05078125,
+      "probability": 0.9613189697265625
+    },
+    {
+      "round": 4,
+      "marked": 0.7626953125,
+      "unmarked": -0.1669921875,
+      "probability": 0.5817041397094727
+    }
+  ],
+  "freeRounds": [
+    0.06250000000000008,
+    0.47265624999999817,
+    0.9084472656249989,
+    0.9613189697265684
+  ],
+  "spinFinal": 0.9991823155432983
+}

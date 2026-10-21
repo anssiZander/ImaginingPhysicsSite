@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ordinary Grover · 4×4</title>
+  <link rel="icon" href="data:,"/>
+  <link rel="stylesheet" href="./styles.css?v=20261014-continue-rounds"/>
+</head>
+<body>
+<div id="wrap">
+  <aside id="ui" class="panel">
+    <div class="head"><h3 id="appTitle">Ordinary Grover · 4×4</h3><button id="minui" class="mini" type="button" aria-expanded="true" aria-label="Collapse controls">−</button></div>
+    <div id="uibody">
+      <div class="section">Search space</div>
+      <div class="row"><label for="gridSize">Grid size</label><input id="gridSize" type="range" min="2" max="5" step="1" value="4" aria-describedby="gridSummary"/><span id="gridSizeValue" class="val">4×4</span></div>
+      <p id="gridSummary" class="note">16 basis states. Changing size resets the search.</p>
+      <div class="section">Gates</div>
+      <div class="ops"><button id="previous" type="button" disabled>Previous step</button><button id="next" type="button">Apply H · prepare</button><button id="full" type="button" class="full">Run full search</button></div>
+      <div id="gateProgress" role="progressbar" aria-label="Current operation progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressBar"></div></div>
+      <div id="stageStatus" class="status" role="status">Ready to prepare</div>
+      <div class="section">Playback &amp; columns</div>
+      <div class="row"><label for="columnView">Columns</label><select id="columnView"><option value="real">Real amplitude · Re(a)</option><option value="imaginary">Imaginary amplitude · Im(a)</option><option value="probability">Probability · |a|²</option></select></div>
+      <p class="note" id="columnHelp">Positive amplitudes rise above zero; negative amplitudes extend below it.</p>
+      <div class="row"><label for="speed">Gate speed</label><input id="speed" type="range" min="0.25" max="3" step="0.25" value="1"/><span id="speedValue" class="val">1.0×</span></div>
+      <div class="row checks"><label><input id="phaseColors" type="checkbox" checked/> Phase colors</label><label><input id="valueLabels" type="checkbox" checked/> Value labels</label></div>
+      <div class="row checks"><label><input id="meanPlane" type="checkbox" checked/> Mean plane / mixer reference</label></div>
+      <div class="section">Initial &amp; marked states</div>
+      <div class="row"><label for="initialState">Initial</label><select id="initialState"></select></div>
+      <div class="row"><label for="targetState">Marked</label><select id="targetState"></select></div>
+      <div class="section">Camera</div>
+      <div class="row"><label for="elevation">Elevation</label><input id="elevation" type="range" min="-85" max="85" step="1" value="30"/><span id="elevationValue" class="val">30°</span></div>
+      <p class="note">Drag or use arrow keys to orbit. Scroll / pinch to zoom. The 0° view is level with the zero plane.</p>
+    </div>
+    <div class="btnrow"><button id="reset" type="button">Reset (R)</button><button id="pause" type="button" disabled>Pause</button></div>
+  </aside>
+
+  <main id="stage">
+    <header id="waveHeader">
+      <div class="waveHeading"><span class="eyebrow" id="stateCountLabel">16 BASIS STATES · 3 ITERATIONS</span><h1>Ordinary Grover</h1></div>
+      <div class="stateBadges"><div class="initialBadge"><span id="initialLabel">INITIAL |0000⟩</span></div><div class="targetBadge"><span id="markedLabel">MARKED |1111⟩</span><b id="markedProbability">0.00%</b></div></div>
+      <div id="selectionGuide" data-step="ready">
+        <strong id="selectionTitle">Choose initial / marked state</strong>
+        <div class="selectionActions" role="group" aria-label="Pick a state on the columns"><button id="selectInitial" type="button" aria-pressed="false">Pick initial</button><button id="selectTarget" type="button" aria-pressed="false">Pick marked</button></div>
+        <p id="selectionHint">Use the selectors or pick a square. Drag to orbit.</p>
+      </div>
+    </header>
+    <div id="plotArea"><canvas id="c" tabindex="0" aria-label="3D signed amplitude columns above and below zero. Drag or use arrow keys to orbit, scroll or use plus and minus to zoom. Home resets the camera." aria-describedby="cameraHint"></canvas><div id="plotBadge">INPUT STATE</div><div id="error" role="alert" hidden></div></div>
+    <footer id="waveFooter">
+      <p id="gateDescription">One initial column has amplitude +1. Apply H to prepare equal amplitudes.</p>
+      <div class="cameraBar"><span id="cameraHint">Drag to orbit · Scroll / pinch to zoom</span><div class="cameraButtons" role="group" aria-label="Camera controls"><button id="orbitLeft" type="button" aria-label="Orbit left" title="Orbit left">↶</button><button id="orbitRight" type="button" aria-label="Orbit right" title="Orbit right">↷</button><button id="zoomOut" type="button" aria-label="Zoom out" title="Zoom out">−</button><button id="zoomIn" type="button" aria-label="Zoom in" title="Zoom in">+</button><button id="levelView" type="button">0° view</button><button id="topView" type="button">Top view</button><button id="resetView" type="button">Reset view</button></div></div>
+      <span id="heightLegend">Height = real amplitude · zero plane separates positive and negative</span>
+    </footer>
+  </main>
+
+  <aside id="rightColumn">
+    <section id="circuitPanel" class="panel" aria-label="Grover circuit: two 4-level registers">
+      <div class="head"><h3>Quantum gate circuit</h3><button id="circuitToggle" class="mini" type="button" aria-expanded="true" aria-label="Collapse circuit">−</button></div>
+      <div class="circuitBody">
+        <div class="circuitDiagramWrap">
+        <button id="combineMixer" type="button" aria-pressed="false" aria-controls="circuitDiagram" title="Animate directly to the full mixer result.">Combine</button>
+        <svg id="circuitDiagram" class="circuitSvg" viewBox="0 0 840 188" role="img" aria-labelledby="circuitTitle circuitDescription">
+          <title id="circuitTitle">Grover circuit: two 4-level registers</title><desc id="circuitDescription">Preparation runs once. Oracle, H, initial-state sign flip Sᵢ and H repeat three times.</desc>
+          <line class="circuitWireGlow" x1="90" y1="55" x2="812" y2="55"/><line class="circuitWire" x1="90" y1="55" x2="812" y2="55"/><text class="circuitInput" id="circuitInputX" x="6" y="61">|0⟩</text><text class="circuitBit" id="circuitXLabel" x="45" y="59">x (4)</text>
+          <line class="circuitWireGlow" x1="90" y1="105" x2="812" y2="105"/><line class="circuitWire" x1="90" y1="105" x2="812" y2="105"/><text class="circuitInput" id="circuitInputY" x="6" y="111">|0⟩</text><text class="circuitBit" id="circuitYLabel" x="45" y="109">y (4)</text>
+          <g class="circuitGate future" data-circuit-kind="prepare"><rect class="gateBox" x="112" y="23" width="82" height="114" rx="9"/><text id="prepareSymbol" class="gateText" x="153" y="87">H</text><text class="gateCaption" x="153" y="155">PREPARE</text><text class="gateTick" x="179" y="39">✓</text></g>
+          <g class="circuitGate future" data-circuit-kind="oracle"><rect class="gateBox" x="231" y="23" width="82" height="114" rx="9"/><text class="gateText" x="272" y="87">Oω</text><text class="gateCaption" x="272" y="155">ORACLE</text><text class="gateTick" x="298" y="39">✓</text></g>
+          <g class="circuitGate future" data-circuit-kind="inverse"><rect class="gateBox" x="367" y="23" width="82" height="114" rx="9"/><text id="inverseSymbol" class="gateText" x="408" y="87">H</text><text class="gateCaption" x="408" y="155">MIX 1/3</text><text class="gateTick" x="434" y="39">✓</text></g>
+          <g class="circuitGate future" data-circuit-kind="reference"><rect class="gateBox" x="486" y="23" width="82" height="114" rx="9"/><text class="gateText" x="527" y="87">Sᵢ</text><text class="gateCaption" x="527" y="155">FLIP INITIAL</text><text class="gateTick" x="553" y="39">✓</text></g>
+          <g class="circuitGate future" data-circuit-kind="forward"><rect class="gateBox" x="605" y="23" width="82" height="114" rx="9"/><text id="forwardSymbol" class="gateText" x="646" y="87">H</text><text class="gateCaption" x="646" y="155">MIX 3/3</text><text class="gateTick" x="672" y="39">✓</text></g>
+          <g class="circuitGate future" data-circuit-kind="mixer"><rect class="gateBox" x="367" y="23" width="320" height="114" rx="9"/><text id="combinedMixerSymbol" class="gateText" x="527" y="87">H Sᵢ H</text><text class="gateCaption" x="527" y="155">COMBINED MIXER</text><text class="gateTick" x="672" y="39">✓</text></g>
+          <path class="diffuserBrace" d="M355 166v6h344v-6"/><text id="diffuserLabel" class="diffuserLabel" x="527" y="186">DIFFUSER = H Sᵢ H</text>
+          <g id="circuitReadout" class="readoutNode"><circle cx="777" cy="80" r="33"/><path d="M756 89a24 24 0 0 1 42 0M777 86l15-18"/><text x="777" y="155">ANSWER</text></g>
+        </svg>
+        </div>
+        <div id="circuitMeta"><span id="circuitTarget">w = |1111⟩</span><span id="circuitStatus">0 / 13 operations</span></div>
+        <p id="repeatCaption" class="note">Prepare once; repeat the four remaining gates 3 times.</p>
+        <div id="iterationTrack" aria-label="Marked probability after each iteration"></div>
+        <p id="mixerNote" class="note">H is the four-qubit Hadamard.</p>
+      </div>
+    </section>
+    <section id="info" class="panel">
+      <div class="head"><h3>State diagnostics</h3></div>
+      <div class="metrics"><div>Marked probability<b id="successValue">0.00%</b></div><div>At recommended stop<b id="expectedValue">96.13%</b></div></div>
+      <div class="normLine">Total probability <b id="normValue">100.00%</b></div>
+      <div id="meanGuidePanel" class="meanGuidePanel">
+        <b id="meanGuideTitle">Mean &amp; mixer shift</b>
+        <div class="meanMetric inputMean"><span id="meanInputLabel">Current mean · Re(μ)</span><b id="meanInputValue"></b></div>
+        <div id="meanOutputRow" class="meanMetric outputMean" hidden><span id="meanOutputLabel">After full mixer · −μ</span><b id="meanOutputValue"></b></div>
+        <div id="meanShiftRow" class="meanMetric meanShift" hidden><span>Full shift · Δ = −2 × input reference</span><b id="meanShiftValue"></b></div>
+        <p id="meanGuideNote" class="note"></p>
+      </div>
+      <p class="note" id="iterationsNote">Three amplification rounds for 16 states.</p>
+      <div id="inspectState" class="stateInspector">Hover a column to inspect its amplitude.</div>
+      <div id="phaseLegend" class="amplitudeLegend"><b>Amplitude phase</b><div class="phaseGradient"></div><div class="phaseTicks"><span>−π</span><span>−π/2</span><span>0</span><span>π/2</span><span>π</span></div></div>
+      <details class="theory" open><summary>Reading signed amplitudes</summary><p>The oracle changes the sign of the marked amplitude only. Hadamard interference can also make unmarked amplitudes negative inside the diffuser. Those signs are part of the circuit calculation.</p><p>Gate checkpoints show exact Grover states. Between checkpoints, a norm-preserving animation rotates amplitudes through the complex plane. This animation is a display choice; Grover specifies the gate endpoints, not a physical path between them.</p><p>The 2×2 and 4×4 gate endpoints are real. The odd grids can have complex amplitudes even at checkpoints. A zero real column can have nonzero probability: choose <b>Imaginary amplitude</b> to inspect its other component.</p></details>
+      <details class="theory"><summary>Gates and phase convention</summary><p id="theoryMixer">H is the tensor-product qubit Hadamard: H† = H.</p><p>The three diffuser steps are H, Sᵢ, H, where Sᵢ = I − 2|i⟩⟨i|. The middle step flips only the initial-state amplitude. Every other amplitude remains fixed throughout this step.</p><p>For |sᵢ⟩ = H|i⟩, the completed diffuser is H Sᵢ H = I − 2|sᵢ⟩⟨sᵢ| = −D. This is Grover's inversion about the mean with an overall minus sign. It gives the same success probabilities, and the columns show that sign explicitly.</p><p>For the default 16-state example, the first Sᵢ step takes the initial column from +0.875 to −0.875. After the final H, the marked amplitude is −0.6875 and each unmarked amplitude is −0.1875. Nothing is replaced by an absolute value or silently rephased.</p></details>
+    </section>
+  </aside>
+</div>
+<script src="./recording.js?v=20261014-continue-rounds"></script>
+<script type="module" src="./main.js?v=20261014-continue-rounds"></script>
+</body>
+</html>
