@@ -1,0 +1,76 @@
+.wave-page { height:100svh; min-height:500px }
+.wave-workspace { display:grid; grid-template-columns:minmax(0,1fr) 310px; flex:1; min-height:0; margin:0 12px; border:1px solid var(--line); border-top:0; border-radius:0 0 8px 8px; overflow:hidden; background:var(--panel) }
+.wave-field { display:flex; flex-direction:column; min-width:0; min-height:0 }
+.wave-stage { position:relative; flex:1; min-height:0; overflow:hidden; background:radial-gradient(ellipse at 48% 35%,#16222f,#0e1520 76%) }
+#wave-canvas { display:block; width:100%; height:100%; touch-action:none; cursor:crosshair }
+.wave-key { position:absolute; left:20px; top:14px; display:flex; align-items:center; gap:20px; font-size:11px; padding:9px 12px; border:1px solid #30435480; border-radius:5px; background:#101925d9; pointer-events:none; backdrop-filter:blur(6px) }
+.wave-key > span { display:flex; align-items:center; gap:7px }
+.wave-key i { display:inline-block; width:17px; height:2px; background:currentColor }
+.short-key { color:var(--cyan) }.long-key { color:var(--violet) }.caustic-key { color:var(--amber) }
+.caustic-key i { height:0; border-top:2px dashed var(--amber); background:none }
+.wave-view-controls { position:absolute; right:16px; top:15px; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:10px; padding:7px 9px; border:1px solid #30435480; border-radius:5px; background:#101925e8 }
+.wave-view-controls output { color:var(--subtle); min-width:31px; text-align:right; font-variant-numeric:tabular-nums }
+.wave-view-controls button { background:transparent; padding:0; color:var(--subtle); font-size:10px }
+.wave-view-controls button:hover { color:var(--text) }
+.front-sampling { position:absolute; top:54px; right:20px; color:var(--muted); font-size:10px; pointer-events:none }
+.flight-controls { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px }
+.flight-controls button { padding:8px 10px; border:1px solid #5ae0d34d; border-radius:5px; background:#5ae0d313; color:var(--cyan); font-size:11px; white-space:nowrap }
+.flight-controls button:hover:enabled { background:#5ae0d325 }
+.flight-controls button:disabled { opacity:.4 }
+.flight-controls output { color:var(--muted); font-size:10px; font-variant-numeric:tabular-nums; text-align:right }
+.wave-transport { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; width:min(580px,calc(100% - 34px)); padding:10px 14px; background:#101925ed; border:1px solid #3d5166; border-radius:8px; box-shadow:0 5px 22px #0003; font-size:11px; color:var(--subtle); backdrop-filter:blur(8px) }
+.wave-transport button { background:transparent; color:var(--cyan); white-space:nowrap; padding:4px 0; min-width:46px; font-size:12px }
+.wave-transport #wave-restart { font-size:21px; min-width:22px }
+.wave-transport label { white-space:nowrap }
+.wave-transport input { flex:1; min-width:45px; width:100% }
+.wave-transport output { font-variant-numeric:tabular-nums; min-width:45px; white-space:nowrap }
+.slow-label { font-size:9px; color:var(--muted); white-space:nowrap }
+.wave-inspector { padding:17px 20px 12px; border-left:1px solid var(--line); overflow-y:auto; scrollbar-width:thin; background:linear-gradient(155deg,#151e2b,#101722 65%) }
+.wave-inspector h1 { font-size:25px; letter-spacing:-.7px; font-weight:530; margin:8px 0 13px }
+.wave-inspector .eyebrow { font-size:9px; letter-spacing:1.7px }
+.wave-inspector p { font-size:12px; color:var(--subtle); line-height:1.5 }
+.wave-switch { display:flex; gap:3px; padding:3px; border:1px solid var(--line); border-radius:6px; background:#090f18a0 }
+.wave-switch button { flex:1; background:transparent; color:var(--muted); border-radius:4px; padding:9px 4px; font-size:12px }
+.wave-switch button[aria-pressed=true] { background:#233c43; color:#b7fff5; box-shadow:0 1px 4px #0004 }
+.wave-switch button:hover { color:var(--text) }
+.wave-equation { padding:6px 0 0; text-align:center; color:#d3ddeb; font-size:19px }
+.wave-settings { margin-top:13px; padding-top:14px; border-top:1px solid var(--line) }
+.wave-range { display:block; margin-bottom:14px; font-size:12px; color:var(--subtle) }
+.wave-range > span { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px }
+.wave-range output { color:var(--text); font-variant-numeric:tabular-nums; font-size:12px }
+.wave-range input { width:100%; margin:0 }
+.setting-label { display:block; font-size:10px; color:var(--muted); margin-bottom:8px }
+.branch-switch button { padding:7px 4px; font-size:11px }
+.branch-switch [data-branch=long][aria-pressed=true] { background:#352a4b; color:#d7c4ff }
+.wave-toggles { display:flex; flex-wrap:wrap; gap:12px; margin-top:13px; font-size:11px; color:var(--subtle) }
+.wave-toggles label { display:flex; align-items:center; gap:5px; cursor:pointer }
+.wave-toggles input { margin:0; accent-color:var(--cyan) }
+.probe-panel { border-top:1px solid var(--line); margin-top:15px; padding-top:13px }
+.probe-heading { display:flex; justify-content:space-between; align-items:center; gap:12px }
+.probe-heading h2 { font-size:14px; font-weight:500; margin:0 }
+.probe-heading output { font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums }
+#ray-status { color:var(--text); margin:9px 0; font-size:12px }
+#ray-details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px }
+.ray-card { border-left:2px solid var(--cyan); background:#5ae0d309; padding:9px 10px; border-radius:0 4px 4px 0 }
+.ray-card:only-child { grid-column:1 / -1 }
+.ray-card:not(:only-child) header { display:block }
+.ray-card:not(:only-child) header span { display:block; margin-top:5px }
+.ray-card.long { border-color:var(--violet); background:#b79bfa0a }
+.ray-card.fold { border-color:var(--amber); background:#ffc77908 }
+.ray-card header { display:flex; align-items:baseline; justify-content:space-between; gap:6px; font-size:11px; color:var(--cyan) }
+.ray-card.long header { color:var(--violet) }.ray-card.fold header { color:var(--amber) }
+.ray-card header span { color:var(--subtle); font-variant-numeric:tabular-nums }
+.ray-card p { display:flex; justify-content:space-between; gap:5px; margin:5px 0 0; font-size:10px; font-variant-numeric:tabular-nums }
+.ray-card b { font-weight:500; color:var(--text) }
+.probe-actions { display:flex; justify-content:space-between; gap:8px; margin-top:13px }
+.probe-actions button { background:transparent; border:1px solid var(--line); border-radius:4px; padding:7px 9px; color:var(--subtle); font-size:10px }
+.probe-actions button:hover { border-color:var(--muted); color:var(--text) }
+.wave-notes { margin-top:12px }
+.wave-notes p { font-size:11px; color:var(--muted); margin:9px 0 }
+.wave-notes p:last-child { margin-bottom:0 }
+.wave-notes .phase-note { color:#738298; font-size:10px }
+@media(max-width:560px) { .wave-view-controls { top:57px }.front-sampling { top:94px } }
+@media(min-width:1600px) { .wave-workspace { grid-template-columns:minmax(0,1fr) 340px }.wave-inspector { padding-left:24px; padding-right:24px } }
+@media(max-height:820px) and (min-width:741px) { .wave-inspector { padding-top:15px }.wave-inspector h1 { margin-bottom:13px }.wave-settings { margin-top:13px; padding-top:14px }.wave-range { margin-bottom:16px }.probe-panel { margin-top:16px; padding-top:14px }.wave-notes { margin-top:13px } }
+@media(max-width:1050px) { .wave-workspace { grid-template-columns:minmax(0,1fr) 280px; margin:0 10px }.wave-inspector { padding-left:15px; padding-right:15px }.slow-label { display:none }.wave-key { gap:12px; left:12px; font-size:10px } }
+@media(max-width:740px) { .wave-page { height:auto }.wave-workspace { grid-template-columns:1fr; overflow:visible }.wave-field { height:65svh; min-height:380px }.wave-inspector { border-left:0; border-top:1px solid var(--line); overflow:visible }.wave-transport { gap:8px; font-size:10px; padding:9px 10px }.wave-settings { display:block }.wave-inspector h1 { font-size:22px }.wave-intro,.wave-settings,.probe-panel,.wave-notes { max-width:500px; margin-left:auto; margin-right:auto } }
