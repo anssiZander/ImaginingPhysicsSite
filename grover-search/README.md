@@ -1,9 +1,12 @@
 # Grover search article
 
 `index.html` is the standalone article, linked from the homepage, blog listing,
-and interactive demos listing. It has no build step or third-party JavaScript
-dependencies for the article, equations, figures, or simulations. The shared
-site font and the optional comment widget retain the site's existing services.
+and interactive demos listing. No build step is required to serve the article.
+Equations and inline mathematics use TeX delimiters in the HTML, rendered by
+`math.js` with KaTeX 0.19.0. The distribution, fonts, license, and provenance
+are pinned in `vendor/katex-0.19.0/`; math makes no CDN requests. KaTeX emits
+HTML plus accessible MathML. The shared site font and optional comment widget
+retain the site's existing services.
 
 Serve the site root over HTTP, for example:
 
@@ -16,7 +19,8 @@ require a server; opening the HTML with a `file:` URL is insufficient.
 
 ## Content and conventions
 
-- The worked example is a 4×4 grid, input 0000, marked state 1111.
+- The opening problem and reflections use general N. An explicit transition
+  introduces the 4×4 worked example, input 0000, marked state 1111.
 - The opening vector widget (`reflections.js`, `reflection-core.js`) uses the
   conventional D = 2|s><s| − I in the normalized (unmarked sum, marked) basis.
   It starts already prepared and steps through the oracle and full diffuser.
@@ -36,6 +40,7 @@ require a server; opening the HTML with a `file:` URL is insufficient.
   the complete signed reflection is exactly R S_i R^T = H S_i H = −D.
   Playback can be paused, scrubbed, or reversed. The example angle is adjustable.
 - The article separates logical-mode probabilities from spatial cell integrals.
+- The four-model comparison summarizes states, preparation, and current rules.
 - Free evolution supplies the spatial mixer; ideal mode-projector phase pulses
   are still assumed. The spin version adds a specified spin-only drive.
 - The compact column viewer imports the ordinary core and renderer unchanged.
@@ -62,7 +67,7 @@ To deliberately refresh them, update the pinned revisions in the script, then:
 
 ```powershell
 python grover-search/tools/snapshot-demos.py ../BohmianGrover2D
-node --experimental-default-type=module grover-search/tools/build-figures.mjs
+node grover-search/tools/build-figures.mjs
 ```
 
 The SVG generator evaluates the branch cores directly. Wave hues follow the
@@ -71,14 +76,20 @@ is a monotone density scale, shared across panels in each wave figure. The spin
 total panel instead colors z polarization. `images/checkpoints.json` records the
 numerical values used in the post. `hero.png` is a 1200×540 browser rasterization
 of `hero.svg` for social metadata; regenerate that export after changing the hero.
+Each figure also has a `-mobile.svg` portrait composition, generated from the
+same states and brightness scales. HTML `picture` sources select it at widths
+up to 600px; full-size figure links remain available. The comparison becomes
+four stacked model rows on small screens. Figure generation and checks use
+Node.js 22 or newer with ES module syntax detection.
 
 ## Verification
 
 ```powershell
-node --experimental-default-type=module --test grover-search/tests/article.test.mjs
-node --experimental-default-type=module --check grover-search/article.js
-node --experimental-default-type=module --check grover-search/reflections.js
-node --experimental-default-type=module --check grover-search/construction.js
+node --test grover-search/tests/article.test.mjs
+node --check grover-search/article.js
+node --check grover-search/math.js
+node --check grover-search/reflections.js
+node --check grover-search/construction.js
 python grover-search/tools/check-links.py
 git -c core.safecrlf=false diff --check
 ```
@@ -89,7 +100,9 @@ mean. They compare the two-dimensional widget against the full 16-state search
 and its analytic rotation, including the global sign and overshoot. They also
 check the real rotation sandwich and its visible mirror geometry against
 the full signed Hadamard mixer for multiple input vectors. They
-compare all 131 bundled files against their source hashes.
+compare all 131 bundled files against their source hashes. This byte-level
+snapshot check requires LF checkout endings; Windows CRLF conversion can cause
+hash mismatches without a content change.
 
 Open `/grover-search/tests/browser-check.html` on the same server for the browser
 fixture. It exercises vector reflection endpoints, drawn arrow coordinates,
@@ -97,7 +110,9 @@ the three geometric stages, their carried reference and mirror, the selective
 component flip, the final reflection symmetry, and input-angle/reset controls, alongside
 previous/reset/cancellation/overshoot, and the production compact column viewer, previous/combine/pause,
 overshoot, measurement indication, figure loading, every full demo's preparation,
-and desktop/390px layout. Canvas readbacks verify the mean guide is drawn and
+and desktop/390px layout. It also checks KaTeX, MathML, portrait figure sources,
+the model comparison, and 320px layout with all technical details expanded.
+Canvas readbacks verify the mean guide is drawn and
 responds to the toggle and probability view. The vector diagram supports keyboard
 buttons, live descriptions, and reduced motion. The construction view uses a
 continuous real geometric sweep with pause, scrub, and reverse controls. The original branch

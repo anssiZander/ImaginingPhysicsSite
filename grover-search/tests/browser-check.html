@@ -11,6 +11,14 @@ const near=(a,b)=>Math.abs(a-b)<1e-8;
 try {
   await wait(()=>frame.contentDocument?.querySelector('#column-lab'),'article loaded');
   const doc=frame.contentDocument,win=frame.contentWindow,$=id=>doc.getElementById(id);
+  await wait(()=>doc.documentElement.dataset.mathReady==='true','KaTeX rendering ready');
+  check(doc.querySelectorAll('.equation .katex-display').length===25,'all display equations are typeset');
+  check(doc.querySelectorAll('.katex-mathml math').length>250,'inline and display math include accessible MathML');
+  check(!doc.querySelector('.katex-error'),'no TeX rendering errors');
+  check($('problem').querySelector('annotation').textContent==='N','introduction starts with general N');
+  check($('problem').querySelector('.equation annotation').textContent.includes('N-1'),'state sum uses N candidates');
+  check(doc.querySelector('.worked-example').textContent.includes('N=16'),'sixteen-state example is explicitly introduced');
+  check(doc.querySelectorAll('.model-comparison tbody tr').length===4,'comparison includes all four models');
   doc.documentElement.style.scrollBehavior='auto';
   $('reflection-lab').scrollIntoView({block:'center'});
   await wait(()=>$('reflection-lab').dataset.ready==='true','reflection widget ready');
@@ -168,6 +176,11 @@ try {
   frame.style.width='390px';
   $('reflection-lab').scrollIntoView({block:'start'});
   await new Promise(r=>setTimeout(r,200));
+  for(const image of doc.querySelectorAll('article picture img')) {
+    await wait(()=>image.complete&&image.naturalWidth>0&&image.currentSrc.endsWith('-mobile.svg'),'portrait figure loaded');
+    check(image.naturalWidth===380,'phone receives the readable portrait artwork');
+  }
+  check(doc.querySelector('.model-comparison').getBoundingClientRect().right<=390,'mobile model comparison fits');
   check($('reflection-svg').getBoundingClientRect().right<=390,'mobile reflection diagram fits');
   check($('reflection-next').getBoundingClientRect().right<=390,'mobile reflection controls fit');
   const svgRect=$('reflection-svg').getBoundingClientRect();
@@ -189,6 +202,12 @@ try {
   check(doc.documentElement.scrollWidth<=win.innerWidth,'390px article fits viewport');
   check($('column-canvas').getBoundingClientRect().width<=390,'mobile canvas fits viewport');
   check($('lab-next').getBoundingClientRect().right<=390,'mobile controls remain reachable');
+  frame.style.width='320px';
+  for(const details of doc.querySelectorAll('article details'))details.open=true;
+  await new Promise(r=>setTimeout(r,200));
+  check(doc.documentElement.scrollWidth<=win.innerWidth,'320px layout fits with every mathematical detail expanded');
+  for(const details of doc.querySelectorAll('article details'))details.open=false;
+  frame.style.width='390px';
   report.dataset.status='passed';report.textContent=`PASS · ${checks} browser checks · vector reflections, three-gate construction, columns, four demos, desktop and mobile layout`;
 }catch(error){report.dataset.status='failed';report.textContent=`FAIL after ${checks} checks · ${error.stack}`;console.error(error);}
 </script></body></html>

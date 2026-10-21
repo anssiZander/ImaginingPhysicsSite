@@ -49,19 +49,22 @@ const first=checkpoint(ordinary), waveFirst=checkpoint(controlled);
 let hero=text(44,50,'GROVER SEARCH','#7dd7e4',15,'letter-spacing="3"')+text(44,94,'Sixteen amplitudes. One wave.','#edf5fc',34);
 hero+=text(44,126,'After the first round · marked probability 47.27%','#a4bbd0',17);
 const project=(x,y,z)=>[260+(x-y)*48,265+(x+y)*22-z*205];
-for(let x=0;x<=4;x++) { const a=project(x,0,0),b=project(x,4,0); hero+=line(...a,...b,'#335a70'); }
-for(let y=0;y<=4;y++) { const a=project(0,y,0),b=project(4,y,0); hero+=line(...a,...b,'#335a70'); }
+let heroColumns='';
+for(let x=0;x<=4;x++) { const a=project(x,0,0),b=project(x,4,0); heroColumns+=line(...a,...b,'#335a70'); }
+for(let y=0;y<=4;y++) { const a=project(0,y,0),b=project(4,y,0); heroColumns+=line(...a,...b,'#335a70'); }
 for(let depth=0;depth<=6;depth++)for(let x=0;x<4;x++)for(let row=0;row<4;row++) {
   if(x+row!==depth)continue;
   const q=4*x+(3-row),v=first[2*q],marked=q===15;
   const p=[project(x+.12,row+.12,0),project(x+.88,row+.12,0),project(x+.88,row+.88,0),project(x+.12,row+.88,0)];
   const t=[project(x+.12,row+.12,v),project(x+.88,row+.12,v),project(x+.88,row+.88,v),project(x+.12,row+.88,v)];
   const poly=(pts,color)=>`<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${color}" stroke="${marked?'#ffb1a3':'#a96a64'}" stroke-width="1"/>`;
-  hero+=poly([p[1],p[2],t[2],t[1]],marked?'#a74b55':'#713f48')+poly([p[2],p[3],t[3],t[2]],marked?'#d46c66':'#a75f59')+poly(p,marked?'#ee927d':'#c97a68');
-  if(marked)hero+=text(t[2][0]+10,t[2][1]+20,'−11/16','#ffaf9b',20);
+  heroColumns+=poly([p[1],p[2],t[2],t[1]],marked?'#a74b55':'#713f48')+poly([p[2],p[3],t[3],t[2]],marked?'#d46c66':'#a75f59')+poly(p,marked?'#ee927d':'#c97a68');
+  if(marked)heroColumns+=text(t[2][0]+10,t[2][1]+20,'−11/16','#ffaf9b',20);
 }
+hero+=heroColumns;
 hero+=text(54,489,'SIGNED AMPLITUDES','#d6dfeb',15)+text(54,516,'H Sᵢ H = −D · global sign retained','#a1b4c9',15);
-hero+=line(514,339,514,475,'#88a9bc')+line(508,339,520,339,'#88a9bc')+text(527,345,'0','#b8d4e5',16)+text(526,467,'−','#b8d4e5',21);
+const heroAxis=line(514,339,514,475,'#88a9bc')+line(508,339,520,339,'#88a9bc')+text(527,345,'0','#b8d4e5',16)+text(526,467,'−','#b8d4e5',21);
+hero+=heroAxis;
 const hw=sample(controlled,waveFirst);hero+=map(hw,733,146,330,maximum([hw]));
 hero+=text(733,510,'SPATIAL WAVE','#d6dfeb',15)+phaseLegend(911,493);
 hero+=line(627,175,627,464,'#354052')+text(588,320,'→','#84d1df',35);
@@ -123,6 +126,18 @@ async function waveRow(filename,title,core,states,labels,options={}) {
   body+=text(42,391,options.foot||'Hue: phase · brightness: density · common brightness scale','#9cb7c9',15);
   if(!options.densityOnly)body+=phaseLegend(890,374);
   await save(filename,1100,410,title,body);
+  // A separate portrait composition keeps each panel and legend readable.
+  let mobile=text(28,36,filename==='spin.svg'?'Position and spin':'Follow the wave','#e0eff8',23);
+  mobile+=text(28,65,filename==='spin.svg'?'Four rounds · P(w) = 99.92%':'Three checkpoints · the same scale','#9cb7c9',16);
+  samples.forEach((points,i)=>{
+    const y=104+i*342;
+    mobile+=text(30,y,labels[i],'#c7dfed',18)+map(points,40,y+18,300,max,{densityOnly:options.densityOnly,spinColor:options.channels?.[i]==='total'});
+  });
+  mobile+=text(28,1138,'Brightness: density · common scale','#a6c2d4',16);
+  if(options.densityOnly) {
+    mobile+=text(28,1164,'Total: cyan = up · magenta = down','#a6c2d4',16)+text(28,1188,'Violet = balanced','#a6c2d4',16);
+  } else mobile+=text(28,1174,'Phase','#a6c2d4',16)+phaseLegend(174,1156);
+  await save(filename.replace('.svg','-mobile.svg'),380,1200,title,mobile);
 }
 const prepared=checkpoint(controlled,0),postOracle=controlled.evolveGate(prepared,'oracle',1,15);
 await waveRow('wave-hadamard.svg','The same coefficients now form a continuous wave',controlled,[prepared,postOracle,waveFirst],['Prepared · P(w) = 6.25%','Oracle · P(w) = 6.25%','Mixer · P(w) = 47.27%']);
@@ -140,9 +155,76 @@ await save('free-circuit.svg',1100,260,'Free-box search circuit with a seven-T i
 const spinFinal=checkpoint(spin,4,30);
 await waveRow('spin.svg','A joint position–spin target · four rounds · P(w) = 99.92%',spin,[spinFinal,spinFinal,spinFinal],['Up-channel density','Down-channel density','Total · local z-spin colors'],{channels:['up','down','total'],densityOnly:true,foot:'Density: common scale · total view: cyan = up, magenta = down, violet = balanced'});
 
+// Portrait variants use the same data and operators as the wide figures.
+let heroMobile=text(28,36,'Sixteen amplitudes.','#edf5fc',27)+text(28,70,'One wave.','#edf5fc',27);
+heroMobile+=text(28,104,'After round 1 · P(w) = 47.27%','#a4bbd0',17);
+// Reuse only the signed histogram, keeping its captions at the mobile text size.
+heroMobile+=`<svg x="18" y="126" width="344" height="280" viewBox="50 240 510 310">${heroColumns}${heroAxis}</svg>`;
+heroMobile+=text(28,431,'SIGNED AMPLITUDES','#d6dfeb',16)+text(28,458,'H Sᵢ H = −D · global sign retained','#a1b4c9',16);
+heroMobile+=map(hw,40,493,300,maximum([hw]));
+heroMobile+=text(28,830,'SPATIAL WAVE','#d6dfeb',16)+text(28,859,'Brightness: density','#a1b4c9',16)+phaseLegend(199,848);
+await save('hero-mobile.svg',380,900,'Signed columns and a spatial wave after one Grover round',heroMobile);
+
+let reflectionMobile=text(28,35,'Oracle and mean reflection','#e0eff8',22);
+panels.forEach((p,i)=>{
+  const x=30,top=74+i*310,y=top+156,scale=155;
+  reflectionMobile+=text(x,top,p.label,'#c9ddeb',19);
+  reflectionMobile+=text(x,top+27,i===2?'Final mean: −7/32':'Input mean: +7/32','#ddbe79',15);
+  reflectionMobile+=line(x,y,x+320,y,'#8fa3b5')+line(x,y-p.mean*scale,x+320,y-p.mean*scale,'#ffd783','stroke-dasharray="5 4"');
+  p.values.forEach((v,q)=>{const yTip=y-v*scale;reflectionMobile+=rect(x+q*20,Math.min(yTip,y),14,Math.abs(v*scale),q===15?'#ff7c91':p.color);});
+  const v=p.values[15];
+  reflectionMobile+=text(284,y-v*scale+(v<0?23:-12),i===0?'−1/4':i===1?'+11/16':'−11/16','#ffb1bf',16);
+  reflectionMobile+=text(x,top+291,i===0?'a → Owa':i===1?'a′ = 2μ − a':'a′ = a − 2μ','#adc6d7',18);
+});
+await save('reflection-mobile.svg',380,1030,'Oracle and the two diffuser sign conventions',reflectionMobile);
+
+let circuitMobile=text(26,34,'Four qubits · time runs downward','#dcebf7',19);
+for(let k=0;k<4;k++) {
+  const x=78+k*72;
+  circuitMobile+=text(x-13,79,'|0⟩','#c5d9ee',21)+line(x,90,x,560,'#587d9a');
+  for(const y of [120,279,448])circuitMobile+=rect(x-20,y-18,40,36,'#123c42','rx="5" stroke="#5cbbb9"')+text(x-7,y+7,'H','#d0fbf4',20);
+}
+circuitMobile+=text(26,163,'Prepare once; then repeat the bracket','#90b8d0',16);
+for(const [y,label,color] of [[210,'Oracle Ow','#ff9aaf'],[365,'Reference Sᵢ','#d3b0ff']])circuitMobile+=rect(53,y-24,265,48,'#182238',`rx="7" stroke="${color}"`)+text(185,y+7,label,color,21,'text-anchor="middle"');
+circuitMobile+=line(342,183,342,475,'#b799e7')+line(331,183,342,183,'#b799e7')+line(331,475,342,475,'#b799e7');
+circuitMobile+=rect(53,521,265,48,'#2d2a1a','rx="7" stroke="#cfb471"')+text(185,552,'Measure after three rounds','#ffe19c',18,'text-anchor="middle"');
+circuitMobile+=text(28,612,'Repeated: Ow → H → Sᵢ → H','#b8cfe1',19)+text(28,646,'Mixer: M = H Sᵢ H = −D','#ceb4ee',20);
+await save('circuit-mobile.svg',380,680,'Four-qubit circuit, with time running downward',circuitMobile);
+
+let itersMobile=text(28,34,'Marked probability','#dcebf7',23)+text(28,62,'16 states · whole Grover rounds','#a5c0d3',17);
+const mx=k=>48+k*28,my=p=>270-p*162;
+for(const p of [0,.5,1])itersMobile+=line(48,my(p),330,my(p),'#2c475d')+text(7,my(p)+5,`${p*100}%`,'#9db6ca',13);
+let mobilePath='';for(let j=0;j<=600;j++){const k=j/60;mobilePath+=`${j?'L':'M'}${mx(k).toFixed(2)},${my(ordinary.expectedProbability(k)).toFixed(2)} `;}
+itersMobile+=`<path d="${mobilePath}" fill="none" stroke="#6ab4c7" stroke-width="2"/>`;
+for(let k=0;k<=10;k++){const p=ordinary.expectedProbability(k);itersMobile+=`<circle cx="${mx(k)}" cy="${my(p)}" r="${k===3?5:3}" fill="${k===3?'#ffd783':'#8fe2e5'}"/>`+text(mx(k)-5,292,k,'#afc4d5',13);}
+itersMobile+=text(72,94,'96.13% at round 3','#ffdd93',17)+text(278,322,'rounds','#9db6ca',15);
+await save('iterations-mobile.svg',380,340,'Grover probability and the recommended stop at three rounds',itersMobile);
+
+let encodingMobile=text(28,36,'Four overlapping packets','#d7e7f7',23)+text(28,65,'Orthonormal along one axis','#a5c2d6',17);
+const ex=x=>30+320*x,ey=f=>192-f*28;
+for(let j=0;j<5;j++)encodingMobile+=line(ex(j/4),94,ex(j/4),248,'#263f56');
+encodingMobile+=line(30,ey(0),350,ey(0),'#547082');
+for(let j=0;j<4;j++){
+  let d='';for(let k=0;k<=400;k++){const x=k/400;d+=`${k?'L':'M'}${ex(x).toFixed(2)},${ey(controlled.axisPacket(j,x)).toFixed(2)} `;}
+  encodingMobile+=`<path d="${d}" stroke="${colors[j]}" fill="none" stroke-width="2"/>`+text(ex((j+.5)/4)-8,100,`f${j}`,colors[j],18);
+}
+encodingMobile+=text(30,274,'0','#a3b9c9',15)+text(338,274,'L','#a3b9c9',15);
+encodingMobile+=text(28,317,'Input φ₀₀ · one logical mode','#d9eaf5',19)+map(encInitial,40,340,300,encMax,{densityOnly:true,target:false});
+encodingMobile+=text(28,668,'The packet has overlapping tails.','#a5c2d6',16);
+encodingMobile+=text(28,710,'H preparation · 16 equal coefficients','#d9eaf5',18)+map(encPrepared,40,733,300,encMax,{densityOnly:true,target:false});
+await save('encoding-mobile.svg',380,1040,'Four overlapping packets, initial density and Hadamard preparation',encodingMobile);
+
+let freeCircuitMobile=text(26,35,'All mixing runs forward in time.','#dceaf5',21);
+freeCircuitMobile+=line(190,65,190,691,'#567f92');
+const mobileGates=[{y:70,h:64,label:'wait T',sub:'prepare',color:'#64d5d1'},{y:176,h:64,label:'Ow · phase pulse',sub:'start the round',color:'#f38da3'},
+  {y:274,h:196,label:'wait 7T',sub:'A† = Ubox(7T)',color:'#a8a3f1'},{y:504,h:64,label:'Sᵢ · reference phase',color:'#f38da3'},{y:602,h:64,label:'wait T',sub:'A = Ubox(T)',color:'#64d5d1'}];
+for(const b of mobileGates){freeCircuitMobile+=rect(52,b.y,276,b.h,'#132239',`rx="7" stroke="${b.color}"`)+text(190,b.y+b.h/2+7,b.label,b.color,23,'text-anchor="middle"');if(b.sub)freeCircuitMobile+=text(190,b.y+b.h+23,b.sub,'#9dbcd0',16,'text-anchor="middle"');}
+freeCircuitMobile+=text(28,722,'Repeat the oracle and A Sᵢ A†.','#bfc2ea',19);
+await save('free-circuit-mobile.svg',380,760,'Free-box circuit with the longer positive-time inverse wait',freeCircuitMobile);
+
 // Exact values for the checks and for regenerating prose/table references.
 const numbers={ordinaryRounds:Array.from({length:5},(_,k)=>{
   const a=checkpoint(ordinary,k);return {round:k,marked:a[30],unmarked:a[2],probability:a[30]**2};
 }),freeRounds:Array.from({length:4},(_,k)=>free.probabilities(checkpoint(free,k))[15]),spinFinal:spin.probabilities(spinFinal)[30]};
 await writeFile(new URL('checkpoints.json',output),JSON.stringify(numbers,null,2)+'\n');
-console.log('Generated 9 quantitative SVG figures and checkpoint data.');
+console.log('Generated 9 quantitative SVG figures, 9 portrait variants, and checkpoint data.');

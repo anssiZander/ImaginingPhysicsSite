@@ -24,6 +24,8 @@ class Page(HTMLParser):
         for key in ('href', 'src'):
             if key in attrs:
                 self.links.append(attrs[key])
+        if 'srcset' in attrs:
+            self.links.extend(candidate.strip().split()[0] for candidate in attrs['srcset'].split(','))
         if tag == 'img' and not attrs.get('alt'):
             errors.append(f'{self.path}: image without alt')
 
@@ -59,6 +61,9 @@ for name in ('index.html', 'blog.html', 'interactive.html'):
     for link in page.links:
         if link.startswith('grover-search'):
             check(SITE / name, link)
+for path in (ARTICLE / 'vendor').rglob('*.css'):
+    for link in re.findall(r'''url\(["']?([^\s)'";]+)''', path.read_text(encoding='utf-8')):
+        check(path, link)
 if errors:
     raise SystemExit('\n'.join(errors))
 print(f'{checked} local links, media, module imports and fragments checked.')
