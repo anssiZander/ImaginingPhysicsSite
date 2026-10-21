@@ -173,7 +173,7 @@ export function createGroverGeometry(root) {
       nodes.normValue.textContent = state.bloch.vector ? '|r| = 1' : 'r undefined';
       nodes.markedBar.style.width = percent(state.targetProbability);
       nodes.weightBar.style.width = percent(state.bloch.weight);
-      nodes.liveDescription.textContent = `${gateName}. The gold unit vector represents the normalized marked/unmarked projection. Subspace weight ${percent(state.bloch.weight)}; actual marked probability ${percent(state.targetProbability)}. Drag or use arrow keys to rotate the view.`;
+      nodes.liveDescription.textContent = `${gateName}. The yellow unit vector represents the normalized marked/unmarked projection. Subspace weight ${percent(state.bloch.weight)}; actual marked probability ${percent(state.targetProbability)}. Drag or use arrow keys to rotate the view.`;
       root.dataset.kind = kind;
       root.dataset.iteration = String(iteration);
       root.dataset.progress = String(progress);

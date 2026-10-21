@@ -1,4 +1,4 @@
-"""Copy pinned, independent Grover demos without checking out their branches.
+"""Copy pinned Grover demos and apply the documented display-copy edits.
 
 Run: python grover-search/tools/snapshot-demos.py ../BohmianGrover2D
 The source checkout is read only. No fetch, commit or push is performed.
@@ -26,6 +26,7 @@ def git(*args):
     return subprocess.check_output(["git", "-C", str(SOURCE), *args])
 
 manifest = {"repository": "https://github.com/anssiZander/BohmianGrover2D", "demos": {}}
+copy_edits = json.loads((ROOT / 'demos/copy-edits.json').read_text(encoding='utf-8'))
 for name, (branch, revision) in REVISIONS.items():
     commit = git("rev-parse", revision).decode().strip()
     dest = ROOT / "demos" / name
@@ -41,8 +42,13 @@ for name, (branch, revision) in REVISIONS.items():
         data = git("show", f"{commit}:{path}")
         target = dest / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(data)
         hashes[relative] = hashlib.sha256(data).hexdigest()
+        edits = copy_edits.get(f'{name}/{relative}', {})
+        for before, after in edits.items():
+            if before.encode() not in data:
+                raise ValueError(f'{name}/{relative}: missing expected copy: {before}')
+            data = data.replace(before.encode(), after.encode())
+        target.write_bytes(data)
     manifest["demos"][name] = {"branch": branch, "commit": commit, "sha256": hashes}
-    print(f"{name}: {len(hashes)} unchanged files from {commit[:7]}")
+    print(f"{name}: {len(hashes)} files from {commit[:7]}, with documented display-copy edits")
 (ROOT / "demos" / "sources.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

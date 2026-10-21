@@ -1,7 +1,14 @@
-# Grover search article
+# Grover articles
 
-`index.html` is the standalone article, linked from the homepage, blog listing,
-and interactive demos listing. No build step is required to serve the article.
+`index.html` is **Grover implementation with a particle in a Box**. It opens with
+the spatial implementation, then covers the free spectrum, forward-wait inverse,
+probability transport, spin, and a controlled-mixer comparison.
+`../grovers-algorithm/index.html` is the separate refresher **Grovers algoritm**,
+with the general search problem and the three interactive teaching widgets.
+Both posts are dated 15 October 2026 and linked from the site listings. The main
+article invites readers to the refresher; the refresher links back to the spatial
+implementation. Old main-article links to the moved sections redirect to their
+new anchors. No build step is required to serve either post.
 Equations and inline mathematics use TeX delimiters in the HTML, rendered by
 `math.js` with KaTeX 0.19.0. The distribution, fonts, license, and provenance
 are pinned in `vendor/katex-0.19.0/`; math makes no CDN requests. KaTeX emits
@@ -14,12 +21,13 @@ Serve the site root over HTTP, for example:
 python -m http.server 5593 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:5593/grover-search/`. ES modules and the shader fetches
+Open `http://127.0.0.1:5593/grover-search/` or `/grovers-algorithm/` on that server.
+ES modules and the shader fetches
 require a server; opening the HTML with a `file:` URL is insufficient.
 
 ## Content and conventions
 
-- The opening problem and reflections use general N. An explicit transition
+- The refresher's opening problem and reflections use general N. An explicit transition
   introduces the 4×4 worked example, input 0000, marked state 1111.
 - The opening vector widget (`reflections.js`, `reflection-core.js`) uses the
   conventional D = 2|s><s| − I in the normalized (unmarked sum, marked) basis.
@@ -39,11 +47,12 @@ require a server; opening the HTML with a `file:` URL is insufficient.
   R is labelled as a rotation: its intermediate vectors differ from H, while
   the complete signed reflection is exactly R S_i R^T = H S_i H = −D.
   Playback can be paused, scrubbed, or reversed. The example angle is adjustable.
-- The article separates logical-mode probabilities from spatial cell integrals.
+- The main article separates logical-mode probabilities from spatial cell integrals.
 - The four-model comparison summarizes states, preparation, and current rules.
 - Free evolution supplies the spatial mixer; ideal mode-projector phase pulses
   are still assumed. The spin version adds a specified spin-only drive.
-- The compact column viewer imports the ordinary core and renderer unchanged.
+- The compact column viewer (`columns.js`, loaded only by the refresher) imports
+  the ordinary core and renderer unchanged.
   It fixes the example at 4×4; the full apps retain all grid/state controls.
 - The full-demo picker creates one iframe at a time, on demand. Switching apps
   starts a fresh simulation. The compact viewer suspends its animation while
@@ -51,10 +60,13 @@ require a server; opening the HTML with a `file:` URL is insufficient.
 
 ## Independent demo snapshots
 
-`demos/sources.json` records the source branch, full local commit ID, and SHA-256
-of every copied file. Copies include their source license and keep their original
-asset-version suffixes. Source files have not been adapted to article layout or
-mixed across branches. The source repository is not modified.
+`demos/sources.json` records the source branch, full local commit ID, and original
+SHA-256 of every copied file. Copies include their source license and keep their
+original asset-version suffixes. `demos/copy-edits.json` records the only local
+edits: eight UI files call the color yellow instead of gold. The snapshot script
+reapplies those text substitutions, and the integrity test reverses them before
+comparing to the original source hashes. Numerical, rendering, and current code
+is unchanged; branches are not mixed. The source repository is not modified.
 
 | Folder | Source branch | Pinned revision |
 | --- | --- | --- |
@@ -87,6 +99,7 @@ Node.js 22 or newer with ES module syntax detection.
 ```powershell
 node --test grover-search/tests/article.test.mjs
 node --check grover-search/article.js
+node --check grover-search/columns.js
 node --check grover-search/math.js
 node --check grover-search/reflections.js
 node --check grover-search/construction.js
@@ -100,12 +113,13 @@ mean. They compare the two-dimensional widget against the full 16-state search
 and its analytic rotation, including the global sign and overshoot. They also
 check the real rotation sandwich and its visible mirror geometry against
 the full signed Hadamard mixer for multiple input vectors. They
-compare all 131 bundled files against their source hashes. This byte-level
-snapshot check requires LF checkout endings; Windows CRLF conversion can cause
-hash mismatches without a content change.
+compare all 131 bundled files against their source hashes, reversing only the
+documented display-copy substitutions and normalizing text checkout endings to
+LF. Binary assets are compared byte for byte.
 
 Open `/grover-search/tests/browser-check.html` on the same server for the browser
-fixture. It exercises vector reflection endpoints, drawn arrow coordinates,
+fixture. It verifies the two posts independently, their titles, shared date,
+cross-links, and redirects for moved sections. It exercises vector reflection endpoints, drawn arrow coordinates,
 the three geometric stages, their carried reference and mirror, the selective
 component flip, the final reflection symmetry, and input-angle/reset controls, alongside
 previous/reset/cancellation/overshoot, and the production compact column viewer, previous/combine/pause,
@@ -118,5 +132,4 @@ buttons, live descriptions, and reduced motion. The construction view uses a
 continuous real geometric sweep with pause, scrub, and reverse controls. The original branch
 test suites remain in the source repository; they are not duplicated here.
 
-The article publishes through the homepage repository's GitHub Pages deployment.
-Its original publication date is 15 October 2026.
+Both articles publish through the homepage repository's GitHub Pages deployment.

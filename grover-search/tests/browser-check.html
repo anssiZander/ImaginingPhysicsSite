@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Grover article browser checks</title>
 <style>body{margin:0;background:#081320;color:#cce8ef;font:14px system-ui}#report{position:fixed;top:0;left:0;right:0;height:48px;padding:8px 20px;box-sizing:border-box;z-index:10;background:#133043}iframe{display:block;border:0;width:100%;height:calc(100vh - 48px);margin-top:48px}#report[data-status=passed]{background:#164c3a}#report[data-status=failed]{background:#701e31}</style></head>
-<body><div id="report" role="status" data-status="running">Loading production article…</div><iframe id="article" title="Production article under test" src="../index.html"></iframe>
+<body><div id="report" role="status" data-status="running">Loading the Grover refresher…</div><iframe id="article" title="Production article under test" src="../../grovers-algorithm/"></iframe>
 <script type="module">
 const report=document.querySelector('#report'),frame=document.querySelector('#article');
 let checks=0;
@@ -10,15 +10,18 @@ const wait=async(predicate,message,timeout=12000)=>{const start=performance.now(
 const near=(a,b)=>Math.abs(a-b)<1e-8;
 try {
   await wait(()=>frame.contentDocument?.querySelector('#column-lab'),'article loaded');
-  const doc=frame.contentDocument,win=frame.contentWindow,$=id=>doc.getElementById(id);
+  let doc=frame.contentDocument,win=frame.contentWindow;
+  const $=id=>doc.getElementById(id);
+  const publicationDate=doc.querySelector('time').dateTime;
   await wait(()=>doc.documentElement.dataset.mathReady==='true','KaTeX rendering ready');
-  check(doc.querySelectorAll('.equation .katex-display').length===25,'all display equations are typeset');
-  check(doc.querySelectorAll('.katex-mathml math').length>250,'inline and display math include accessible MathML');
+  check([...doc.querySelectorAll('.equation')].every(e=>e.querySelector('.katex-display')),'all refresher display equations are typeset');
+  check(doc.querySelectorAll('.katex-mathml math').length===doc.querySelectorAll('.katex').length,'every rendered expression includes accessible MathML');
+  check(doc.querySelector('h1').textContent==='Grovers algoritm','refresher has its own title');
+  check(doc.querySelector('article .prose a').pathname==='/grover-search/','refresher links to the implementation article');
   check(!doc.querySelector('.katex-error'),'no TeX rendering errors');
   check($('problem').querySelector('annotation').textContent==='N','introduction starts with general N');
   check($('problem').querySelector('.equation annotation').textContent.includes('N-1'),'state sum uses N candidates');
   check(doc.querySelector('.worked-example').textContent.includes('N=16'),'sixteen-state example is explicitly introduced');
-  check(doc.querySelectorAll('.model-comparison tbody tr').length===4,'comparison includes all four models');
   doc.documentElement.style.scrollBehavior='auto';
   $('reflection-lab').scrollIntoView({block:'center'});
   await wait(()=>$('reflection-lab').dataset.ready==='true','reflection widget ready');
@@ -112,15 +115,15 @@ try {
   check($('construction-svg').getAttribute('aria-labelledby').includes('construction-svg-description'),'construction has an accessible state description');
   $('column-lab').scrollIntoView({block:'start'});
   await wait(()=>$('column-lab').dataset.ready==='true','column renderer ready');
-  const goldGuidePixels=()=>{
+  const yellowGuidePixels=()=>{
     const canvas=$('column-canvas'),scale=canvas.width/canvas.getBoundingClientRect().width;
     const pixels=canvas.getContext('2d').getImageData(Math.round(8*scale),Math.round(38*scale),Math.round(265*scale),Math.round(22*scale)).data;
-    let gold=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]>175&&pixels[i+1]>130&&pixels[i+2]<175&&pixels[i]>pixels[i+1]+15)gold++;
-    return gold;
+    let yellow=0;for(let i=0;i<pixels.length;i+=4)if(pixels[i]>175&&pixels[i+1]>130&&pixels[i+2]<175&&pixels[i]>pixels[i+1]+15)yellow++;
+    return yellow;
   };
-  check(goldGuidePixels()>20,'mean guide is actually drawn on the canvas');
-  $('lab-mean-toggle').click();check(goldGuidePixels()===0,'mean guide toggle removes its canvas annotation');
-  $('lab-mean-toggle').click();check(goldGuidePixels()>20,'mean guide can be restored');
+  check(yellowGuidePixels()>20,'mean guide is actually drawn on the canvas');
+  $('lab-mean-toggle').click();check(yellowGuidePixels()===0,'mean guide toggle removes its canvas annotation');
+  $('lab-mean-toggle').click();check(yellowGuidePixels()>20,'mean guide can be restored');
   const step=async(completed)=>{ $('lab-next').click();await wait(()=>$('column-lab').dataset.completed===String(completed),`step ${completed}`); };
   check($('lab-back').disabled,'Previous disabled at input');
   await step(1);check($('lab-amplitude').textContent==='+0.2500','preparation gives +1/4');
@@ -144,7 +147,7 @@ try {
   check(!$('lab-next').disabled,'can continue further');
   $('lab-view').value='probability';$('lab-view').dispatchEvent(new Event('change'));
   check($('lab-norm').textContent==='100.00%','probability view preserves norm');
-  check(goldGuidePixels()===0,'probability view hides the amplitude mean guide');
+  check(yellowGuidePixels()===0,'probability view hides the amplitude mean guide');
   $('lab-view').value='real';$('lab-view').dispatchEvent(new Event('change'));
   $('lab-level').click();$('lab-camera').click();
   $('lab-next').click();$('lab-pause').click();
@@ -154,25 +157,6 @@ try {
     image.loading='eager';await wait(()=>image.complete,'figure loaded');check(image.naturalWidth>0,'figure '+image.getAttribute('src'));
   }
   check(doc.documentElement.scrollWidth<=win.innerWidth,'desktop article fits viewport');
-  const demos=[['ordinary',.0625],['wave-hadamard',.0625],['free-box',.0625],['spin',1/32]];
-  $('explore').scrollIntoView({block:'start'});
-  for(const [key,probability] of demos){
-    doc.querySelector(`[data-load-demo="${key}"]`).click();
-    await wait(()=>{
-      const f=$('demo-host').querySelector('iframe');
-      // The recording helper also initializes on DOMContentLoaded. Wait for
-      // the complete document before a rapid switch can tear it down.
-      return f?.contentDocument?.readyState==='complete' && f?.contentWindow?.BohmianGrover2D?.isReady?.();
-    },`${key} WebGL initialization`,20000);
-    const f=$('demo-host').querySelector('iframe'),api=f.contentWindow.BohmianGrover2D;
-    check($('demo-host').querySelectorAll('iframe').length===1,`${key}: one full demo active`);
-    api.beginFrameRecording?.();api.startNext();api.advanceTime(5);
-    const state=api.state();
-    check(near(state.probabilities[state.target],probability),`${key}: correct prepared target probability`);
-    check(near(state.norm,1),`${key}: norm preserved`);
-    check($('demo-fullscreen').getAttribute('href')===`demos/${key}/index.html`,`${key}: full-page link matches`);
-    check(f.contentDocument.documentElement.dataset.webgl2!=='error',`${key}: no WebGL2 error`);
-  }
   frame.style.width='390px';
   $('reflection-lab').scrollIntoView({block:'start'});
   await new Promise(r=>setTimeout(r,200));
@@ -180,7 +164,6 @@ try {
     await wait(()=>image.complete&&image.naturalWidth>0&&image.currentSrc.endsWith('-mobile.svg'),'portrait figure loaded');
     check(image.naturalWidth===380,'phone receives the readable portrait artwork');
   }
-  check(doc.querySelector('.model-comparison').getBoundingClientRect().right<=390,'mobile model comparison fits');
   check($('reflection-svg').getBoundingClientRect().right<=390,'mobile reflection diagram fits');
   check($('reflection-next').getBoundingClientRect().right<=390,'mobile reflection controls fit');
   const svgRect=$('reflection-svg').getBoundingClientRect();
@@ -208,6 +191,64 @@ try {
   check(doc.documentElement.scrollWidth<=win.innerWidth,'320px layout fits with every mathematical detail expanded');
   for(const details of doc.querySelectorAll('article details'))details.open=false;
   frame.style.width='390px';
-  report.dataset.status='passed';report.textContent=`PASS · ${checks} browser checks · vector reflections, three-gate construction, columns, four demos, desktop and mobile layout`;
+  check(!/\bgold(?:en)?\b/i.test(doc.querySelector('article').textContent),'refresher descriptions use yellow');
+  frame.style.width='100%';
+  frame.src='../index.html';
+  await wait(()=>frame.contentWindow?.location.pathname==='/grover-search/index.html'&&frame.contentDocument?.documentElement?.dataset.mathReady==='true','implementation article ready');
+  doc=frame.contentDocument;win=frame.contentWindow;
+  doc.documentElement.style.scrollBehavior='auto';
+  check(doc.querySelector('h1').textContent==='Grover implementation with a particle in a Box','implementation has its own title');
+  check(doc.querySelector('time').dateTime===publicationDate&&publicationDate==='2026-10-15','both posts retain the same publication date');
+  check(doc.querySelector('article .prose a').pathname==='/grovers-algorithm/','opening links to the refresher');
+  check(doc.querySelector('article section').id==='encoding'&&!$('problem'),'main article starts with spatial encoding');
+  check(!$('column-lab')&&!$('reflection-lab')&&!$('construction-lab'),'general tutorial widgets live in the separate refresher');
+  check([...doc.querySelectorAll('.equation')].every(e=>e.querySelector('.katex-display')),'all implementation equations are typeset');
+  check(doc.querySelectorAll('.katex-mathml math').length===doc.querySelectorAll('.katex').length,'implementation math includes accessible MathML');
+  check(!doc.querySelector('.katex-error'),'implementation has no TeX errors');
+  check(doc.querySelectorAll('.model-comparison tbody tr').length===4,'comparison includes all four models');
+  check(doc.querySelector('.model-comparison a').pathname==='/grovers-algorithm/','ordinary-columns comparison links to its new article');
+  check(!/\bgold(?:en)?\b/i.test(doc.querySelector('article').textContent),'implementation descriptions use yellow');
+  for(const image of doc.querySelectorAll('article img')) {
+    image.loading='eager';await wait(()=>image.complete,'implementation figure loaded');check(image.naturalWidth>0,'implementation figure '+image.getAttribute('src'));
+  }
+  check(doc.documentElement.scrollWidth<=win.innerWidth,'desktop implementation fits viewport');
+  const demos=[['ordinary',.0625],['wave-hadamard',.0625],['free-box',.0625],['spin',1/32]];
+  $('explore').scrollIntoView({block:'start'});
+  for(const [key,probability] of demos){
+    doc.querySelector(`[data-load-demo="${key}"]`).click();
+    await wait(()=>{
+      const f=$('demo-host').querySelector('iframe');
+      // The recording helper also initializes on DOMContentLoaded. Wait for
+      // the complete document before a rapid switch can tear it down.
+      return f?.contentDocument?.readyState==='complete' && f?.contentWindow?.BohmianGrover2D?.isReady?.();
+    },`${key} WebGL initialization`,20000);
+    const f=$('demo-host').querySelector('iframe'),api=f.contentWindow.BohmianGrover2D;
+    check($('demo-host').querySelectorAll('iframe').length===1,`${key}: one full demo active`);
+    api.beginFrameRecording?.();api.startNext();api.advanceTime(5);
+    const state=api.state();
+    check(near(state.probabilities[state.target],probability),`${key}: correct prepared target probability`);
+    check(near(state.norm,1),`${key}: norm preserved`);
+    check(new URL($('demo-fullscreen').href).pathname===`/grover-search/demos/${key}/index.html`,`${key}: full-page link matches`);
+    check(f.contentDocument.documentElement.dataset.webgl2!=='error',`${key}: no WebGL2 error`);
+    check(!/\bgold(?:en)?\b/i.test(f.contentDocument.body.textContent),`${key}: display copy uses yellow`);
+  }
+  frame.style.width='390px';
+  $('encoding').scrollIntoView({block:'start'});
+  await new Promise(r=>setTimeout(r,200));
+  for(const image of doc.querySelectorAll('article picture img')) {
+    await wait(()=>image.complete&&image.naturalWidth>0&&image.currentSrc.endsWith('-mobile.svg'),'implementation portrait figure loaded');
+    check(image.naturalWidth===380,'implementation phone view receives portrait artwork');
+  }
+  check(doc.documentElement.scrollWidth<=win.innerWidth,'390px implementation fits viewport');
+  check(doc.querySelector('.model-comparison').getBoundingClientRect().right<=390,'mobile model comparison fits');
+  frame.style.width='320px';
+  for(const details of doc.querySelectorAll('article details'))details.open=true;
+  await new Promise(r=>setTimeout(r,200));
+  check(doc.documentElement.scrollWidth<=win.innerWidth,'320px implementation fits with technical details expanded');
+  frame.src='../index.html#global-phase';
+  await wait(()=>frame.contentWindow?.location.pathname==='/grovers-algorithm/'&&frame.contentDocument?.getElementById('global-phase'),'old section link redirects to the refresher');
+  check(frame.contentWindow.location.hash==='#global-phase','old section link preserves its anchor');
+  frame.style.width='390px';
+  report.dataset.status='passed';report.textContent=`PASS · ${checks} browser checks · both posts, reflection and column widgets, four demos, desktop and mobile layout`;
 }catch(error){report.dataset.status='failed';report.textContent=`FAIL after ${checks} checks · ${error.stack}`;console.error(error);}
 </script></body></html>

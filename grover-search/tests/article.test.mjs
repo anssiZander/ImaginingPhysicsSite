@@ -95,10 +95,20 @@ test('the two mirror axes and geometric sweep keep their distinct meanings',()=>
   }
 });
 
-test('all published demo files retain their pinned branch bytes',async()=>{
+test('published demos match their pinned sources apart from documented display-copy edits',async()=>{
   const sources=JSON.parse(await readFile(new URL('demos/sources.json',root)));
+  const copyEdits=JSON.parse(await readFile(new URL('demos/copy-edits.json',root)));
   for(const [name,demo] of Object.entries(sources.demos))for(const [path,hash] of Object.entries(demo.sha256)) {
-    const bytes=await readFile(new URL(`demos/${name}/${path}`,root));
+    let bytes=await readFile(new URL(`demos/${name}/${path}`,root));
+    if(!path.endsWith('.png')) {
+      let source=bytes.toString('utf8').replaceAll('\r\n','\n');
+      for(const [before,after] of Object.entries(copyEdits[`${name}/${path}`]||{})) {
+        assert.ok(source.includes(after),`${name}/${path}: expected display copy ${after}`);
+        assert.ok(!source.includes(before),`${name}/${path}: old display copy ${before}`);
+        source=source.replaceAll(after,before);
+      }
+      bytes=Buffer.from(source);
+    }
     assert.equal(createHash('sha256').update(bytes).digest('hex'),hash,`${name}/${path}`);
   }
 });

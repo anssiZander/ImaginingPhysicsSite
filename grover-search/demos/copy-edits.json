@@ -1,0 +1,10 @@
+{
+  "ordinary/main.js": {"gold plane": "yellow plane", "Gold tiles": "Yellow tiles"},
+  "wave-hadamard/index.html": {"gold unit vector": "yellow unit vector"},
+  "wave-hadamard/grover-geometry.js": {"gold unit vector": "yellow unit vector"},
+  "free-box/index.html": {"gold unit vector": "yellow unit vector"},
+  "free-box/grover-geometry.js": {"gold unit vector": "yellow unit vector"},
+  "spin/index.html": {"gold unit vector": "yellow unit vector", "Gold dots": "Yellow dots"},
+  "spin/grover-geometry.js": {"gold unit vector": "yellow unit vector"},
+  "spin/main.js": {"Gold dots": "Yellow dots"}
+}

@@ -47,7 +47,7 @@ def check(path, link):
         if url.fragment not in page.ids:
             errors.append(f'{path.relative_to(SITE)}: unknown fragment {link}')
 
-for path in [ARTICLE / 'index.html', *ARTICLE.glob('demos/*/index.html')]:
+for path in [ARTICLE / 'index.html', SITE / 'grovers-algorithm/index.html', *ARTICLE.glob('demos/*/index.html')]:
     page = Page(path)
     page.feed(path.read_text(encoding='utf-8'))
     for link in page.links:
@@ -59,7 +59,7 @@ for name in ('index.html', 'blog.html', 'interactive.html'):
     page = Page(SITE / name)
     page.feed((SITE / name).read_text(encoding='utf-8'))
     for link in page.links:
-        if link.startswith('grover-search'):
+        if link.startswith(('grover-search', 'grovers-algorithm')):
             check(SITE / name, link)
 for path in (ARTICLE / 'vendor').rglob('*.css'):
     for link in re.findall(r'''url\(["']?([^\s)'";]+)''', path.read_text(encoding='utf-8')):

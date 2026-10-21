@@ -225,9 +225,9 @@ function syncUI(state, guide = meanGuide(state)) {
   text(dom.meanShiftValue, precise(guide.shifts[guide.uniform ? 0 : q]));
   dom.meanOutputRow.hidden = dom.meanShiftRow.hidden = !guide.showResult;
   text(dom.meanGuideNote, guide.uniform
-    ? guide.showResult ? `μ₀ is the mixer input mean. The gold plane follows the current columns${state.combineMixer ? ', moving with them during the combined mixer' : ', including the intermediate gate states'}. The full shift is −2μ₀.`
-      : 'The gold plane tracks the mean amplitude. After the oracle, it fixes the shift a′ = a − 2μ for the full mixer.'
-    : `The chosen input prepares different phases. Gold tiles follow the current pⱼ = sⱼ⟨s|a⟩. The full shift is −2pⱼ₀, using the mixer input reference. Hover a column for its reference and shift.`);
+    ? guide.showResult ? `μ₀ is the mixer input mean. The yellow plane follows the current columns${state.combineMixer ? ', moving with them during the combined mixer' : ', including the intermediate gate states'}. The full shift is −2μ₀.`
+      : 'The yellow plane tracks the mean amplitude. After the oracle, it fixes the shift a′ = a − 2μ for the full mixer.'
+    : `The chosen input prepares different phases. Yellow tiles follow the current pⱼ = sⱼ⟨s|a⟩. The full shift is −2pⱼ₀, using the mixer input reference. Hover a column for its reference and shift.`);
   if (renderer) { const degrees = Math.round(renderer.view.elevation*180/Math.PI); dom.elevation.value=degrees; text(dom.elevationValue,`${degrees}°`); }
 }
 function render() {

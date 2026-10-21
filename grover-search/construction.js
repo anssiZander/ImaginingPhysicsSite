@@ -12,7 +12,7 @@ const titles=['Start · a tilted reference','1 / Turn the reference onto the ini
   '2 / Reflect across the simple mirror','3 / Turn everything back'];
 const gateNames=['Rᵀ','Sᵢ','R'];
 const explanations=[
-  'The gold arrow is the reference. Its perpendicular violet line is the mirror. We will build that reflection by changing basis.',
+  'The yellow arrow is the reference. Its perpendicular violet line is the mirror. We will build that reflection by changing basis.',
   'Turn the vector, reference, and mirror together. The reference lines up with the horizontal initial-state axis.',
   'Hold the basis fixed and flip the horizontal component. The vertical mirror now makes the reflection easy to see.',
   'Undo the turn. The original and reflected vectors now sit symmetrically across the tilted violet mirror.'
@@ -73,7 +73,7 @@ function draw() {
     <text class="vector-label vector-s-label" x="${ref.x+13}" y="${ref.y-8}">s</text>
     ${showReflection ? `<text class="vector-label construction-input-label" x="${inputLabel.x}" y="${inputLabel.y}" text-anchor="middle">v₀</text>` : ''}
     <text class="vector-label" x="${vectorLabel.x}" y="${vectorLabel.y}" text-anchor="middle">${position===3?'Mv₀':'v'}</text>
-    <text class="vector-axis-note" x="${cx}" y="${height-12}" text-anchor="middle">Violet line = mirror · Gold arrow = reference</text>`;
+    <text class="vector-axis-note" x="${cx}" y="${height-12}" text-anchor="middle">Violet line = mirror · Yellow arrow = reference</text>`;
   Object.assign(root.dataset,{
     x:String(current.vector.x),y:String(current.vector.y),inputX:String(current.input.x),inputY:String(current.input.y),
     refX:String(current.reference.x),refY:String(current.reference.y),mirrorX:String(current.mirror.x),mirrorY:String(current.mirror.y),
@@ -108,7 +108,7 @@ function render() {
     item.classList.toggle('is-current',index===stage);item.classList.toggle('is-done',index<stage);
     if(index===stage)item.setAttribute('aria-current','step');else item.removeAttribute('aria-current');
   }
-  put('svg-description',`${titles[stage]}. Real vector coordinates ${signed(current.vector.x)} and ${signed(current.vector.y)}. The violet mirror is perpendicular to the gold reference. ${position===3?'The original and final vectors are mirror images across the violet line.':''}`);
+  put('svg-description',`${titles[stage]}. Real vector coordinates ${signed(current.vector.x)} and ${signed(current.vector.y)}. The violet mirror is perpendicular to the yellow reference. ${position===3?'The original and final vectors are mirror images across the violet line.':''}`);
   Object.assign(root.dataset,{
     step:String(current.completed),position:String(position),progress:String(current.progress),norm:String(current.norm),
     angle:String(angle),busy:String(!!motion),paused:String(!!motion?.paused||(partial&&!motion)),ready:'true'

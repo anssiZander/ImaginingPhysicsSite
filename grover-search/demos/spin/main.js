@@ -273,7 +273,7 @@ function installEvents() {
   dom.waveView.addEventListener('change', () => {
     params.waveView=Number(dom.waveView.value);
     dom.phaseLegendPanel.hidden=params.waveView===0;
-    dom.waveLegend.textContent=params.waveView===0 ? 'Color = local spin: cyan ↑ · magenta ↓ · violet balanced. Gold dots follow the total current.' : 'Component hue = phase. Gold dots always sample total density and follow the full spinor current.';
+    dom.waveLegend.textContent=params.waveView===0 ? 'Color = local spin: cyan ↑ · magenta ↓ · violet balanced. Yellow dots follow the total current.' : 'Component hue = phase. Yellow dots always sample total density and follow the full spinor current.';
     renderDirty=true;
   });
   dom.currentMode.addEventListener('change',()=>{params.currentMode=Number(dom.currentMode.value);renderDirty=true;});
