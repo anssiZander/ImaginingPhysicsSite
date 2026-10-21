@@ -95,21 +95,23 @@ test('the two mirror axes and geometric sweep keep their distinct meanings',()=>
   }
 });
 
-test('published demos match their pinned sources apart from documented display-copy edits',async()=>{
+test('published demos match their pinned sources and documented presentation overrides',async()=>{
   const sources=JSON.parse(await readFile(new URL('demos/sources.json',root)));
   const copyEdits=JSON.parse(await readFile(new URL('demos/copy-edits.json',root)));
+  const presentation=JSON.parse(await readFile(new URL('demos/presentation.json',root)));
   for(const [name,demo] of Object.entries(sources.demos))for(const [path,hash] of Object.entries(demo.sha256)) {
     let bytes=await readFile(new URL(`demos/${name}/${path}`,root));
+    const override=presentation.sha256[`${name}/${path}`];
     if(!path.endsWith('.png')) {
       let source=bytes.toString('utf8').replaceAll('\r\n','\n');
-      for(const [before,after] of Object.entries(copyEdits[`${name}/${path}`]||{})) {
+      for(const [before,after] of Object.entries(override?{}:copyEdits[`${name}/${path}`]||{})) {
         assert.ok(source.includes(after),`${name}/${path}: expected display copy ${after}`);
         assert.ok(!source.includes(before),`${name}/${path}: old display copy ${before}`);
         source=source.replaceAll(after,before);
       }
       bytes=Buffer.from(source);
     }
-    assert.equal(createHash('sha256').update(bytes).digest('hex'),hash,`${name}/${path}`);
+    assert.equal(createHash('sha256').update(bytes).digest('hex'),override||hash,`${name}/${path}`);
   }
 });
 

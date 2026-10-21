@@ -208,6 +208,8 @@ try {
   check(doc.querySelectorAll('.model-comparison tbody tr').length===4,'comparison includes all four models');
   check(doc.querySelector('.model-comparison a').pathname==='/grovers-algorithm/','ordinary-columns comparison links to its new article');
   check(!/\bgold(?:en)?\b/i.test(doc.querySelector('article').textContent),'implementation descriptions use yellow');
+  check(!/bohm|guidance/i.test(doc.querySelector('article').textContent),'article explains the wave and probability current without interpretation framing');
+  check($('flow').textContent.includes('numerical tracers')&&$('flow').textContent.includes('25,000'),'article identifies the dots as density-flow tracers');
   for(const image of doc.querySelectorAll('article img')) {
     image.loading='eager';await wait(()=>image.complete,'implementation figure loaded');check(image.naturalWidth>0,'implementation figure '+image.getAttribute('src'));
   }
@@ -224,10 +226,25 @@ try {
     },`${key} WebGL initialization`,20000);
     const f=$('demo-host').querySelector('iframe'),api=f.contentWindow.BohmianGrover2D;
     check($('demo-host').querySelectorAll('iframe').length===1,`${key}: one full demo active`);
+    if(key!=='ordinary') {
+      const view=api.viewerSettings(),d=f.contentDocument;
+      check(api.particleStats().count===25000,`${key}: actual GPU tracer count is 25,000`);
+      check(view.particleSize===1.5&&view.trailHalfLife===.1,`${key}: minimum dot size and trail duration`);
+      check(!d.querySelector('#groverGeometry'),`${key}: Bloch sphere removed from viewer`);
+      check(!d.querySelector('#brightness,#particleCount,#particleSize,#trailHalfLife,#arrowGrid,#currentGain'),`${key}: appearance sliders removed`);
+      check([...d.querySelectorAll('input[type=range]')].every(e=>['speed','gridSize'].includes(e.id)),`${key}: only search size and playback sliders remain`);
+      check(!/bohm|guidance/i.test(d.body.textContent),`${key}: viewer describes probability flow`);
+    }
     api.beginFrameRecording?.();api.startNext();api.advanceTime(5);
     const state=api.state();
     check(near(state.probabilities[state.target],probability),`${key}: correct prepared target probability`);
     check(near(state.norm,1),`${key}: norm preserved`);
+    if(key!=='ordinary') {
+      const stats=api.particleStats();
+      check(Math.abs(stats.boxProbability-state.boxProbability)<.035,`${key}: tracer fraction follows integrated goal-box density`);
+      check(f.contentDocument.querySelector('#flowStatus').textContent.includes('25,000 tracers'),`${key}: tracer count labelled in viewer`);
+      check(api.gpuInfo().error===0,`${key}: no GPU errors with the denser tracer preset`);
+    }
     check(new URL($('demo-fullscreen').href).pathname===`/grover-search/demos/${key}/index.html`,`${key}: full-page link matches`);
     check(f.contentDocument.documentElement.dataset.webgl2!=='error',`${key}: no WebGL2 error`);
     check(!/\bgold(?:en)?\b/i.test(f.contentDocument.body.textContent),`${key}: display copy uses yellow`);

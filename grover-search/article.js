@@ -16,14 +16,14 @@ redirectMovedSection();
 const demos = {
   ordinary:{title:'Ordinary columns', description:'Signed amplitudes, orbit controls, separate or combined mixer, and steps beyond the first peak.'},
   'wave-hadamard':{title:'Controlled wave', description:'Sixteen packet modes with ideal Hadamard mixing and the chosen curl-free probability transport.'},
-  'free-box':{title:'Free box', description:'Exact free-box mixing, a forward wait for the inverse, and scalar Bohmian current during free intervals.'},
+  'free-box':{title:'Free box', description:'Exact free-box mixing, a forward wait for the inverse, and Schrödinger probability current during free intervals.'},
   spin:{title:'Free box + spin', description:'Thirty-two joint modes, uniform spin rotation, and the total position current including spin circulation.'}
 };
 let selectedDemo;
 function loadDemo(key) {
   if (!demos[key] || key === selectedDemo) return;
   selectedDemo = key;
-  const data = demos[key], src = new URL(`demos/${key}/index.html`, import.meta.url).href;
+  const data = demos[key], src = new URL(`demos/${key}/index.html?v=20261021-flow`, import.meta.url).href;
   const iframe = document.createElement('iframe');
   iframe.src = src;
   iframe.title = `${data.title} — full interactive Grover simulation`;

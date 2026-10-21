@@ -1,28 +1,23 @@
 import { SearchSimulation, expectedProbability, probabilities,
   sineCoefficients, boxProbability } from './multiregion-core.js?v=20261014-particles';
-import { createGroverGeometry } from './grover-geometry.js?v=20261014-particles';
 import { FlowRenderer } from './flow-renderer.js?v=20261014-particles';
 
 const GRID = 512;
-const PARTICLE_COUNT_MIN = 1000, PARTICLE_COUNT_MAX = 100000;
-const PARTICLE_COUNT_LOG_RANGE = Math.log(PARTICLE_COUNT_MAX / PARTICLE_COUNT_MIN);
+const PARTICLE_COUNT_MAX = 100000;
 const simulation = new SearchSimulation(15);
-const params = { speed: 1, visGain: .65, visGamma: .55, showPhase: true, showGrid: true,
-  showCurrent: true, showParticles: true, showTrails: true, particleCount: 4000,
-  particleSize: 3.5, arrowGrid: 20, currentGain: 2.5, trailHalfLife: 1.5 };
+const params = { speed: 1, visGain: .8, visGamma: .55, showPhase: true, showGrid: true,
+  showCurrent: true, showParticles: true, showTrails: true, particleCount: 25000,
+  particleSize: 1.5, arrowGrid: 16, currentGain: 1.5, trailHalfLife: .1 };
 const byId = id => document.getElementById(id);
 const dom = Object.fromEntries(['gridSize', 'gridSizeValue', 'gridSummary', 'appTitle', 'stateCountLabel',
   'circuitXLabel', 'circuitYLabel', 'circuitTitle', 'circuitDescription', 'inverseCaption', 'c', 'waveArea', 'waveLabels', 'stage', 'waveHeader', 'waveFooter',
   'goalGrid', 'targetSummary', 'prepare', 'oracle', 'inverse', 'reference', 'forward', 'next', 'full',
-  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue', 'brightness', 'brightnessValue',
+  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue',
   'phaseToggle', 'gridToggle', 'ui', 'uibody', 'minui', 'circuitPanel', 'circuitToggle', 'circuitStatus',
   'circuitTarget', 'circuitReadout', 'iterationTrack', 'modeProbability', 'boxProbability', 'normValue',
-  'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading', 'groverGeometry',
-  'currentToggle', 'particlesToggle', 'trailsToggle', 'particleCount', 'particleCountValue',
-  'particleSize', 'particleSizeValue', 'arrowGrid', 'arrowGridValue', 'currentGain', 'currentGainValue',
-  'trailHalfLife', 'trailHalfLifeValue',
+  'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading',
+  'currentToggle', 'particlesToggle', 'trailsToggle',
   'particleProbability', 'flowStatus'].map(id => [id, byId(id)]));
-const geometry = createGroverGeometry(dom.groverGeometry);
 const canvas = dom.c;
 let gl, waveTexture, waveFbo, vao, reconstruction, renderer, flow, ready = false;
 let waveDirty = true, renderDirty = true, frameRecordingActive = false, lastTime = null, glError = 0;
@@ -84,24 +79,10 @@ function reset() { simulation.reset(); flow?.reset(params.particleCount,simulati
 function startNext() { if (simulation.startNext()) { markChanged(); syncUi(); return true; } return false; }
 function runFull() { if (simulation.runFull()) { flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); return true; } return false; }
 function togglePause() { simulation.paused = !simulation.paused; lastUiKey = ''; syncUi(); }
-function particleCountFromSlider() {
-  // Equal thumb distances multiply the count; round to 100 for readable steps.
-  return 100 * Math.round(PARTICLE_COUNT_MIN * Math.exp(
-    PARTICLE_COUNT_LOG_RANGE * Number(dom.particleCount.value) / 1000) / 100);
-}
-function showParticleCount(count) {
-  const label = count.toLocaleString();
-  dom.particleCountValue.textContent = label;
-  dom.particleCount.setAttribute('aria-valuetext', label + ' particles');
-}
-function syncParticleCountSlider(position = 1000 * Math.log(params.particleCount / PARTICLE_COUNT_MIN) / PARTICLE_COUNT_LOG_RANGE) {
-  dom.particleCount.value = position;
-  showParticleCount(params.particleCount);
-}
-function setParticleCount(value, sliderPosition) {
+// Kept for recording integrations; the reading view uses the fixed 25,000-tracer preset.
+function setParticleCount(value) {
   if (simulation.active) return false;
-  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 4000)));
-  syncParticleCountSlider(sliderPosition);
+  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 25000)));
   reset(); return true;
 }
 
@@ -137,7 +118,6 @@ function syncUi() {
   dom.next.disabled = busy || complete;
   dom.full.disabled = busy;
   dom.pause.textContent = simulation.paused ? 'Resume' : 'Pause';
-  dom.particleCount.disabled = busy;
   dom.oracle.textContent = `Oracle · ${targetText}`;
   dom.progressBar.style.width = `${100 * progress}%`;
   const round = iteration ? `Round ${iteration}/${ITERATIONS} · ` : '';
@@ -175,9 +155,6 @@ function syncUi() {
     forward: 'Free evolution for T completes the reflection. Unmarked contributions cancel and the marked mode grows.',
   };
   dom.gateDescription.textContent = complete ? (100*expectedProbability(ITERATIONS,side)).toFixed(3)+'% marked-mode probability after '+ITERATIONS+' iterations.' : descriptions[kind];
-  const stepKey = `${simulation.revision}/${target}/${gate?.index ?? -1}`;
-  geometry.update({ target, kind, progress, running: busy, paused: simulation.paused, iteration, complete,
-    amplitudes: simulation.amplitudes, startAmplitudes: gate?.startAmplitudes || simulation.amplitudes, stepKey });
   document.documentElement.dataset.stage = String(simulation.completed);
   document.documentElement.dataset.gate = kind;
   document.documentElement.dataset.progress = String(progress);
@@ -185,8 +162,8 @@ function syncUi() {
   if (flow) {
     const stats = flow.statistics(target, progress, !busy || simulation.paused);
     dom.particleProbability.textContent = formatProbability(stats.boxProbability);
-    const model = ['prepare','inverse','forward'].includes(kind) ? 'Bohmian free-box current' : 'conserved phase-gate transport';
-    dom.flowStatus.textContent = `${stats.count.toLocaleString()} particles · ${model}`;
+    const model = ['input','prepare','inverse','forward'].includes(kind) ? 'Schrödinger probability current' : 'conserved phase-gate transport';
+    dom.flowStatus.textContent = `${stats.count.toLocaleString()} tracers · ${model}`;
     document.documentElement.dataset.particleFailures = String(stats.failures);
     document.documentElement.dataset.particleLag = String(stats.maxLag);
   }
@@ -194,13 +171,11 @@ function syncUi() {
 }
 
 function installEvents() {
-  syncParticleCountSlider();
   dom.gridSize.addEventListener('input', () => setGridSize(dom.gridSize.value));
   gateButtons.forEach(id => dom[id].addEventListener('click', startNext));
   dom.next.addEventListener('click', startNext); dom.full.addEventListener('click', runFull);
   dom.reset.addEventListener('click', reset); dom.pause.addEventListener('click', togglePause);
   dom.speed.addEventListener('input', () => { params.speed = Number(dom.speed.value); dom.speedValue.textContent = `${params.speed.toFixed(2)}×`; });
-  dom.brightness.addEventListener('input', () => { params.visGain = Number(dom.brightness.value); dom.brightnessValue.textContent = params.visGain.toFixed(2); renderDirty = true; });
   dom.phaseToggle.addEventListener('click', () => {
     params.showPhase = !params.showPhase; dom.phaseToggle.textContent = params.showPhase ? 'ON' : 'OFF';
     dom.phaseToggle.setAttribute('aria-pressed', String(params.showPhase)); renderDirty = true;
@@ -217,20 +192,6 @@ function installEvents() {
       renderDirty = true;
     });
   }
-  for (const key of ['particleSize','arrowGrid','currentGain']) {
-    dom[key].addEventListener('input', () => {
-      params[key] = Number(dom[key].value); dom[`${key}Value`].textContent = String(params[key]); renderDirty = true;
-    });
-  }
-  dom.trailHalfLife.addEventListener('input', () => {
-    params.trailHalfLife = Number(dom.trailHalfLife.value);
-    dom.trailHalfLifeValue.textContent = `${params.trailHalfLife.toFixed(1)} s`;
-  });
-  dom.particleCount.addEventListener('input', () => showParticleCount(particleCountFromSlider()));
-  dom.particleCount.addEventListener('change', () => {
-    const count = particleCountFromSlider();
-    if (count !== params.particleCount) setParticleCount(count, dom.particleCount.value);
-  });
   dom.minui.addEventListener('click', () => {
     dom.uibody.hidden = !dom.uibody.hidden; dom.minui.textContent = dom.uibody.hidden ? '+' : '−';
     dom.minui.setAttribute('aria-expanded', String(!dom.uibody.hidden));
@@ -333,6 +294,7 @@ function advance(seconds) {
 // reproducible browser verification page. Reads expose the actual GPU texture.
 const api = {
   isReady: () => ready,
+  viewerSettings: () => ({ ...params }),
   state: () => ({ ...simulation.snapshot(), boxProbability: cachedBoxProbability, grid: GRID, speed: params.speed }),
   reset, setTarget: chooseTarget, startNext, runFull, togglePause,
   setParticleCount, setGridSize,

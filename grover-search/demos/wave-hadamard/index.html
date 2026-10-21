@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Grover Search 2D — 16 Regions</title>
   <link rel="icon" href="data:,"/>
-  <link rel="stylesheet" href="./styles.css?v=20261014-particles"/>
+  <link rel="stylesheet" href="./styles.css?v=20261021-flow"/>
 </head>
 <body>
 <div id="wrap">
@@ -24,17 +24,8 @@
       <div id="stageStatus" class="status" role="status"></div>
       <div class="section">Playback &amp; wave</div>
       <div class="row"><label for="speed">Gate speed</label><input id="speed" type="range" min="0.1" max="3" step="0.05" value="1"/><span id="speedValue" class="val">1.00×</span></div>
-      <div class="row"><label for="brightness">Brightness</label><input id="brightness" type="range" min="0.1" max="2" step="0.05" value="0.65"/><span id="brightnessValue" class="val">0.65</span></div>
       <div class="row"><span>Phase colors</span><button id="phaseToggle" aria-pressed="true">ON</button><span>Grid labels</span><button id="gridToggle" aria-pressed="true">ON</button></div>
-      <details class="flowSettings" open><summary>Flow settings</summary>
-        <div class="row"><label for="arrowGrid">Arrow grid</label><input id="arrowGrid" type="range" min="8" max="36" step="2" value="20"/><span id="arrowGridValue" class="val">20</span></div>
-        <div class="row"><label for="currentGain">Arrow gain</label><input id="currentGain" type="range" min="0.25" max="10" step="0.25" value="2.5"/><span id="currentGainValue" class="val">2.5</span></div>
-        <div class="row"><label for="particleSize">Dot size</label><input id="particleSize" type="range" min="1.5" max="8" step="0.5" value="3.5"/><span id="particleSizeValue" class="val">3.5</span></div>
-        <div class="row"><label for="trailHalfLife">Trail length</label><input id="trailHalfLife" type="range" min="0.1" max="12" step="0.1" value="1.5" aria-describedby="trailLengthHelp"/><span id="trailHalfLifeValue" class="val">1.5 s</span></div>
-        <p id="trailLengthHelp" class="note">Trail fading half-life, in gate time. Longer values keep more of each path. Pause holds the trails.</p>
-        <div class="row"><label for="particleCount">Particles</label><input id="particleCount" type="range" min="0" max="1000" step="1" value="301" aria-valuetext="4,000 particles" aria-describedby="particleCountHelp"/><span id="particleCountValue" class="val">4,000</span></div>
-        <p id="particleCountHelp" class="note">1,000–100,000 particles on a logarithmic scale. Changing the count resets the search. Hidden particles keep moving.</p>
-      </details>
+      <p class="note">25,000 yellow tracers show how probability density flows. Their short trails make the local motion visible.</p>
     </div>
     <div class="btnrow"><button id="reset">Reset (R)</button><button id="pause">Pause</button></div>
   </aside>
@@ -47,7 +38,7 @@
     </div>
     </header>
     <div id="waveArea"><canvas id="c" aria-label="Continuous two-dimensional probability wave with 16 outcome regions"></canvas><div id="waveLabels" aria-hidden="true"></div><div id="loading">Preparing the wave…</div><div id="error" role="alert" hidden></div></div>
-    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Particles</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Hue = phase · brightness = density · dots follow j / ρ</span></footer>
+    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Hue = phase · brightness = density · tracers show probability flow</span></footer>
   </main>
 
   <aside id="rightColumn">
@@ -74,57 +65,15 @@
       <div class="head"><h3>State diagnostics</h3></div>
       <div class="metrics"><div>Marked mode<b id="modeProbability">0.0%</b></div><div>Inside goal box<b id="boxProbability">0.0%</b></div></div>
       <div class="normLine">Total probability <b id="normValue">1.000000</b></div>
-      <div class="particleMetric">Particles inside goal box <b id="particleProbability">—</b></div>
+      <div class="particleMetric">Tracers inside goal box <b id="particleProbability">—</b></div>
       <div id="flowStatus" class="note">Conserved probability flow</div>
-      <details id="groverGeometry" class="groverGeometry" open>
-      <summary>Effective Grover Bloch sphere</summary>
-      <figure>
-        <div class="geometryMeta"><span data-geometry="target">Target |1111⟩</span><b data-geometry="status">Input |0000⟩</b></div>
-        <svg class="blochSphere" data-geometry="sphere" viewBox="0 0 360 312" role="img" tabindex="0" aria-labelledby="groverGeometryTitle groverGeometryDescription">
-          <title id="groverGeometryTitle">Effective Bloch sphere for the marked and unmarked subspace</title>
-          <desc id="groverGeometryDescription" data-geometry="liveDescription">A yellow unit vector shows the normalized projection. The marked state is at the north pole and the unmarked superposition at the south pole. Drag or use arrow keys to rotate the view.</desc>
-          <defs>
-            <radialGradient id="blochGlass" cx="35%" cy="25%" r="78%"><stop offset="0" stop-color="#234b75" stop-opacity=".5"/><stop offset=".7" stop-color="#10243f" stop-opacity=".3"/><stop offset="1" stop-color="#416985" stop-opacity=".3"/></radialGradient>
-            <radialGradient id="blochTipGlow"><stop offset="0" stop-color="#ffe392" stop-opacity=".6"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient>
-            <marker id="blochHead" viewBox="0 0 11 8" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L11 4L0 8L2 4Z" fill="#ffd36b"/></marker>
-          </defs>
-          <circle cx="180" cy="153" r="108" fill="url(#blochGlass)" stroke="#709fc7" stroke-opacity=".46"/>
-          <path data-geometry="backGrid" fill="none" stroke="#75a7d0" stroke-opacity=".2" stroke-width=".7" stroke-dasharray="2 4"/>
-          <path data-geometry="axes" fill="none" stroke="#6c8bab" stroke-opacity=".48" stroke-width=".8"/>
-          <path data-geometry="backTrace" fill="none" stroke="#ffce69" stroke-opacity=".38" stroke-width="1.6" stroke-dasharray="3 3"/>
-          <path data-geometry="frontGrid" fill="none" stroke="#83bce4" stroke-opacity=".32" stroke-width=".8"/>
-          <path data-geometry="frontTrace" fill="none" stroke="#ffdc89" stroke-opacity=".8" stroke-width="2"/>
-          <circle data-geometry="northDot" fill="#a4d8ff"/><circle data-geometry="southDot" fill="#a4d8ff"/>
-          <circle data-geometry="gateStart" fill="none" stroke="#c4d3e5" stroke-width="1.1"/>
-          <circle data-geometry="preparedDot" fill="none" stroke="#67ccf0" stroke-width="1.5"/>
-          <text data-geometry="preparedLabel" class="geometryLabel" style="fill:#67ccf0">|s⟩</text>
-          <path data-geometry="vector" fill="none" stroke="#ffd36b" stroke-width="3" marker-end="url(#blochHead)"/>
-          <circle data-geometry="tipHalo" fill="url(#blochTipGlow)"/>
-          <circle data-geometry="tip" fill="#ffedb6" stroke="#ffcf69" stroke-width=".8"/>
-          <circle cx="180" cy="153" r="2.8" fill="#dbeafc"/>
-          <text data-geometry="northLabel" class="blochLabel">|ω⟩ · marked</text>
-          <text data-geometry="southLabel" class="blochLabel">|s′⟩ · unmarked</text>
-          <text data-geometry="xLabel" class="blochAxisLabel">X</text><text data-geometry="yLabel" class="blochAxisLabel">Y</text>
-        </svg>
-        <div class="blochTools"><span>Drag to orbit · <b data-geometry="normValue">|r| = 1</b></span><button type="button" data-geometry="resetView" title="Reset sphere view (Home when focused)">Reset view</button></div>
-        <div class="geometryLegend"><span style="--color:#ffd36b">State &amp; path</span><span style="--color:#67ccf0">Prepared |s⟩</span><span style="--color:#c4d3e5">Gate input</span></div>
-        <div class="geometryMeasures">
-          <div class="blochWeight">In Grover subspace <b data-geometry="weightValue">0.0%</b><div class="bar"><i data-geometry="weightBar"></i></div><div class="blochOutside">Outside: <b data-geometry="outsideValue">0.0%</b></div></div>
-          <div>Marked · full state <b data-geometry="markedValue">0.0%</b><div class="bar"><i data-geometry="markedBar"></i></div></div>
-          <div class="blochConditional">Marked within subspace<b data-geometry="conditionalValue">0.0%</b></div>
-        </div>
-        <figcaption>
-          <p data-geometry="description">Start in |0000⟩. Preparation will create the balanced search state |s⟩.</p>
-          <p class="note">The arrow has unit length in 3D; its tip stays on the sphere. It represents the normalized marked/unmarked projection. The weight bar shows how much of the full state is represented.</p>
-        </figcaption>
-      </figure>
-    </details>
+
       <div id="phaseLegendPanel" class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
-      <details class="theory"><summary>About the wave and gates</summary><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so the probability of a logical mode differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. Choose the initial mode |i⟩ and the goal on the main wave using the guide beside the title. The default initial mode is |0000⟩. The reference phase acts on the chosen |i⟩, so the diffuser reflects about H|i⟩.</p><div class="math">H = H<sub>Had</sub><sup>⊗2log₂N</sup> (N = 2, 4)<br>H<sub>xy,uv</sub> = e<sup>2πi(xv−yu)/N</sup>/N (N = 3, 5)<br>ℋ<sub>mix</sub> = πℏ(I − H)/(2T)</div><p>Both mixers satisfy H† = H and H² = I, with equal probabilities from every input. Preparation and forward mixing use exp(−iℋ<sub>mix</sub>t/ℏ); inverse mixing uses the opposite sign. Phase gates use exact mode-projector exponentials. These are ideal mode operations, rather than free-box propagation. The wave evolves unitarily at every instant.</p><p>The first optimal Grover peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively. All gates and the wave hold still at checkpoints and when paused.</p><div class="math">j = ∇χ &nbsp; · &nbsp; ∇²χ = −∂ρ/∂t<br>Particle velocity: v = j / ρ</div><p>The arrows show a conserved spatial current derived from the exact density change, with zero flow through the outer walls. We choose the curl-free solution. This is a generalized probability-transport model; the nonlocal gate Hamiltonian does not uniquely determine continuous particle paths.</p><p>Particle fractions sample the spatial density and should track “Inside goal box.” Arrow length indicates current strength, with a compressed display scale. Pause freezes the instantaneous arrows and all trajectories for inspection.</p></details>
+      <details class="theory"><summary>About the wave and gates</summary><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so the probability of a logical mode differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. Choose the initial mode |i⟩ and the goal on the main wave using the guide beside the title. The default initial mode is |0000⟩. The reference phase acts on the chosen |i⟩, so the diffuser reflects about H|i⟩.</p><div class="math">H = H<sub>Had</sub><sup>⊗2log₂N</sup> (N = 2, 4)<br>H<sub>xy,uv</sub> = e<sup>2πi(xv−yu)/N</sup>/N (N = 3, 5)<br>ℋ<sub>mix</sub> = πℏ(I − H)/(2T)</div><p>Both mixers satisfy H† = H and H² = I, with equal probabilities from every input. Preparation and forward mixing use exp(−iℋ<sub>mix</sub>t/ℏ); inverse mixing uses the opposite sign. Phase gates use exact mode-projector exponentials. These are ideal mode operations, rather than free-box propagation. The wave evolves unitarily at every instant.</p><p>The first optimal Grover peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively. All gates and the wave hold still at checkpoints and when paused.</p><div class="math">j = ∇χ &nbsp; · &nbsp; ∇²χ = −∂ρ/∂t<br>Tracer transport: v = j / ρ</div><p>The arrows show a conserved spatial current derived from the exact density change, with zero flow through the outer walls. We choose the curl-free solution. This curl-free current is the transport convention chosen for these ideal nonlocal gates. Yellow tracers carried by j / ρ visualize the resulting redistribution of density.</p><p>Tracer fractions sample the spatial density and should track “Inside goal box.” Arrow length indicates current strength, with a compressed display scale. Pause freezes the instantaneous arrows and tracer motion for inspection.</p></details>
     </section>
   </aside>
 </div>
 <script src="./recording.js?v=20261014-particles"></script>
-<script type="module" src="./main.js?v=20261014-particles"></script>
+<script type="module" src="./main.js?v=20261021-flow"></script>
 </body>
 </html>

@@ -1,0 +1,762 @@
+diff --git a/free-box/index.html b/free-box/index.html
+index 8fcf93b..bb957be 100644
+--- a/free-box/index.html
++++ b/free-box/index.html
+@@ -5,7 +5,7 @@
+   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+   <title>Grover Search 2D — 16 Regions · Free Mixing</title>
+   <link rel="icon" href="data:,"/>
+-  <link rel="stylesheet" href="./styles.css?v=20261014-particles"/>
++  <link rel="stylesheet" href="./styles.css?v=20261021-flow"/>
+ </head>
+ <body>
+ <div id="wrap">
+@@ -32,17 +32,8 @@
+       <div id="stageStatus" class="status" role="status"></div>
+       <div class="section">Playback &amp; wave</div>
+       <div class="row"><label for="speed">Gate speed</label><input id="speed" type="range" min="0.1" max="3" step="0.05" value="1"/><span id="speedValue" class="val">1.00×</span></div>
+-      <div class="row"><label for="brightness">Brightness</label><input id="brightness" type="range" min="0.1" max="2" step="0.05" value="0.65"/><span id="brightnessValue" class="val">0.65</span></div>
+       <div class="row"><span>Phase colors</span><button id="phaseToggle" aria-pressed="true">ON</button><span>Grid labels</span><button id="gridToggle" aria-pressed="true">ON</button></div>
+-      <details class="flowSettings" open><summary>Flow settings</summary>
+-        <div class="row"><label for="arrowGrid">Arrow grid</label><input id="arrowGrid" type="range" min="8" max="36" step="2" value="20"/><span id="arrowGridValue" class="val">20</span></div>
+-        <div class="row"><label for="currentGain">Arrow gain</label><input id="currentGain" type="range" min="0.25" max="10" step="0.25" value="2.5"/><span id="currentGainValue" class="val">2.5</span></div>
+-        <div class="row"><label for="particleSize">Dot size</label><input id="particleSize" type="range" min="1.5" max="8" step="0.5" value="3.5"/><span id="particleSizeValue" class="val">3.5</span></div>
+-        <div class="row"><label for="trailHalfLife">Trail length</label><input id="trailHalfLife" type="range" min="0.1" max="12" step="0.1" value="1.5" aria-describedby="trailLengthHelp"/><span id="trailHalfLifeValue" class="val">1.5 s</span></div>
+-        <p id="trailLengthHelp" class="note">Trail fading half-life, in gate time. Longer values keep more of each path. Pause holds the trails.</p>
+-        <div class="row"><label for="particleCount">Particles</label><input id="particleCount" type="range" min="0" max="1000" step="1" value="301" aria-valuetext="4,000 particles" aria-describedby="particleCountHelp"/><span id="particleCountValue" class="val">4,000</span></div>
+-        <p id="particleCountHelp" class="note">1,000–100,000 particles on a logarithmic scale. Changing the count resets the search. Hidden particles keep moving.</p>
+-      </details>
++      <p class="note">25,000 yellow tracers show how probability density flows. Their short trails make the local motion visible.</p>
+     </div>
+     <div class="btnrow"><button id="reset">Reset (R)</button><button id="pause">Pause</button></div>
+   </aside>
+@@ -50,7 +41,7 @@
+   <main id="stage">
+     <header id="waveHeader"><div><span id="stateCountLabel" class="eyebrow">FREE BOX EVOLUTION · 16 LOGICAL MODES</span><h1>Amplitude amplification</h1></div><div class="targetBadge"><span id="waveTarget">MARKED |1111⟩</span><b id="waveProbability">0.0%</b></div></header>
+     <div id="waveArea"><canvas id="c" aria-label="Continuous two-dimensional probability wave with 16 outcome regions"></canvas><div id="waveLabels" aria-hidden="true"></div><div id="loading">Preparing the wave…</div><div id="error" role="alert" hidden></div></div>
+-    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Probability flow overlays"><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Particles</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span>Hue = phase · arrows = probability current · dots follow j / ρ</span></footer>
++    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Probability flow overlays"><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span>Hue = phase · arrows = probability current · tracers show probability flow</span></footer>
+   </main>
+ 
+   <aside id="rightColumn">
+@@ -77,57 +68,15 @@
+       <div class="head"><h3>State diagnostics</h3></div>
+       <div class="metrics"><div>Marked mode<b id="modeProbability">0.0%</b></div><div>Inside goal box<b id="boxProbability">0.0%</b></div></div>
+       <div class="normLine">Total probability <b id="normValue">1.000000</b></div>
+-      <div class="particleMetric">Particles inside goal box <b id="particleProbability">—</b></div>
++      <div class="particleMetric">Tracers inside goal box <b id="particleProbability">—</b></div>
+       <div id="flowStatus" class="note">Conserved probability flow</div>
+-      <details id="groverGeometry" class="groverGeometry" open>
+-      <summary>Effective Grover Bloch sphere</summary>
+-      <figure>
+-        <div class="geometryMeta"><span data-geometry="target">Target |1111⟩</span><b data-geometry="status">Input |0000⟩</b></div>
+-        <svg class="blochSphere" data-geometry="sphere" viewBox="0 0 360 312" role="img" tabindex="0" aria-labelledby="groverGeometryTitle groverGeometryDescription">
+-          <title id="groverGeometryTitle">Effective Bloch sphere for the marked and unmarked subspace</title>
+-          <desc id="groverGeometryDescription" data-geometry="liveDescription">A yellow unit vector shows the normalized projection. The marked state is at the north pole and the unmarked superposition at the south pole. Drag or use arrow keys to rotate the view.</desc>
+-          <defs>
+-            <radialGradient id="blochGlass" cx="35%" cy="25%" r="78%"><stop offset="0" stop-color="#234b75" stop-opacity=".5"/><stop offset=".7" stop-color="#10243f" stop-opacity=".3"/><stop offset="1" stop-color="#416985" stop-opacity=".3"/></radialGradient>
+-            <radialGradient id="blochTipGlow"><stop offset="0" stop-color="#ffe392" stop-opacity=".6"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient>
+-            <marker id="blochHead" viewBox="0 0 11 8" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L11 4L0 8L2 4Z" fill="#ffd36b"/></marker>
+-          </defs>
+-          <circle cx="180" cy="153" r="108" fill="url(#blochGlass)" stroke="#709fc7" stroke-opacity=".46"/>
+-          <path data-geometry="backGrid" fill="none" stroke="#75a7d0" stroke-opacity=".2" stroke-width=".7" stroke-dasharray="2 4"/>
+-          <path data-geometry="axes" fill="none" stroke="#6c8bab" stroke-opacity=".48" stroke-width=".8"/>
+-          <path data-geometry="backTrace" fill="none" stroke="#ffce69" stroke-opacity=".38" stroke-width="1.6" stroke-dasharray="3 3"/>
+-          <path data-geometry="frontGrid" fill="none" stroke="#83bce4" stroke-opacity=".32" stroke-width=".8"/>
+-          <path data-geometry="frontTrace" fill="none" stroke="#ffdc89" stroke-opacity=".8" stroke-width="2"/>
+-          <circle data-geometry="northDot" fill="#a4d8ff"/><circle data-geometry="southDot" fill="#a4d8ff"/>
+-          <circle data-geometry="gateStart" fill="none" stroke="#c4d3e5" stroke-width="1.1"/>
+-          <circle data-geometry="preparedDot" fill="none" stroke="#67ccf0" stroke-width="1.5"/>
+-          <text data-geometry="preparedLabel" class="geometryLabel" style="fill:#67ccf0">|s⟩</text>
+-          <path data-geometry="vector" fill="none" stroke="#ffd36b" stroke-width="3" marker-end="url(#blochHead)"/>
+-          <circle data-geometry="tipHalo" fill="url(#blochTipGlow)"/>
+-          <circle data-geometry="tip" fill="#ffedb6" stroke="#ffcf69" stroke-width=".8"/>
+-          <circle cx="180" cy="153" r="2.8" fill="#dbeafc"/>
+-          <text data-geometry="northLabel" class="blochLabel">|ω⟩ · marked</text>
+-          <text data-geometry="southLabel" class="blochLabel">|s′⟩ · unmarked</text>
+-          <text data-geometry="xLabel" class="blochAxisLabel">X</text><text data-geometry="yLabel" class="blochAxisLabel">Y</text>
+-        </svg>
+-        <div class="blochTools"><span>Drag to orbit · <b data-geometry="normValue">|r| = 1</b></span><button type="button" data-geometry="resetView" title="Reset sphere view (Home when focused)">Reset view</button></div>
+-        <div class="geometryLegend"><span style="--color:#ffd36b">State &amp; path</span><span style="--color:#67ccf0">Prepared |s⟩</span><span style="--color:#c4d3e5">Gate input</span></div>
+-        <div class="geometryMeasures">
+-          <div class="blochWeight">In Grover subspace <b data-geometry="weightValue">0.0%</b><div class="bar"><i data-geometry="weightBar"></i></div><div class="blochOutside">Outside: <b data-geometry="outsideValue">0.0%</b></div></div>
+-          <div>Marked · full state <b data-geometry="markedValue">0.0%</b><div class="bar"><i data-geometry="markedBar"></i></div></div>
+-          <div class="blochConditional">Marked within subspace<b data-geometry="conditionalValue">0.0%</b></div>
+-        </div>
+-        <figcaption>
+-          <p data-geometry="description">Start in |0000⟩. Preparation will create the balanced search state |s⟩.</p>
+-          <p class="note">The arrow has unit length in 3D; its tip stays on the sphere. It represents the normalized marked/unmarked projection. The weight bar shows how much of the full state is represented.</p>
+-        </figcaption>
+-      </figure>
+-    </details>
++
+       <div class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
+-      <details class="theory"><summary>About the wave and gates</summary><p>Choose N = 2, 3, 4 or 5. The box and mass stay fixed: T = T<sub>rev</sub>/(2N), and the inverse is a positive-time wait of (2N−1)T. There is one scalar wave and no spin channel.</p><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so logical-mode probability differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. The input is the lower-left packet |0,0⟩ (|0000⟩ at 4×4).</p><div class="math">ℋ = −ℏ²∇²/(2m)<br>A = U(T), &nbsp; A† = U((2N−1)T), &nbsp; U(2NT) = I</div><p>Preparation and forward mixing wait for T = πℏ/(NE₁). The inverse waits forward for (2N−1)T under the same positive kinetic Hamiltonian. The fixed revival time is 19.2 gate-time seconds. At the default 4×4 size, T is 2.4 and 7T is 16.8. Both axes evolve simultaneously.</p><p>Preparation gives equal probabilities with definite relative phases. The Bloch sphere uses those phases in its marked/unmarked basis. Oracle and reference pulses remain ideal mode-projector phase operations. The first optimal peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively.</p><div class="math">Free mixing: j = (ℏ/m) Im(ψ*∇ψ)<br>Phase pulses: j = ∇χ, &nbsp; ∇²χ = −∂ρ/∂t<br>Particle velocity: v = j / ρ</div><p>During free evolution the arrows and particles use the ordinary Bohmian current. During the ideal nonlocal phase pulses they use the chosen conserved curl-free transport. Every stage has zero normal flux at the outer walls.</p><p>Compare particle fractions with “Inside goal box.” Arrow lengths show current strength on a compressed scale. Pause and manual gate checkpoints hold the wave, current, particles, and trails still for inspection.</p></details>
++      <details class="theory"><summary>About the wave and gates</summary><p>Choose N = 2, 3, 4 or 5. The box and mass stay fixed: T = T<sub>rev</sub>/(2N), and the inverse is a positive-time wait of (2N−1)T. There is one scalar wave and no spin channel.</p><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so logical-mode probability differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. The input is the lower-left packet |0,0⟩ (|0000⟩ at 4×4).</p><div class="math">ℋ = −ℏ²∇²/(2m)<br>A = U(T), &nbsp; A† = U((2N−1)T), &nbsp; U(2NT) = I</div><p>Preparation and forward mixing wait for T = πℏ/(NE₁). The inverse waits forward for (2N−1)T under the same positive kinetic Hamiltonian. The fixed revival time is 19.2 gate-time seconds. At the default 4×4 size, T is 2.4 and 7T is 16.8. Both axes evolve simultaneously.</p><p>Preparation gives equal probabilities with definite relative phases. Oracle and reference pulses remain ideal mode-projector phase operations. The first optimal peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively.</p><div class="math">Free mixing: j = (ℏ/m) Im(ψ*∇ψ)<br>Phase pulses: j = ∇χ, &nbsp; ∇²χ = −∂ρ/∂t<br>Tracer transport: v = j / ρ</div><p>During free evolution the arrows show the Schrödinger probability current. During the ideal nonlocal phase pulses they show the chosen conserved curl-free current. Yellow tracers move with v = j / ρ to visualize the evolving density. They are visualization samples, and adding more tracers changes only the sampling detail. Every stage has zero normal flux at the outer walls.</p><p>Compare tracer fractions with “Inside goal box.” Arrow lengths show current strength on a compressed scale. Pause and manual gate checkpoints hold the wave, current, tracers, and trails still for inspection.</p></details>
+     </section>
+   </aside>
+ </div>
+ <script src="./recording.js?v=20261014-particles"></script>
+-<script type="module" src="./main.js?v=20261014-particles"></script>
++<script type="module" src="./main.js?v=20261021-flow"></script>
+ </body>
+ </html>
+diff --git a/free-box/main.js b/free-box/main.js
+index 042c2c3..39e1b07 100644
+--- a/free-box/main.js
++++ b/free-box/main.js
+@@ -1,28 +1,23 @@
+ import { SearchSimulation, expectedProbability, probabilities,
+   sineCoefficients, boxProbability } from './multiregion-core.js?v=20261014-particles';
+-import { createGroverGeometry } from './grover-geometry.js?v=20261014-particles';
+ import { FlowRenderer } from './flow-renderer.js?v=20261014-particles';
+ 
+ const GRID = 512;
+-const PARTICLE_COUNT_MIN = 1000, PARTICLE_COUNT_MAX = 100000;
+-const PARTICLE_COUNT_LOG_RANGE = Math.log(PARTICLE_COUNT_MAX / PARTICLE_COUNT_MIN);
++const PARTICLE_COUNT_MAX = 100000;
+ const simulation = new SearchSimulation(15);
+-const params = { speed: 1, visGain: .65, visGamma: .55, showPhase: true, showGrid: true,
+-  showCurrent: true, showParticles: true, showTrails: true, particleCount: 4000,
+-  particleSize: 3.5, arrowGrid: 20, currentGain: 2.5, trailHalfLife: 1.5 };
++const params = { speed: 1, visGain: .8, visGamma: .55, showPhase: true, showGrid: true,
++  showCurrent: true, showParticles: true, showTrails: true, particleCount: 25000,
++  particleSize: 1.5, arrowGrid: 16, currentGain: 1.5, trailHalfLife: .1 };
+ const byId = id => document.getElementById(id);
+ const dom = Object.fromEntries(['gridSize', 'gridSizeValue', 'gridSummary', 'appTitle', 'stateCountLabel',
+   'circuitXLabel', 'circuitYLabel', 'circuitTitle', 'circuitDescription', 'inverseCaption', 'c', 'waveArea', 'waveLabels', 'stage', 'waveHeader', 'waveFooter',
+   'goalGrid', 'targetSummary', 'prepare', 'oracle', 'inverse', 'reference', 'forward', 'next', 'full',
+-  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue', 'brightness', 'brightnessValue',
++  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue',
+   'phaseToggle', 'gridToggle', 'ui', 'uibody', 'minui', 'circuitPanel', 'circuitToggle', 'circuitStatus',
+   'circuitTarget', 'circuitReadout', 'iterationTrack', 'modeProbability', 'boxProbability', 'normValue',
+-  'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading', 'groverGeometry',
+-  'currentToggle', 'particlesToggle', 'trailsToggle', 'particleCount', 'particleCountValue',
+-  'particleSize', 'particleSizeValue', 'arrowGrid', 'arrowGridValue', 'currentGain', 'currentGainValue',
+-  'trailHalfLife', 'trailHalfLifeValue',
++  'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading',
++  'currentToggle', 'particlesToggle', 'trailsToggle',
+   'particleProbability', 'flowStatus'].map(id => [id, byId(id)]));
+-const geometry = createGroverGeometry(dom.groverGeometry);
+ const canvas = dom.c;
+ let gl, waveTexture, waveFbo, vao, reconstruction, renderer, flow, ready = false;
+ let waveDirty = true, renderDirty = true, frameRecordingActive = false, lastTime = null, glError = 0;
+@@ -84,24 +79,10 @@ function reset() { simulation.reset(); flow?.reset(params.particleCount,simulati
+ function startNext() { if (simulation.startNext()) { markChanged(); syncUi(); return true; } return false; }
+ function runFull() { if (simulation.runFull()) { flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); return true; } return false; }
+ function togglePause() { simulation.paused = !simulation.paused; lastUiKey = ''; syncUi(); }
+-function particleCountFromSlider() {
+-  // Equal thumb distances multiply the count; round to 100 for readable steps.
+-  return 100 * Math.round(PARTICLE_COUNT_MIN * Math.exp(
+-    PARTICLE_COUNT_LOG_RANGE * Number(dom.particleCount.value) / 1000) / 100);
+-}
+-function showParticleCount(count) {
+-  const label = count.toLocaleString();
+-  dom.particleCountValue.textContent = label;
+-  dom.particleCount.setAttribute('aria-valuetext', label + ' particles');
+-}
+-function syncParticleCountSlider(position = 1000 * Math.log(params.particleCount / PARTICLE_COUNT_MIN) / PARTICLE_COUNT_LOG_RANGE) {
+-  dom.particleCount.value = position;
+-  showParticleCount(params.particleCount);
+-}
+-function setParticleCount(value, sliderPosition) {
++// Kept for recording integrations; the reading view uses the fixed 25,000-tracer preset.
++function setParticleCount(value) {
+   if (simulation.active) return false;
+-  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 4000)));
+-  syncParticleCountSlider(sliderPosition);
++  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 25000)));
+   reset(); return true;
+ }
+ 
+@@ -137,7 +118,6 @@ function syncUi() {
+   dom.next.disabled = busy || complete;
+   dom.full.disabled = busy;
+   dom.pause.textContent = simulation.paused ? 'Resume' : 'Pause';
+-  dom.particleCount.disabled = busy;
+   dom.oracle.textContent = `Oracle · ${targetText}`;
+   dom.progressBar.style.width = `${100 * progress}%`;
+   const round = iteration ? `Round ${iteration}/${ITERATIONS} · ` : '';
+@@ -175,9 +155,6 @@ function syncUi() {
+     forward: 'Free evolution for T completes the reflection. Unmarked contributions cancel and the marked mode grows.',
+   };
+   dom.gateDescription.textContent = complete ? (100*expectedProbability(ITERATIONS,side)).toFixed(3)+'% marked-mode probability after '+ITERATIONS+' iterations.' : descriptions[kind];
+-  const stepKey = `${simulation.revision}/${target}/${gate?.index ?? -1}`;
+-  geometry.update({ target, kind, progress, running: busy, paused: simulation.paused, iteration, complete,
+-    amplitudes: simulation.amplitudes, startAmplitudes: gate?.startAmplitudes || simulation.amplitudes, stepKey });
+   document.documentElement.dataset.stage = String(simulation.completed);
+   document.documentElement.dataset.gate = kind;
+   document.documentElement.dataset.progress = String(progress);
+@@ -185,8 +162,8 @@ function syncUi() {
+   if (flow) {
+     const stats = flow.statistics(target, progress, !busy || simulation.paused);
+     dom.particleProbability.textContent = formatProbability(stats.boxProbability);
+-    const model = ['prepare','inverse','forward'].includes(kind) ? 'Bohmian free-box current' : 'conserved phase-gate transport';
+-    dom.flowStatus.textContent = `${stats.count.toLocaleString()} particles · ${model}`;
++    const model = ['input','prepare','inverse','forward'].includes(kind) ? 'Schrödinger probability current' : 'conserved phase-gate transport';
++    dom.flowStatus.textContent = `${stats.count.toLocaleString()} tracers · ${model}`;
+     document.documentElement.dataset.particleFailures = String(stats.failures);
+     document.documentElement.dataset.particleLag = String(stats.maxLag);
+   }
+@@ -194,13 +171,11 @@ function syncUi() {
+ }
+ 
+ function installEvents() {
+-  syncParticleCountSlider();
+   dom.gridSize.addEventListener('input', () => setGridSize(dom.gridSize.value));
+   gateButtons.forEach(id => dom[id].addEventListener('click', startNext));
+   dom.next.addEventListener('click', startNext); dom.full.addEventListener('click', runFull);
+   dom.reset.addEventListener('click', reset); dom.pause.addEventListener('click', togglePause);
+   dom.speed.addEventListener('input', () => { params.speed = Number(dom.speed.value); dom.speedValue.textContent = `${params.speed.toFixed(2)}×`; });
+-  dom.brightness.addEventListener('input', () => { params.visGain = Number(dom.brightness.value); dom.brightnessValue.textContent = params.visGain.toFixed(2); renderDirty = true; });
+   dom.phaseToggle.addEventListener('click', () => {
+     params.showPhase = !params.showPhase; dom.phaseToggle.textContent = params.showPhase ? 'ON' : 'OFF';
+     dom.phaseToggle.setAttribute('aria-pressed', String(params.showPhase)); renderDirty = true;
+@@ -217,20 +192,6 @@ function installEvents() {
+       renderDirty = true;
+     });
+   }
+-  for (const key of ['particleSize','arrowGrid','currentGain']) {
+-    dom[key].addEventListener('input', () => {
+-      params[key] = Number(dom[key].value); dom[`${key}Value`].textContent = String(params[key]); renderDirty = true;
+-    });
+-  }
+-  dom.trailHalfLife.addEventListener('input', () => {
+-    params.trailHalfLife = Number(dom.trailHalfLife.value);
+-    dom.trailHalfLifeValue.textContent = `${params.trailHalfLife.toFixed(1)} s`;
+-  });
+-  dom.particleCount.addEventListener('input', () => showParticleCount(particleCountFromSlider()));
+-  dom.particleCount.addEventListener('change', () => {
+-    const count = particleCountFromSlider();
+-    if (count !== params.particleCount) setParticleCount(count, dom.particleCount.value);
+-  });
+   dom.minui.addEventListener('click', () => {
+     dom.uibody.hidden = !dom.uibody.hidden; dom.minui.textContent = dom.uibody.hidden ? '+' : '−';
+     dom.minui.setAttribute('aria-expanded', String(!dom.uibody.hidden));
+@@ -333,6 +294,7 @@ function advance(seconds) {
+ // reproducible browser verification page. Reads expose the actual GPU texture.
+ const api = {
+   isReady: () => ready,
++  viewerSettings: () => ({ ...params }),
+   state: () => ({ ...simulation.snapshot(), boxProbability: cachedBoxProbability, grid: GRID, speed: params.speed }),
+   reset, setTarget: chooseTarget, startNext, runFull, togglePause,
+   setParticleCount, setGridSize,
+diff --git a/spin/index.html b/spin/index.html
+index 2b42d6d..c1673c2 100644
+--- a/spin/index.html
++++ b/spin/index.html
+@@ -5,7 +5,7 @@
+   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+   <title>Grover with Spin — 32 States · Free Mixing</title>
+   <link rel="icon" href="data:,"/>
+-  <link rel="stylesheet" href="./styles.css?v=20261014-particles"/>
++  <link rel="stylesheet" href="./styles.css?v=20261021-flow"/>
+ </head>
+ <body>
+ <div id="wrap">
+@@ -25,19 +25,10 @@
+       <div class="section">Playback &amp; wave</div>
+       <div class="row"><label for="waveView">Wave view</label><select id="waveView"><option value="0">Total · spin colors</option><option value="1">↑ component · phase</option><option value="2">↓ component · phase</option></select></div>
+       <div class="row"><label for="speed">Gate speed</label><input id="speed" type="range" min="0.1" max="3" step="0.05" value="1"/><span id="speedValue" class="val">1.00×</span></div>
+-      <div class="row"><label for="brightness">Brightness</label><input id="brightness" type="range" min="0.1" max="2" step="0.05" value="0.65"/><span id="brightnessValue" class="val">0.65</span></div>
+       <div class="row"><span>Grid labels</span><button id="gridToggle" aria-pressed="true">ON</button></div>
+-      <details class="flowSettings" open><summary>Flow settings</summary>
+-        <div class="row"><label for="currentMode">Arrows</label><select id="currentMode"><option value="0">Total current</option><option value="1">Transport current</option><option value="2">Spin current</option></select></div>
+-        <p class="note">Arrow selection changes the display. Particles always follow the full current.</p>
+-        <div class="row"><label for="arrowGrid">Arrow grid</label><input id="arrowGrid" type="range" min="8" max="36" step="2" value="20"/><span id="arrowGridValue" class="val">20</span></div>
+-        <div class="row"><label for="currentGain">Arrow gain</label><input id="currentGain" type="range" min="0.25" max="10" step="0.25" value="2.5"/><span id="currentGainValue" class="val">2.5</span></div>
+-        <div class="row"><label for="particleSize">Dot size</label><input id="particleSize" type="range" min="1.5" max="8" step="0.5" value="3.5"/><span id="particleSizeValue" class="val">3.5</span></div>
+-        <div class="row"><label for="trailHalfLife">Trail length</label><input id="trailHalfLife" type="range" min="0.1" max="12" step="0.1" value="1.5" aria-describedby="trailLengthHelp"/><span id="trailHalfLifeValue" class="val">1.5 s</span></div>
+-        <p id="trailLengthHelp" class="note">Trail fading half-life, in gate time. Longer values keep more of each path. Pause holds the trails.</p>
+-        <div class="row"><label for="particleCount">Particles</label><input id="particleCount" type="range" min="0" max="1000" step="1" value="301" aria-valuetext="4,000 particles" aria-describedby="particleCountHelp"/><span id="particleCountValue" class="val">4,000</span></div>
+-        <p id="particleCountHelp" class="note">1,000–100,000 particles on a logarithmic scale. Changing the count resets the search. Hidden particles keep moving.</p>
+-      </details>
++      <p class="note">25,000 yellow tracers show how probability density flows. Their short trails make the local motion visible.</p>
++      <div class="row"><label for="currentMode">Arrows</label><select id="currentMode"><option value="0">Total current</option><option value="1">Transport current</option><option value="2">Spin current</option></select></div>
++      <p class="note">Arrow selection changes the displayed current component. Tracers always follow the total probability current.</p>
+     </div>
+     <div class="btnrow"><button id="reset">Reset (R)</button><button id="pause">Pause</button></div>
+   </aside>
+@@ -50,7 +41,7 @@
+     </div>
+     </header>
+     <div id="waveArea"><canvas id="c" aria-label="Two-component spinor wave: 16 spatial regions, each with spin up and down"></canvas><div id="waveLabels" aria-hidden="true"></div><div id="loading">Preparing the wave…</div><div id="error" role="alert" hidden></div></div>
+-    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="spinToggle" aria-pressed="true">Spin directions</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Particles</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Color = local spin: cyan ↑ · magenta ↓ · violet balanced. Yellow dots follow the total current.</span></footer>
++    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="spinToggle" aria-pressed="true">Spin directions</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Color = local spin: cyan ↑ · magenta ↓ · violet balanced. Yellow tracers show total probability flow.</span></footer>
+   </main>
+ 
+   <aside id="rightColumn">
+@@ -78,68 +69,26 @@
+       <div class="head"><h3>State diagnostics</h3></div>
+       <div class="metrics"><div>Marked mode + spin<b id="modeProbability">0.0%</b></div><div>Inside goal box<b id="boxProbability">0.0%</b></div></div>
+       <div class="normLine">Total probability <b id="normValue">1.000000</b></div>
+-      <div class="particleMetric">Particles inside goal box <b id="particleProbability">—</b></div>
++      <div class="particleMetric">Tracers inside goal box <b id="particleProbability">—</b></div>
+       <div class="spinMetrics"><div class="spinUp">Total ↑ <b id="spinUpProbability">100.0%</b></div><div class="spinDown">Total ↓ <b id="spinDownProbability">0.0%</b></div></div>
+       <div class="normLine">Spin purity <b id="spinPurity">1.000</b></div>
+       <p class="note">Spin purity drops below 1 when spin and spatial modes are entangled. Spin glyphs: arrows show in-plane direction; circles ○ point out of the screen and crosses × point into it.</p>
+       <div id="flowStatus" class="note">Conserved probability flow</div>
+-      <details id="groverGeometry" class="groverGeometry" open>
+-      <summary>Effective Grover Bloch sphere</summary>
+-      <figure>
+-        <div class="geometryMeta"><span data-geometry="target">Target |3,3,↑⟩</span><b data-geometry="status">Input |0,0,↑⟩</b></div>
+-        <svg class="blochSphere" data-geometry="sphere" viewBox="0 0 360 312" role="img" tabindex="0" aria-labelledby="groverGeometryTitle groverGeometryDescription">
+-          <title id="groverGeometryTitle">Effective Bloch sphere for the marked and unmarked subspace</title>
+-          <desc id="groverGeometryDescription" data-geometry="liveDescription">A yellow unit vector shows the normalized projection. The marked state is at the north pole and the unmarked superposition at the south pole. Drag or use arrow keys to rotate the view.</desc>
+-          <defs>
+-            <radialGradient id="blochGlass" cx="35%" cy="25%" r="78%"><stop offset="0" stop-color="#234b75" stop-opacity=".5"/><stop offset=".7" stop-color="#10243f" stop-opacity=".3"/><stop offset="1" stop-color="#416985" stop-opacity=".3"/></radialGradient>
+-            <radialGradient id="blochTipGlow"><stop offset="0" stop-color="#ffe392" stop-opacity=".6"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient>
+-            <marker id="blochHead" viewBox="0 0 11 8" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L11 4L0 8L2 4Z" fill="#ffd36b"/></marker>
+-          </defs>
+-          <circle cx="180" cy="153" r="108" fill="url(#blochGlass)" stroke="#709fc7" stroke-opacity=".46"/>
+-          <path data-geometry="backGrid" fill="none" stroke="#75a7d0" stroke-opacity=".2" stroke-width=".7" stroke-dasharray="2 4"/>
+-          <path data-geometry="axes" fill="none" stroke="#6c8bab" stroke-opacity=".48" stroke-width=".8"/>
+-          <path data-geometry="backTrace" fill="none" stroke="#ffce69" stroke-opacity=".38" stroke-width="1.6" stroke-dasharray="3 3"/>
+-          <path data-geometry="frontGrid" fill="none" stroke="#83bce4" stroke-opacity=".32" stroke-width=".8"/>
+-          <path data-geometry="frontTrace" fill="none" stroke="#ffdc89" stroke-opacity=".8" stroke-width="2"/>
+-          <circle data-geometry="northDot" fill="#a4d8ff"/><circle data-geometry="southDot" fill="#a4d8ff"/>
+-          <circle data-geometry="gateStart" fill="none" stroke="#c4d3e5" stroke-width="1.1"/>
+-          <circle data-geometry="preparedDot" fill="none" stroke="#67ccf0" stroke-width="1.5"/>
+-          <text data-geometry="preparedLabel" class="geometryLabel" style="fill:#67ccf0">|s⟩</text>
+-          <path data-geometry="vector" fill="none" stroke="#ffd36b" stroke-width="3" marker-end="url(#blochHead)"/>
+-          <circle data-geometry="tipHalo" fill="url(#blochTipGlow)"/>
+-          <circle data-geometry="tip" fill="#ffedb6" stroke="#ffcf69" stroke-width=".8"/>
+-          <circle cx="180" cy="153" r="2.8" fill="#dbeafc"/>
+-          <text data-geometry="northLabel" class="blochLabel">|ω⟩ · marked</text>
+-          <text data-geometry="southLabel" class="blochLabel">|s′⟩ · unmarked</text>
+-          <text data-geometry="xLabel" class="blochAxisLabel">X</text><text data-geometry="yLabel" class="blochAxisLabel">Y</text>
+-        </svg>
+-        <div class="blochTools"><span>Drag to orbit · <b data-geometry="normValue">|r| = 1</b></span><button type="button" data-geometry="resetView" title="Reset sphere view (Home when focused)">Reset view</button></div>
+-        <div class="geometryLegend"><span style="--color:#ffd36b">State &amp; path</span><span style="--color:#67ccf0">Prepared |s⟩</span><span style="--color:#c4d3e5">Gate input</span></div>
+-        <div class="geometryMeasures">
+-          <div class="blochWeight">In Grover subspace <b data-geometry="weightValue">0.0%</b><div class="bar"><i data-geometry="weightBar"></i></div><div class="blochOutside">Outside: <b data-geometry="outsideValue">0.0%</b></div></div>
+-          <div>Marked · full state <b data-geometry="markedValue">0.0%</b><div class="bar"><i data-geometry="markedBar"></i></div></div>
+-          <div class="blochConditional">Marked within subspace<b data-geometry="conditionalValue">0.0%</b></div>
+-        </div>
+-        <figcaption>
+-          <p data-geometry="description">Start in |0,0,↑⟩. Preparation will create the balanced search state |s⟩.</p>
+-          <p class="note">The arrow has unit length in 3D; its tip stays on the sphere. It represents the normalized marked/unmarked projection. The weight bar shows how much of the full state is represented.</p>
+-        </figcaption>
+-      </figure>
+-    </details>
++
+       <div id="phaseLegendPanel" class="phaseLegend" hidden aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
+-      <details class="theory"><summary>Wave, spin &amp; guidance</summary>
++      <details class="theory"><summary>Wave, spin &amp; probability current</summary>
+ <p>One spinor Ψ = (ψ↑, ψ↓) has N×N orthogonal spatial packets in each spin channel. Labels are |x,y,spin⟩, with x and y from 0 to N−1. Choose the input |i⟩ first and the goal |w⟩ second on the main wave grid, following the guide above it, or run with the current selections. Each colored box contains overlapping tails, so its spatial probability differs from its logical-mode probability.</p>
+ <div class="math">A = U<sub>box</sub>(T) ⊗ R<sub>y</sub>(π/2)<br>A† = U<sub>box</sub>((2N−1)T) ⊗ R<sub>y</sub>(−π/2)</div>
+ <p>The spatial mixer uses exact free-box evolution. T = T<sub>rev</sub>/(2N). The imposed uniform spin-only drive is reversed during the forward (2N−1)T wait. The oracle phases the red goal |w⟩; the reference phases the selected green input |i⟩. Thus D = A Sᵢ A† reflects about A|i⟩. The search uses the first optimal Grover peak: 2, 3, 4 or 5 iterations for grids of size 2, 3, 4 or 5.</p>
+ <div class="math">ρ = |ψ↑|² + |ψ↓|²<br>j<sub>P</sub> = (ℏ/m) Im(Ψ†∇Ψ) + (1/m) ∇×(ρs)<br>∇×(ρs) = ∇ρ × s + ρ ∇×s<br>v = j<sub>total</sub> / ρ</div>
+ <p>The full spinor gradients include spin-texture effects. This planar model uses the in-plane magnetization current (ℏ/2m)(∂ᵧM<sub>z</sub>, −∂ₓM<sub>z</sub>), with M<sub>z</sub> = |ψ↑|² − |ψ↓|². It describes reduced planar flow, not all possible transverse motion in a three-dimensional trap.</p>
+-<p>Free intervals use the Pauli current. Ideal mode-selective phase pulses are spatially nonlocal: we choose j<sub>total</sub> = j<sub>P</sub> + ∇u, with Δu = −∂ₜρ − ∇·j<sub>P</sub> and zero wall flux. This generalized guidance conserves density and retains spin circulation; it is not a unique local-Pauli implementation of those gates.</p>
+-<p>Particles sample total position density; they have no permanently assigned up/down label. Compare their fraction inside the box with the spatial probability, not the joint marked-mode probability. Changing wave or arrow views leaves their motion unchanged. Pause and gate checkpoints freeze the simulation clock.</p>
++<p>Free intervals use the Pauli probability current. During ideal mode-selective phase pulses we choose j<sub>total</sub> = j<sub>P</sub> + ∇u, with Δu = −∂ₜρ − ∇·j<sub>P</sub> and zero wall flux. This current obeys the continuity equation while retaining spin circulation. Tracers carried by j<sub>total</sub> / ρ visualize the density’s flow.</p>
++<p>Tracers sample total position density; their dots are visualization samples and carry no fixed up/down label. Compare their fraction inside the box with the spatial probability, not the joint marked-mode probability. Changing wave or arrow views leaves their motion unchanged. Pause and gate checkpoints freeze the simulation clock.</p>
+ </details>
+     </section>
+   </aside>
+ </div>
+ <script src="./recording.js"></script>
+-<script type="module" src="./main.js?v=20261014-particles"></script>
++<script type="module" src="./main.js?v=20261021-flow"></script>
+ </body>
+ </html>
+diff --git a/spin/main.js b/spin/main.js
+index fad9aaa..8d11b11 100644
+--- a/spin/main.js
++++ b/spin/main.js
+@@ -1,29 +1,25 @@
+ import { SearchSimulation, probabilities, sineCoefficients, boxProbability, expectedProbability, spinSummary } from './multiregion-core.js';
+-import { createGroverGeometry } from './grover-geometry.js';
+ import { FlowRenderer } from './flow-renderer.js';
+ 
+ const GRID = 512;
+-const PARTICLE_COUNT_MIN = 1000, PARTICLE_COUNT_MAX = 100000;
+-const PARTICLE_COUNT_LOG_RANGE = Math.log(PARTICLE_COUNT_MAX / PARTICLE_COUNT_MIN);
++const PARTICLE_COUNT_MAX = 100000;
+ const simulation = new SearchSimulation(30);
+-const params = { speed: 1, visGain: .65, visGamma: .55, showGrid: true, showMarkers: true,
+-  showCurrent: true, showParticles: true, showTrails: true, particleCount: 4000,
+-  particleSize: 3.5, arrowGrid: 20, currentGain: 2.5, trailHalfLife: 1.5, waveView: 0, currentMode: 0, showSpin: true };
++const params = { speed: 1, visGain: .8, visGamma: .55, showGrid: true, showMarkers: true,
++  showCurrent: true, showParticles: true, showTrails: true, particleCount: 25000,
++  particleSize: 1.5, arrowGrid: 16, currentGain: 1.5, trailHalfLife: .1, waveView: 0, currentMode: 0, showSpin: true };
+ const byId = id => document.getElementById(id);
+ const dom = Object.fromEntries(['c', 'waveArea', 'waveLabels', 'stage', 'waveHeader', 'waveFooter',
+   'selectionGuide', 'selectionTitle', 'selectionHint', 'selectionBack', 'selectionNext', 'markersToggle',
+   'next', 'full', 'gridSize', 'gridSizeValue', 'gridSummary', 'appTitle', 'stateCountLabel',
+   'circuitXLabel', 'circuitYLabel', 'circuitInputX', 'circuitInputY', 'circuitInputSpin', 'inverseCaption', 'circuitDescription', 'circuitTitle',
+-  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue', 'brightness', 'brightnessValue',
++  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue',
+   'gridToggle', 'ui', 'uibody', 'minui', 'circuitPanel', 'circuitToggle', 'circuitStatus',
+   'circuitTarget', 'circuitReadout', 'iterationTrack', 'modeProbability', 'boxProbability', 'normValue',
+-  'waveInitial', 'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading', 'groverGeometry',
+-  'currentToggle', 'particlesToggle', 'trailsToggle', 'particleCount', 'particleCountValue',
+-  'particleSize', 'particleSizeValue', 'arrowGrid', 'arrowGridValue', 'currentGain', 'currentGainValue',
+-  'trailHalfLife', 'trailHalfLifeValue', 'waveView', 'currentMode', 'spinToggle',
++  'waveInitial', 'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading',
++  'currentToggle', 'particlesToggle', 'trailsToggle',
++  'waveView', 'currentMode', 'spinToggle',
+   'spinUpProbability', 'spinDownProbability', 'spinPurity', 'waveLegend', 'phaseLegendPanel',
+   'particleProbability', 'flowStatus'].map(id => [id, byId(id)]));
+-const geometry = createGroverGeometry(dom.groverGeometry);
+ const canvas = dom.c;
+ let gl, waveTexture, waveFbo, vao, reconstruction, renderer, flow, ready = false;
+ let waveDirty = true, renderDirty = true, frameRecordingActive = false, lastTime = null, glError = 0;
+@@ -97,24 +93,10 @@ function reset() { simulation.reset(); selectionStep = 'initial'; flow?.reset(pa
+ function startNext() { if (simulation.startNext()) { selectionStep = 'ready'; markChanged(); syncUi(); layout(); return true; } return false; }
+ function runFull() { if (simulation.runFull()) { selectionStep = 'ready'; flow?.reset(params.particleCount,simulation.model.side,simulation.initial); markChanged(); syncUi(); layout(); return true; } return false; }
+ function togglePause() { simulation.paused = !simulation.paused; lastUiKey = ''; syncUi(); }
+-function particleCountFromSlider() {
+-  // Equal thumb distances multiply the count; round to 100 for readable steps.
+-  return 100 * Math.round(PARTICLE_COUNT_MIN * Math.exp(
+-    PARTICLE_COUNT_LOG_RANGE * Number(dom.particleCount.value) / 1000) / 100);
+-}
+-function showParticleCount(count) {
+-  const label = count.toLocaleString();
+-  dom.particleCountValue.textContent = label;
+-  dom.particleCount.setAttribute('aria-valuetext', label + ' particles');
+-}
+-function syncParticleCountSlider(position = 1000 * Math.log(params.particleCount / PARTICLE_COUNT_MIN) / PARTICLE_COUNT_LOG_RANGE) {
+-  dom.particleCount.value = position;
+-  showParticleCount(params.particleCount);
+-}
+-function setParticleCount(value, sliderPosition) {
++// Kept for recording integrations; the reading view uses the fixed 25,000-tracer preset.
++function setParticleCount(value) {
+   if (simulation.active) return false;
+-  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 4000)));
+-  syncParticleCountSlider(sliderPosition);
++  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 25000)));
+   reset(); return true;
+ }
+ 
+@@ -179,7 +161,6 @@ function syncUi() {
+   dom.next.disabled = busy || complete;
+   dom.full.disabled = busy;
+   dom.pause.textContent = simulation.paused ? 'Resume' : 'Pause';
+-  dom.particleCount.disabled = busy;
+   dom.progressBar.style.width = `${100 * progress}%`;
+   const round = iteration ? `Round ${iteration}/${ITERATIONS} · ` : '';
+   const status = complete ? 'Complete · '+ITERATIONS+' Grover iterations' : busy
+@@ -216,9 +197,6 @@ function syncUi() {
+     forward: 'Free evolution plus the forward spin rotation completes the reflection. Unmarked contributions cancel and the marked mode grows.',
+   };
+   dom.gateDescription.textContent = complete ? (100*expectedProbability(ITERATIONS,side)).toFixed(3)+'% in the marked position–spin state after '+ITERATIONS+' iterations.' : descriptions[kind];
+-  const stepKey = `${simulation.revision}/${target}/${gate?.index ?? -1}`;
+-  geometry.update({ target, initial, kind, progress, running: busy, paused: simulation.paused, iteration, complete,
+-    amplitudes: simulation.amplitudes, startAmplitudes: gate?.startAmplitudes || simulation.amplitudes, stepKey });
+   document.documentElement.dataset.stage = String(simulation.completed);
+   document.documentElement.dataset.gate = kind;
+   document.documentElement.dataset.progress = String(progress);
+@@ -228,7 +206,7 @@ function syncUi() {
+     const stats = flow.statistics(target, progress, !busy || simulation.paused);
+     dom.particleProbability.textContent = formatProbability(stats.boxProbability);
+     const model = ['input','prepare','inverse','forward'].includes(kind) ? 'Pauli flow · full spin current' : 'spin current + conserved gate transport';
+-    dom.flowStatus.textContent = `${stats.count.toLocaleString()} particles · ${model}`;
++    dom.flowStatus.textContent = `${stats.count.toLocaleString()} tracers · ${model}`;
+     document.documentElement.dataset.particleFailures = String(stats.failures);
+     document.documentElement.dataset.particleLag = String(stats.maxLag);
+   }
+@@ -236,7 +214,6 @@ function syncUi() {
+ }
+ 
+ function installEvents() {
+-  syncParticleCountSlider();
+   dom.selectionBack.addEventListener('click', () => setSelectionStep('initial'));
+   dom.selectionNext.addEventListener('click', () => setSelectionStep({ initial: 'goal', goal: 'ready', ready: 'initial' }[selectionStep]));
+   dom.markersToggle.addEventListener('click', () => {
+@@ -248,7 +225,6 @@ function installEvents() {
+   dom.next.addEventListener('click', startNext); dom.full.addEventListener('click', runFull);
+   dom.reset.addEventListener('click', reset); dom.pause.addEventListener('click', togglePause);
+   dom.speed.addEventListener('input', () => { params.speed = Number(dom.speed.value); dom.speedValue.textContent = `${params.speed.toFixed(2)}×`; });
+-  dom.brightness.addEventListener('input', () => { params.visGain = Number(dom.brightness.value); dom.brightnessValue.textContent = params.visGain.toFixed(2); renderDirty = true; });
+   dom.gridToggle.addEventListener('click', () => {
+     params.showGrid = !params.showGrid; dom.gridToggle.textContent = params.showGrid ? 'ON' : 'OFF';
+     dom.gridToggle.setAttribute('aria-pressed', String(params.showGrid));
+@@ -261,27 +237,13 @@ function installEvents() {
+       renderDirty = true;
+     });
+   }
+-  for (const key of ['particleSize','arrowGrid','currentGain']) {
+-    dom[key].addEventListener('input', () => {
+-      params[key] = Number(dom[key].value); dom[`${key}Value`].textContent = String(params[key]); renderDirty = true;
+-    });
+-  }
+-  dom.trailHalfLife.addEventListener('input', () => {
+-    params.trailHalfLife = Number(dom.trailHalfLife.value);
+-    dom.trailHalfLifeValue.textContent = `${params.trailHalfLife.toFixed(1)} s`;
+-  });
+   dom.waveView.addEventListener('change', () => {
+     params.waveView=Number(dom.waveView.value);
+     dom.phaseLegendPanel.hidden=params.waveView===0;
+-    dom.waveLegend.textContent=params.waveView===0 ? 'Color = local spin: cyan ↑ · magenta ↓ · violet balanced. Yellow dots follow the total current.' : 'Component hue = phase. Yellow dots always sample total density and follow the full spinor current.';
++    dom.waveLegend.textContent=params.waveView===0 ? 'Color = local spin: cyan ↑ · magenta ↓ · violet balanced. Yellow tracers show total probability flow.' : 'Component hue = phase. Yellow tracers sample total density and show its current.';
+     renderDirty=true;
+   });
+   dom.currentMode.addEventListener('change',()=>{params.currentMode=Number(dom.currentMode.value);renderDirty=true;});
+-  dom.particleCount.addEventListener('input', () => showParticleCount(particleCountFromSlider()));
+-  dom.particleCount.addEventListener('change', () => {
+-    const count = particleCountFromSlider();
+-    if (count !== params.particleCount) setParticleCount(count, dom.particleCount.value);
+-  });
+   dom.minui.addEventListener('click', () => {
+     dom.uibody.hidden = !dom.uibody.hidden; dom.minui.textContent = dom.uibody.hidden ? '+' : '−';
+     dom.minui.setAttribute('aria-expanded', String(!dom.uibody.hidden));
+@@ -385,6 +347,7 @@ function advance(seconds) {
+ // reproducible browser verification page. Reads expose the actual GPU texture.
+ const api = {
+   isReady: () => ready,
++  viewerSettings: () => ({ ...params }),
+   state: () => ({ ...simulation.snapshot(), boxProbability: cachedBoxProbability, grid: GRID, speed: params.speed }),
+   reset, setTarget: chooseTarget, selectCell: chooseCell, startNext, runFull, togglePause,
+   setInitial: chooseInitial, selectInitialCell: chooseInitialCell,
+diff --git a/wave-hadamard/index.html b/wave-hadamard/index.html
+index 00dfc35..51753ba 100644
+--- a/wave-hadamard/index.html
++++ b/wave-hadamard/index.html
+@@ -5,7 +5,7 @@
+   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+   <title>Grover Search 2D — 16 Regions</title>
+   <link rel="icon" href="data:,"/>
+-  <link rel="stylesheet" href="./styles.css?v=20261014-particles"/>
++  <link rel="stylesheet" href="./styles.css?v=20261021-flow"/>
+ </head>
+ <body>
+ <div id="wrap">
+@@ -24,17 +24,8 @@
+       <div id="stageStatus" class="status" role="status"></div>
+       <div class="section">Playback &amp; wave</div>
+       <div class="row"><label for="speed">Gate speed</label><input id="speed" type="range" min="0.1" max="3" step="0.05" value="1"/><span id="speedValue" class="val">1.00×</span></div>
+-      <div class="row"><label for="brightness">Brightness</label><input id="brightness" type="range" min="0.1" max="2" step="0.05" value="0.65"/><span id="brightnessValue" class="val">0.65</span></div>
+       <div class="row"><span>Phase colors</span><button id="phaseToggle" aria-pressed="true">ON</button><span>Grid labels</span><button id="gridToggle" aria-pressed="true">ON</button></div>
+-      <details class="flowSettings" open><summary>Flow settings</summary>
+-        <div class="row"><label for="arrowGrid">Arrow grid</label><input id="arrowGrid" type="range" min="8" max="36" step="2" value="20"/><span id="arrowGridValue" class="val">20</span></div>
+-        <div class="row"><label for="currentGain">Arrow gain</label><input id="currentGain" type="range" min="0.25" max="10" step="0.25" value="2.5"/><span id="currentGainValue" class="val">2.5</span></div>
+-        <div class="row"><label for="particleSize">Dot size</label><input id="particleSize" type="range" min="1.5" max="8" step="0.5" value="3.5"/><span id="particleSizeValue" class="val">3.5</span></div>
+-        <div class="row"><label for="trailHalfLife">Trail length</label><input id="trailHalfLife" type="range" min="0.1" max="12" step="0.1" value="1.5" aria-describedby="trailLengthHelp"/><span id="trailHalfLifeValue" class="val">1.5 s</span></div>
+-        <p id="trailLengthHelp" class="note">Trail fading half-life, in gate time. Longer values keep more of each path. Pause holds the trails.</p>
+-        <div class="row"><label for="particleCount">Particles</label><input id="particleCount" type="range" min="0" max="1000" step="1" value="301" aria-valuetext="4,000 particles" aria-describedby="particleCountHelp"/><span id="particleCountValue" class="val">4,000</span></div>
+-        <p id="particleCountHelp" class="note">1,000–100,000 particles on a logarithmic scale. Changing the count resets the search. Hidden particles keep moving.</p>
+-      </details>
++      <p class="note">25,000 yellow tracers show how probability density flows. Their short trails make the local motion visible.</p>
+     </div>
+     <div class="btnrow"><button id="reset">Reset (R)</button><button id="pause">Pause</button></div>
+   </aside>
+@@ -47,7 +38,7 @@
+     </div>
+     </header>
+     <div id="waveArea"><canvas id="c" aria-label="Continuous two-dimensional probability wave with 16 outcome regions"></canvas><div id="waveLabels" aria-hidden="true"></div><div id="loading">Preparing the wave…</div><div id="error" role="alert" hidden></div></div>
+-    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Particles</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Hue = phase · brightness = density · dots follow j / ρ</span></footer>
++    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Hue = phase · brightness = density · tracers show probability flow</span></footer>
+   </main>
+ 
+   <aside id="rightColumn">
+@@ -74,57 +65,15 @@
+       <div class="head"><h3>State diagnostics</h3></div>
+       <div class="metrics"><div>Marked mode<b id="modeProbability">0.0%</b></div><div>Inside goal box<b id="boxProbability">0.0%</b></div></div>
+       <div class="normLine">Total probability <b id="normValue">1.000000</b></div>
+-      <div class="particleMetric">Particles inside goal box <b id="particleProbability">—</b></div>
++      <div class="particleMetric">Tracers inside goal box <b id="particleProbability">—</b></div>
+       <div id="flowStatus" class="note">Conserved probability flow</div>
+-      <details id="groverGeometry" class="groverGeometry" open>
+-      <summary>Effective Grover Bloch sphere</summary>
+-      <figure>
+-        <div class="geometryMeta"><span data-geometry="target">Target |1111⟩</span><b data-geometry="status">Input |0000⟩</b></div>
+-        <svg class="blochSphere" data-geometry="sphere" viewBox="0 0 360 312" role="img" tabindex="0" aria-labelledby="groverGeometryTitle groverGeometryDescription">
+-          <title id="groverGeometryTitle">Effective Bloch sphere for the marked and unmarked subspace</title>
+-          <desc id="groverGeometryDescription" data-geometry="liveDescription">A yellow unit vector shows the normalized projection. The marked state is at the north pole and the unmarked superposition at the south pole. Drag or use arrow keys to rotate the view.</desc>
+-          <defs>
+-            <radialGradient id="blochGlass" cx="35%" cy="25%" r="78%"><stop offset="0" stop-color="#234b75" stop-opacity=".5"/><stop offset=".7" stop-color="#10243f" stop-opacity=".3"/><stop offset="1" stop-color="#416985" stop-opacity=".3"/></radialGradient>
+-            <radialGradient id="blochTipGlow"><stop offset="0" stop-color="#ffe392" stop-opacity=".6"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient>
+-            <marker id="blochHead" viewBox="0 0 11 8" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L11 4L0 8L2 4Z" fill="#ffd36b"/></marker>
+-          </defs>
+-          <circle cx="180" cy="153" r="108" fill="url(#blochGlass)" stroke="#709fc7" stroke-opacity=".46"/>
+-          <path data-geometry="backGrid" fill="none" stroke="#75a7d0" stroke-opacity=".2" stroke-width=".7" stroke-dasharray="2 4"/>
+-          <path data-geometry="axes" fill="none" stroke="#6c8bab" stroke-opacity=".48" stroke-width=".8"/>
+-          <path data-geometry="backTrace" fill="none" stroke="#ffce69" stroke-opacity=".38" stroke-width="1.6" stroke-dasharray="3 3"/>
+-          <path data-geometry="frontGrid" fill="none" stroke="#83bce4" stroke-opacity=".32" stroke-width=".8"/>
+-          <path data-geometry="frontTrace" fill="none" stroke="#ffdc89" stroke-opacity=".8" stroke-width="2"/>
+-          <circle data-geometry="northDot" fill="#a4d8ff"/><circle data-geometry="southDot" fill="#a4d8ff"/>
+-          <circle data-geometry="gateStart" fill="none" stroke="#c4d3e5" stroke-width="1.1"/>
+-          <circle data-geometry="preparedDot" fill="none" stroke="#67ccf0" stroke-width="1.5"/>
+-          <text data-geometry="preparedLabel" class="geometryLabel" style="fill:#67ccf0">|s⟩</text>
+-          <path data-geometry="vector" fill="none" stroke="#ffd36b" stroke-width="3" marker-end="url(#blochHead)"/>
+-          <circle data-geometry="tipHalo" fill="url(#blochTipGlow)"/>
+-          <circle data-geometry="tip" fill="#ffedb6" stroke="#ffcf69" stroke-width=".8"/>
+-          <circle cx="180" cy="153" r="2.8" fill="#dbeafc"/>
+-          <text data-geometry="northLabel" class="blochLabel">|ω⟩ · marked</text>
+-          <text data-geometry="southLabel" class="blochLabel">|s′⟩ · unmarked</text>
+-          <text data-geometry="xLabel" class="blochAxisLabel">X</text><text data-geometry="yLabel" class="blochAxisLabel">Y</text>
+-        </svg>
+-        <div class="blochTools"><span>Drag to orbit · <b data-geometry="normValue">|r| = 1</b></span><button type="button" data-geometry="resetView" title="Reset sphere view (Home when focused)">Reset view</button></div>
+-        <div class="geometryLegend"><span style="--color:#ffd36b">State &amp; path</span><span style="--color:#67ccf0">Prepared |s⟩</span><span style="--color:#c4d3e5">Gate input</span></div>
+-        <div class="geometryMeasures">
+-          <div class="blochWeight">In Grover subspace <b data-geometry="weightValue">0.0%</b><div class="bar"><i data-geometry="weightBar"></i></div><div class="blochOutside">Outside: <b data-geometry="outsideValue">0.0%</b></div></div>
+-          <div>Marked · full state <b data-geometry="markedValue">0.0%</b><div class="bar"><i data-geometry="markedBar"></i></div></div>
+-          <div class="blochConditional">Marked within subspace<b data-geometry="conditionalValue">0.0%</b></div>
+-        </div>
+-        <figcaption>
+-          <p data-geometry="description">Start in |0000⟩. Preparation will create the balanced search state |s⟩.</p>
+-          <p class="note">The arrow has unit length in 3D; its tip stays on the sphere. It represents the normalized marked/unmarked projection. The weight bar shows how much of the full state is represented.</p>
+-        </figcaption>
+-      </figure>
+-    </details>
++
+       <div id="phaseLegendPanel" class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
+-      <details class="theory"><summary>About the wave and gates</summary><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so the probability of a logical mode differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. Choose the initial mode |i⟩ and the goal on the main wave using the guide beside the title. The default initial mode is |0000⟩. The reference phase acts on the chosen |i⟩, so the diffuser reflects about H|i⟩.</p><div class="math">H = H<sub>Had</sub><sup>⊗2log₂N</sup> (N = 2, 4)<br>H<sub>xy,uv</sub> = e<sup>2πi(xv−yu)/N</sup>/N (N = 3, 5)<br>ℋ<sub>mix</sub> = πℏ(I − H)/(2T)</div><p>Both mixers satisfy H† = H and H² = I, with equal probabilities from every input. Preparation and forward mixing use exp(−iℋ<sub>mix</sub>t/ℏ); inverse mixing uses the opposite sign. Phase gates use exact mode-projector exponentials. These are ideal mode operations, rather than free-box propagation. The wave evolves unitarily at every instant.</p><p>The first optimal Grover peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively. All gates and the wave hold still at checkpoints and when paused.</p><div class="math">j = ∇χ &nbsp; · &nbsp; ∇²χ = −∂ρ/∂t<br>Particle velocity: v = j / ρ</div><p>The arrows show a conserved spatial current derived from the exact density change, with zero flow through the outer walls. We choose the curl-free solution. This is a generalized probability-transport model; the nonlocal gate Hamiltonian does not uniquely determine continuous particle paths.</p><p>Particle fractions sample the spatial density and should track “Inside goal box.” Arrow length indicates current strength, with a compressed display scale. Pause freezes the instantaneous arrows and all trajectories for inspection.</p></details>
++      <details class="theory"><summary>About the wave and gates</summary><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so the probability of a logical mode differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. Choose the initial mode |i⟩ and the goal on the main wave using the guide beside the title. The default initial mode is |0000⟩. The reference phase acts on the chosen |i⟩, so the diffuser reflects about H|i⟩.</p><div class="math">H = H<sub>Had</sub><sup>⊗2log₂N</sup> (N = 2, 4)<br>H<sub>xy,uv</sub> = e<sup>2πi(xv−yu)/N</sup>/N (N = 3, 5)<br>ℋ<sub>mix</sub> = πℏ(I − H)/(2T)</div><p>Both mixers satisfy H† = H and H² = I, with equal probabilities from every input. Preparation and forward mixing use exp(−iℋ<sub>mix</sub>t/ℏ); inverse mixing uses the opposite sign. Phase gates use exact mode-projector exponentials. These are ideal mode operations, rather than free-box propagation. The wave evolves unitarily at every instant.</p><p>The first optimal Grover peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively. All gates and the wave hold still at checkpoints and when paused.</p><div class="math">j = ∇χ &nbsp; · &nbsp; ∇²χ = −∂ρ/∂t<br>Tracer transport: v = j / ρ</div><p>The arrows show a conserved spatial current derived from the exact density change, with zero flow through the outer walls. We choose the curl-free solution. This curl-free current is the transport convention chosen for these ideal nonlocal gates. Yellow tracers carried by j / ρ visualize the resulting redistribution of density.</p><p>Tracer fractions sample the spatial density and should track “Inside goal box.” Arrow length indicates current strength, with a compressed display scale. Pause freezes the instantaneous arrows and tracer motion for inspection.</p></details>
+     </section>
+   </aside>
+ </div>
+ <script src="./recording.js?v=20261014-particles"></script>
+-<script type="module" src="./main.js?v=20261014-particles"></script>
++<script type="module" src="./main.js?v=20261021-flow"></script>
+ </body>
+ </html>
+diff --git a/wave-hadamard/main.js b/wave-hadamard/main.js
+index 605684f..2483d77 100644
+--- a/wave-hadamard/main.js
++++ b/wave-hadamard/main.js
+@@ -1,28 +1,23 @@
+ import { SearchSimulation, expectedProbability, probabilities,
+   sineCoefficients, boxProbability } from './multiregion-core.js?v=20261014-particles';
+-import { createGroverGeometry } from './grover-geometry.js?v=20261014-particles';
+ import { FlowRenderer } from './flow-renderer.js?v=20261014-particles';
+ 
+ const GRID = 512;
+-const PARTICLE_COUNT_MIN = 1000, PARTICLE_COUNT_MAX = 100000;
+-const PARTICLE_COUNT_LOG_RANGE = Math.log(PARTICLE_COUNT_MAX / PARTICLE_COUNT_MIN);
++const PARTICLE_COUNT_MAX = 100000;
+ const simulation = new SearchSimulation(15);
+-const params = { speed: 1, visGain: .65, visGamma: .55, showPhase: true, showGrid: true, showMarkers: true,
+-  showCurrent: true, showParticles: true, showTrails: true, particleCount: 4000,
+-  particleSize: 3.5, arrowGrid: 20, currentGain: 2.5, trailHalfLife: 1.5 };
++const params = { speed: 1, visGain: .8, visGamma: .55, showPhase: true, showGrid: true, showMarkers: true,
++  showCurrent: true, showParticles: true, showTrails: true, particleCount: 25000,
++  particleSize: 1.5, arrowGrid: 16, currentGain: 1.5, trailHalfLife: .1 };
+ const byId = id => document.getElementById(id);
+ const dom = Object.fromEntries(['gridSize', 'gridSizeValue', 'gridSummary', 'appTitle', 'stateCountLabel',
+   'circuitXLabel', 'circuitYLabel', 'circuitTitle', 'circuitDescription', 'inverseCaption', 'c', 'waveArea', 'waveLabels', 'stage', 'waveHeader', 'waveFooter',
+   'selectionGuide', 'selectionTitle', 'selectionHint', 'selectionBack', 'selectionNext', 'markersToggle', 'waveInitial', 'waveLegend', 'phaseLegendPanel', 'next', 'full',
+-  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue', 'brightness', 'brightnessValue',
++  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue',
+   'phaseToggle', 'gridToggle', 'ui', 'uibody', 'minui', 'circuitPanel', 'circuitToggle', 'circuitStatus',
+   'circuitTarget', 'circuitReadout', 'iterationTrack', 'modeProbability', 'boxProbability', 'normValue',
+-  'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading', 'groverGeometry',
+-  'currentToggle', 'particlesToggle', 'trailsToggle', 'particleCount', 'particleCountValue',
+-  'particleSize', 'particleSizeValue', 'arrowGrid', 'arrowGridValue', 'currentGain', 'currentGainValue',
+-  'trailHalfLife', 'trailHalfLifeValue',
++  'waveTarget', 'waveProbability', 'gateDescription', 'error', 'loading',
++  'currentToggle', 'particlesToggle', 'trailsToggle',
+   'particleProbability', 'flowStatus'].map(id => [id, byId(id)]));
+-const geometry = createGroverGeometry(dom.groverGeometry);
+ const canvas = dom.c;
+ let gl, waveTexture, waveFbo, vao, reconstruction, renderer, flow, ready = false;
+ let waveDirty = true, renderDirty = true, frameRecordingActive = false, lastTime = null, glError = 0;
+@@ -85,24 +80,10 @@ function reset() { simulation.reset(); selectionStep = 'initial'; flow?.reset(pa
+ function startNext() { if (simulation.startNext()) { selectionStep = 'ready'; markChanged(); syncUi(); layout(); return true; } return false; }
+ function runFull() { if (simulation.runFull()) { selectionStep = 'ready'; flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); layout(); return true; } return false; }
+ function togglePause() { simulation.paused = !simulation.paused; lastUiKey = ''; syncUi(); }
+-function particleCountFromSlider() {
+-  // Equal thumb distances multiply the count; round to 100 for readable steps.
+-  return 100 * Math.round(PARTICLE_COUNT_MIN * Math.exp(
+-    PARTICLE_COUNT_LOG_RANGE * Number(dom.particleCount.value) / 1000) / 100);
+-}
+-function showParticleCount(count) {
+-  const label = count.toLocaleString();
+-  dom.particleCountValue.textContent = label;
+-  dom.particleCount.setAttribute('aria-valuetext', label + ' particles');
+-}
+-function syncParticleCountSlider(position = 1000 * Math.log(params.particleCount / PARTICLE_COUNT_MIN) / PARTICLE_COUNT_LOG_RANGE) {
+-  dom.particleCount.value = position;
+-  showParticleCount(params.particleCount);
+-}
+-function setParticleCount(value, sliderPosition) {
++// Kept for recording integrations; the reading view uses the fixed 25,000-tracer preset.
++function setParticleCount(value) {
+   if (simulation.active) return false;
+-  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 4000)));
+-  syncParticleCountSlider(sliderPosition);
++  params.particleCount = Math.max(256, Math.min(PARTICLE_COUNT_MAX, Math.round(Number(value) || 25000)));
+   reset(); return true;
+ }
+ 
+@@ -157,7 +138,6 @@ function syncUi() {
+   dom.next.disabled = busy || complete;
+   dom.full.disabled = busy;
+   dom.pause.textContent = simulation.paused ? 'Resume' : 'Pause';
+-  dom.particleCount.disabled = busy;
+   dom.progressBar.style.width = `${100 * progress}%`;
+   const round = iteration ? `Round ${iteration}/${ITERATIONS} · ` : '';
+   const status = complete ? 'Complete · ' + ITERATIONS + ' Grover iterations' : busy
+@@ -194,9 +174,6 @@ function syncUi() {
+     forward: 'The forward mixer completes the reflection. Unmarked contributions cancel and the marked mode grows.',
+   };
+   dom.gateDescription.textContent = complete ? (100*expectedProbability(ITERATIONS,side)).toFixed(3)+'% marked-mode probability after '+ITERATIONS+' iterations.' : descriptions[kind];
+-  const stepKey = `${simulation.revision}/${target}/${gate?.index ?? -1}`;
+-  geometry.update({ target, initial, kind, progress, running: busy, paused: simulation.paused, iteration, complete,
+-    amplitudes: simulation.amplitudes, startAmplitudes: gate?.startAmplitudes || simulation.amplitudes, stepKey });
+   document.documentElement.dataset.stage = String(simulation.completed);
+   document.documentElement.dataset.gate = kind;
+   document.documentElement.dataset.progress = String(progress);
+@@ -205,7 +182,7 @@ function syncUi() {
+   if (flow) {
+     const stats = flow.statistics(target, progress, !busy || simulation.paused);
+     dom.particleProbability.textContent = formatProbability(stats.boxProbability);
+-    dom.flowStatus.textContent = `${stats.count.toLocaleString()} guided particles · sampled spatial probability`;
++    dom.flowStatus.textContent = `${stats.count.toLocaleString()} tracers · sampled probability flow`;
+     document.documentElement.dataset.particleFailures = String(stats.failures);
+     document.documentElement.dataset.particleLag = String(stats.maxLag);
+   }
+@@ -213,7 +190,6 @@ function syncUi() {
+ }
+ 
+ function installEvents() {
+-  syncParticleCountSlider();
+   dom.gridSize.addEventListener('input', () => setGridSize(dom.gridSize.value));
+   dom.selectionBack.addEventListener('click', () => setSelectionStep('initial'));
+   dom.selectionNext.addEventListener('click', () => setSelectionStep({ initial: 'goal', goal: 'ready', ready: 'initial' }[selectionStep]));
+@@ -225,12 +201,11 @@ function installEvents() {
+   dom.next.addEventListener('click', startNext); dom.full.addEventListener('click', runFull);
+   dom.reset.addEventListener('click', reset); dom.pause.addEventListener('click', togglePause);
+   dom.speed.addEventListener('input', () => { params.speed = Number(dom.speed.value); dom.speedValue.textContent = `${params.speed.toFixed(2)}×`; });
+-  dom.brightness.addEventListener('input', () => { params.visGain = Number(dom.brightness.value); dom.brightnessValue.textContent = params.visGain.toFixed(2); renderDirty = true; });
+   dom.phaseToggle.addEventListener('click', () => {
+     params.showPhase = !params.showPhase; dom.phaseToggle.textContent = params.showPhase ? 'ON' : 'OFF';
+     dom.phaseToggle.setAttribute('aria-pressed', String(params.showPhase));
+     dom.phaseLegendPanel.hidden = !params.showPhase;
+-    dom.waveLegend.textContent = params.showPhase ? 'Hue = phase · brightness = density · dots follow j / ρ' : 'Color = density · arrows = probability current · dots follow j / ρ';
++    dom.waveLegend.textContent = params.showPhase ? 'Hue = phase · brightness = density · tracers show probability flow' : 'Color = density · arrows = probability current · tracers show probability flow';
+     renderDirty = true;
+   });
+   dom.gridToggle.addEventListener('click', () => {
+@@ -245,20 +220,6 @@ function installEvents() {
+       renderDirty = true;
+     });
+   }
+-  for (const key of ['particleSize','arrowGrid','currentGain']) {
+-    dom[key].addEventListener('input', () => {
+-      params[key] = Number(dom[key].value); dom[`${key}Value`].textContent = String(params[key]); renderDirty = true;
+-    });
+-  }
+-  dom.trailHalfLife.addEventListener('input', () => {
+-    params.trailHalfLife = Number(dom.trailHalfLife.value);
+-    dom.trailHalfLifeValue.textContent = `${params.trailHalfLife.toFixed(1)} s`;
+-  });
+-  dom.particleCount.addEventListener('input', () => showParticleCount(particleCountFromSlider()));
+-  dom.particleCount.addEventListener('change', () => {
+-    const count = particleCountFromSlider();
+-    if (count !== params.particleCount) setParticleCount(count, dom.particleCount.value);
+-  });
+   dom.minui.addEventListener('click', () => {
+     dom.uibody.hidden = !dom.uibody.hidden; dom.minui.textContent = dom.uibody.hidden ? '+' : '−';
+     dom.minui.setAttribute('aria-expanded', String(!dom.uibody.hidden));
+@@ -366,6 +327,7 @@ function advance(seconds) {
+ // reproducible browser verification page. Reads expose the actual GPU texture.
+ const api = {
+   isReady: () => ready,
++  viewerSettings: () => ({ ...params }),
+   state: () => ({ ...simulation.snapshot(), boxProbability: cachedBoxProbability, grid: GRID, speed: params.speed }),
+   reset, setTarget: chooseTarget, setInitial: chooseInitial, startNext, runFull, togglePause,
+   setParticleCount, setGridSize,

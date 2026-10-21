@@ -62,11 +62,21 @@ require a server; opening the HTML with a `file:` URL is insufficient.
 
 `demos/sources.json` records the source branch, full local commit ID, and original
 SHA-256 of every copied file. Copies include their source license and keep their
-original asset-version suffixes. `demos/copy-edits.json` records the only local
-edits: eight UI files call the color yellow instead of gold. The snapshot script
-reapplies those text substitutions, and the integrity test reverses them before
-comparing to the original source hashes. Numerical, rendering, and current code
-is unchanged; branches are not mixed. The source repository is not modified.
+original source hashes. `demos/copy-edits.json` records the color-name changes.
+`demos/presentation.patch` records the homepage changes to the three wave viewers'
+HTML and entry scripts. `demos/presentation.json` records their published hashes.
+The snapshot script applies the color edits and then the presentation patch;
+the integrity test checks the published overrides explicitly and compares all
+other files to the original source hashes. Scientific cores, current solvers,
+and rendering shaders are unchanged; branches are not mixed. The source
+repository is not modified.
+
+The wave viewers use 25,000 numerical tracers, 1.5px dots, a 0.1-second trail
+half-life, brightness 0.8, a 16×16 arrow grid, and arrow gain 1.5. Appearance
+sliders and the Bloch panel are removed. Grid size, playback speed, and overlay
+toggles remain. Both the article and viewers describe tracer advection as a way
+to visualize probability-density transport, with no interpretation of the dots
+as physical particle trajectories.
 
 | Folder | Source branch | Pinned revision |
 | --- | --- | --- |
@@ -113,9 +123,9 @@ mean. They compare the two-dimensional widget against the full 16-state search
 and its analytic rotation, including the global sign and overshoot. They also
 check the real rotation sandwich and its visible mirror geometry against
 the full signed Hadamard mixer for multiple input vectors. They
-compare all 131 bundled files against their source hashes, reversing only the
-documented display-copy substitutions and normalizing text checkout endings to
-LF. Binary assets are compared byte for byte.
+compare all 131 bundled files against their original or documented presentation
+hashes, reversing display-copy substitutions where applicable and normalizing
+text checkout endings to LF. Binary assets are compared byte for byte.
 
 Open `/grover-search/tests/browser-check.html` on the same server for the browser
 fixture. It verifies the two posts independently, their titles, shared date,

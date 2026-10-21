@@ -1,2 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Unified patches preserve literal whitespace in their context lines.
+grover-search/demos/presentation.patch text eol=lf whitespace=-blank-at-eol

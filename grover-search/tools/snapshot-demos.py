@@ -1,4 +1,4 @@
-"""Copy pinned Grover demos and apply the documented display-copy edits.
+"""Copy pinned Grover demos and apply the documented presentation edits.
 
 Run: python grover-search/tools/snapshot-demos.py ../BohmianGrover2D
 The source checkout is read only. No fetch, commit or push is performed.
@@ -52,3 +52,11 @@ for name, (branch, revision) in REVISIONS.items():
     manifest["demos"][name] = {"branch": branch, "commit": commit, "sha256": hashes}
     print(f"{name}: {len(hashes)} files from {commit[:7]}, with documented display-copy edits")
 (ROOT / "demos" / "sources.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+presentation = json.loads((ROOT / 'demos/presentation.json').read_text(encoding='utf-8'))
+subprocess.run(['git', '-C', str(ROOT.parent), '-c', 'core.safecrlf=false', 'apply',
+                '--directory=grover-search/demos', str(ROOT / 'demos' / presentation['patch'])], check=True)
+for path, expected in presentation['sha256'].items():
+    data = (ROOT / 'demos' / path).read_bytes().replace(b'\r\n', b'\n')
+    if hashlib.sha256(data).hexdigest() != expected:
+        raise ValueError(f'{path}: presentation hash changed; review the overlay for the new revision')
+print('Applied the homepage presentation overlay; scientific cores and shaders remain pinned.')

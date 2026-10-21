@@ -1,0 +1,12 @@
+{
+  "description": "Homepage viewer presentation: fixed tracer and arrow presets, simplified controls, probability-current copy, no Bloch panel. Scientific cores, current solvers and rendering shaders retain their pinned source bytes.",
+  "patch": "presentation.patch",
+  "sha256": {
+    "free-box/index.html": "b29150e3ed701bacf3a87309e34d2290d1e9e7b86956ca675112f233626cf62f",
+    "free-box/main.js": "41fdd555b6ceeac9d83b48180db24e8c46454165a02a0a0ecd0b4db24643c029",
+    "wave-hadamard/index.html": "1b9a13a98338726906445ead897ecb8896ecdbef615794027c693e997ee1c1b0",
+    "wave-hadamard/main.js": "e739fcd9343291fdd0a876fa722d296ed5aedee12d4020cd8ae5fb581457e634",
+    "spin/index.html": "43634600ac20c2e36e72761d0f6a7e35b42183b661b25ba2304e7e7218d2b690",
+    "spin/main.js": "425a24fc09dcab581ccab4f92688ec846cc3d0f17910f1be83df12fc54416642"
+  }
+}

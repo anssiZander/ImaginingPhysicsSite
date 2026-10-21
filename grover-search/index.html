@@ -47,7 +47,7 @@
       <div class="prose">
         <p>Want a refresher on the search algorithm? <a href="../grovers-algorithm/">Grovers algoritm</a> explains the two reflections and the usual gate construction. Here we focus on our implementation in a particle’s spatial wavefunction.</p>
         <p><strong>Free evolution between hard walls can supply Grover’s mixer.</strong> We encode the candidates in orthonormal wave packets, let their energy phases evolve, and interrupt the free motion with selective phase pulses. For the sixteen-state example, three search rounds put about 96.13% of the logical probability in the marked mode.</p>
-        <p>The wave and its probability flow make the dynamics visible between gates. Below, we develop the free-box model, add spin, and compare it with a controlled Hadamard mixer. <a class="demo-link" data-demo="free-box" href="#explore">Open the free-box simulation →</a></p>
+        <p>The wave and its probability current make the dynamics visible between gates. Yellow tracer dots sample the density and help us follow its flow; they are a visualization of the evolving wave. Below, we develop the free-box model, add spin, and compare it with a controlled Hadamard mixer. <a class="demo-link" data-demo="free-box" href="#explore">Open the free-box simulation →</a></p>
       </div>
         <figure class="hero-figure">
           <a class="figure-link" href="images/free-evolution.svg" target="_blank" rel="noopener noreferrer"><picture><source media="(max-width: 600px)" srcset="images/free-evolution-mobile.svg" width="380" height="1200" /><img src="images/free-evolution.svg" width="1100" height="410" alt="Exact free-box wave evolution from the initial packet, through half the preparation interval, to T. The final logical probabilities are all 1/16, while the spatial wave has a nonuniform phase pattern." fetchpriority="high" /></picture><span class="figure-zoom">Open full-size figure ↗</span></a>
@@ -80,7 +80,7 @@
         <div class="prose">
           <p>The inner grid lines are labels, <strong>not additional walls</strong>. The packets overlap in space while remaining orthogonal as functions. Consequently, the probability of the logical outcome \(|x,y\rangle\) is \(|c_{xy}|^2\), whereas the probability of finding the particle inside the corresponding drawn square is the integral of \(|\psi|^2\) over that square. The two readouts are different.</p>
           <p>We start in the lower-left packet, \(|i\rangle=|0,0\rangle\). In the illustrated run the target is the upper-right packet, \(|w\rangle=|3,3\rangle\). Choosing that target programs the demo’s phase oracle; the search itself only acts through the oracle.</p>
-          <p>A measurement that distinguishes the packet modes would read out the logical search result. A simple position measurement reads out position instead. This distinction matters when comparing a grid percentage with the fraction of displayed particles inside a square.</p>
+          <p>A measurement that distinguishes the packet modes would read out the logical search result. A simple position measurement reads out position instead. This distinction matters when comparing a grid percentage with the fraction of tracers inside a square.</p>
           <details><summary>The precise packet basis</summary><p>For a \(g\times g\) grid, \(f_j(X)=\sum_{n=1}^{g}T_{jn}u_n(X)\), where \(T_{jn}=\sqrt{2/g}\sin[(j+1/2)n\pi/g]\) for \(n\lt g\), and \(T_{jg}=\sin[(j+1/2)\pi]/\sqrt g\). This real orthogonal transform preserves normalization. The figures use \(g=4\) and \(L=1\). Every packet vanishes at the outer walls; finite sums of sine modes do not have compact support inside one cell.</p></details>
         </div>
       </section>
@@ -128,19 +128,19 @@
         <p class="chapter-number">03 / The motion between gates</p>
         <h2 id="flow-title">Follow the probability through the box</h2>
         <div class="prose">
-          <p>During these free intervals the arrows show the usual scalar Schrödinger current, and the particles follow ordinary Bohmian guidance:</p>
+          <p>During free evolution, the wave determines the scalar Schrödinger probability current. The arrows show this current; yellow tracers are advected with the local transport velocity \(\mathbf v=\mathbf j/\rho\):</p>
           <div class="equation">\[
             \begin{gathered}\rho=|\psi|^2,\qquad\mathbf v=\frac{\mathbf j}{\rho},\\[0.5em]\mathbf j=\frac{\hbar}{m}\operatorname{Im}(\psi^*\nabla\psi).\end{gathered}
           \]</div>
-          <p>The yellow dots are an ensemble of possible initial positions, not extra search registers or little agents checking different answers. More particles make the distribution easier to see; they do not change the quantum algorithm. Their paths make the transfer of density visible.</p>
+          <p>The current obeys the continuity equation, \(\partial_t\rho+\nabla\cdot\mathbf j=0\): probability leaves one region by flowing into another. The yellow dots are numerical tracers sampled from \(\rho=|\psi|^2\). Their motion helps us track how that density moves and changes shape. The viewer uses 25,000 small tracers with short trails, so local flow remains readable. The tracer count controls the detail of this visual sampling; the wave, current, and search probabilities are computed independently of it.</p>
           <h3>The phase pulses need a different transport rule</h3>
           <p>Free evolution supplies the mixing intervals. The oracle and reference are ideal mode-selective pulses, during which we omit the kinetic Hamiltonian. Each pulse rotates one packet coefficient through half a turn:</p>
           <div class="equation">\[
             \begin{gathered}U_q(p)=I+\bigl(e^{-i\pi p}-1\bigr)|q\rangle\langle q|,\\p=t/\tau,\qquad 0\le p\le1,\\q=w\text{ for the oracle},\\q=i\text{ for the reference}.\end{gathered}
           \]</div>
           <p>Here \(\tau\) is the pulse duration. The logical probabilities stay fixed during a pulse, but spatial density can change because the packets overlap and interfere. A mode projector is therefore not equivalent to applying a local potential inside one drawn square.</p>
-          <p>For these nonlocal pulses, the scalar demo chooses \(\mathbf j=\nabla\chi\), with \(\nabla^2\chi=-\partial_t\rho\) and zero normal current at the walls. Moving the dots with \(\mathbf v=\mathbf j/\rho\) transports the changing density consistently. This is a specified curl-free current for the ideal gate, rather than ordinary phase-gradient guidance. <a class="cite" href="https://arxiv.org/abs/0808.0290">[Generalized guidance]</a></p>
-          <aside class="callout"><h3>What the implementation assumes</h3><p>The wave evolves exactly within the retained sine-mode space, and the free intervals use the box’s kinetic Hamiltonian. Preparing the input and implementing the selective mode projectors are separate experimental control problems. The trajectory rule during the ideal phase pulses specifies how we visualize their probability transport.</p></aside>
+          <p>For these nonlocal pulses, the scalar demo chooses \(\mathbf j=\nabla\chi\), with \(\nabla^2\chi=-\partial_t\rho\) and zero normal current at the walls. Moving the dots with \(\mathbf v=\mathbf j/\rho\) transports the changing density consistently. This is the curl-free current chosen for the ideal pulse. It satisfies the same continuity equation as the evolving density.</p>
+          <aside class="callout"><h3>What the implementation assumes</h3><p>The wave evolves exactly within the retained sine-mode space, and the free intervals use the box’s kinetic Hamiltonian. Preparing the input and implementing the selective mode projectors are separate experimental control problems. The chosen current during the ideal phase pulses specifies how we visualize their probability transport.</p></aside>
         </div>
       </section>
 
@@ -165,13 +165,13 @@
         <div class="prose">
           <p>Preparation gives \(1/32\) in every joint mode. The first recommended stop is now four rounds, at approximately 99.9182% marked-mode probability. A position measurement alone does not distinguish up from down. The demo therefore separates joint-mode probabilities from the spatial probability inside the goal box, which includes both spin components.</p>
           <h3>Spin changes the current, too</h3>
-          <p>Spin introduces an additional contribution to the probability current, which can change trajectories without changing the density evolution. The position current used during free evolution with the uniform spin drive includes the convective term and this spin contribution:</p>
+          <p>Spin introduces an additional contribution to the probability current, which can change the current’s circulation while leaving the density evolution unchanged. The position current used during free evolution with the uniform spin drive includes the convective term and this spin contribution:</p>
           <div class="equation">\[
             \begin{aligned}\mathbf j&=\frac{\hbar}{m}\operatorname{Im}(\Psi^\dagger\nabla\Psi)\\&\quad+\frac1m\nabla\times(\rho\mathbf s),\\[0.6em]\mathbf s&=\frac{\hbar}{2}\frac{\Psi^\dagger\boldsymbol\sigma\Psi}{\rho}.\end{aligned}
           \]</div>
-          <p>In the planar model, the spin term is \((\hbar/2m)(\partial_YM_z,-\partial_XM_z)\), with \(M_z=|\psi_\uparrow|^2-|\psi_\downarrow|^2\). It is divergence-free: it can add circulation and change particle trajectories without changing the density’s continuity equation. After a selective oracle, position and spin can become entangled; a particle is not assigned a permanent little “up” or “down” tag. <a class="cite" href="https://arxiv.org/abs/physics/9807019">[Pauli current]</a></p>
+          <p>In the planar model, the spin term is \((\hbar/2m)(\partial_YM_z,-\partial_XM_z)\), with \(M_z=|\psi_\uparrow|^2-|\psi_\downarrow|^2\). It is divergence-free: it can add circulation and bend the tracer paths without changing the density’s continuity equation. After a selective oracle, position and spin can become entangled. The tracers continue to sample the total density, with both spin components contributing to the current. <a class="cite" href="https://arxiv.org/abs/physics/9807019">[Pauli current]</a></p>
           <p><strong>Total · spin colors</strong> uses cyan and magenta for opposite local z polarizations. A spinor has no single scalar phase, so that total view has a different legend from the individual up/down phase views. Switch the current arrows between total, transport, and spin current to see which part produces which flow.</p>
-          <details><summary>The scope of the spin trajectories</summary><p>The simulation uses the planar components of the Pauli current; it does not simulate a transverse wavefunction or claim that arbitrary three-dimensional trajectories remain in the plane. During ideal nonlocal phase pulses it adds a gradient correction \(\nabla u\) satisfying \(\nabla^2u=-\partial_t\rho-\nabla\cdot\mathbf j_{\mathrm P}\), with zero normal derivative at the walls. This retains spin circulation while enforcing continuity. It is a specified extension for these ideal gates, rather than a unique experimental realization of an oracle. The wave coefficients evolve exactly in the retained mode space; particle integration and sampled current fields have numerical error.</p></details>
+          <details><summary>How the spin-current tracers are calculated</summary><p>The simulation displays the planar components of the Pauli probability current. Tracer motion visualizes that current in the two-dimensional density plot. During ideal nonlocal phase pulses it adds a gradient correction \(\nabla u\) satisfying \(\nabla^2u=-\partial_t\rho-\nabla\cdot\mathbf j_{\mathrm P}\), with zero normal derivative at the walls. This retains spin circulation while enforcing continuity. It is a specified extension for these ideal gates, rather than a unique experimental realization of an oracle. The wave coefficients evolve exactly in the retained mode space; tracer advection and sampled current fields have numerical error.</p></details>
           <p><a class="demo-link" data-demo="spin" href="#explore">Explore the spin version →</a> Select a joint goal, run four rounds, and compare the spin-resolved result with the total spatial density.</p>
         </div>
       </section>
@@ -208,7 +208,7 @@
             <caption>Four models at a glance · state counts for the illustrated \(4\times4\) grid</caption>
             <thead><tr><th scope="col">Model</th><th scope="col">States</th><th scope="col">Preparation</th><th scope="col">Flow of the dots</th></tr></thead>
             <tbody>
-              <tr><th scope="row"><a href="../grovers-algorithm/#columns">Ordinary columns</a></th><td data-label="States">16 basis states</td><td data-label="Preparation">\(H=H_1^{\otimes4}\)</td><td data-label="Flow">No spatial trajectories; columns show amplitudes.</td></tr>
+              <tr><th scope="row"><a href="../grovers-algorithm/#columns">Ordinary columns</a></th><td data-label="States">16 basis states</td><td data-label="Preparation">\(H=H_1^{\otimes4}\)</td><td data-label="Flow">Columns show amplitudes; no spatial flow is drawn.</td></tr>
               <tr><th scope="row"><a href="#controlled">Controlled wave</a></th><td data-label="States">16 spatial modes</td><td data-label="Preparation">The same \(H\), acting on packet coefficients</td><td data-label="Flow">A chosen gradient current \(\mathbf j=\nabla\chi\) preserves continuity throughout the controlled gates.</td></tr>
               <tr><th scope="row"><a href="#free">Free box</a></th><td data-label="States">16 spatial modes</td><td data-label="Preparation">\(A=U_{\mathrm{box}}(T)\)</td><td data-label="Flow">Schrödinger current during free evolution; chosen gradient transport during phase pulses.</td></tr>
               <tr><th scope="row"><a href="#spin">Free box + spin</a></th><td data-label="States">32 joint position–spin modes</td><td data-label="Preparation">\(U_{\mathrm{box}}(T)\otimes R_y(\pi/2)\)</td><td data-label="Flow">Planar Pauli current, including spin circulation; a gradient correction enforces continuity during phase pulses.</td></tr>
@@ -233,7 +233,6 @@
         <ul>
           <li>Gilles Brassard, Peter Høyer, Michele Mosca, and Alain Tapp, <a href="https://arxiv.org/abs/quant-ph/0005055">Quantum Amplitude Amplification and Estimation</a> (2000): preparation by a general unitary A.</li>
           <li>Marek Nowakowski, <a href="https://arxiv.org/abs/physics/9807019">The Quantum Mechanical Current of the Pauli Equation</a> (1998; published 1999): the spin contribution obtained from the nonrelativistic limit of the Dirac current.</li>
-          <li>Ward Struyve and Antony Valentini, <a href="https://arxiv.org/abs/0808.0290">De Broglie–Bohm Guidance Equations for Arbitrary Hamiltonians</a> (2008): constructing conserved currents beyond the usual local Hamiltonian.</li>
         </ul>
       </section>
     </article>
@@ -244,6 +243,6 @@
   </main>
   <footer class="site-footer"><div class="container footer-grid"><div><strong>Imagining Physics</strong><p>Visualizing physics through videos, simulations, shaders, and small games.</p></div><nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="../blog.html">Blog Posts</a></li><li><a href="../interactive.html">Interactive demos</a></li><li><a href="../about.html">About</a></li><li><a href="https://www.youtube.com/@imaginingPhysics" target="_blank" rel="noopener noreferrer">YouTube</a></li></ul></nav></div></footer>
   <script src="../main.js"></script>
-  <script type="module" src="article.js?v=20261021-split"></script>
+  <script type="module" src="article.js?v=20261021-flow"></script>
 </body>
 </html>
