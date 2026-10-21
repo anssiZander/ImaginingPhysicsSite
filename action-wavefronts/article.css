@@ -117,6 +117,9 @@ body {
   margin: 2rem auto 2.2rem;
 }
 .action-post figure { margin: 0; min-width: 0; }
+.action-post .two-route-film { max-width: 780px; margin: 1.8rem auto 2.2rem; }
+#two-routes { scroll-margin-top: 100px; }
+.two-route-film figcaption a { color: var(--violet); text-underline-offset: 3px; }
 .action-post figure > a { display: block; }
 .action-post figure img,
 .action-post figure video {
