@@ -1,12 +1,20 @@
 {
-  "description": "Homepage viewer presentation: fixed tracer and arrow presets, simplified controls, probability-current copy, no Bloch panel. Scientific cores, current solvers and rendering shaders retain their pinned source bytes.",
+  "description": "Homepage presentation: compact branch-style canvas selection, fixed tracer/arrow presets, simplified controls, probability-current copy, no Bloch panel. Scientific cores, current solvers and wave reconstruction retain their pinned source bytes; the free-box marker display adopts the MultiRegion UI.",
+  "ui_reference": {
+    "repository": "https://github.com/anssiZander/BohmianGrover2D",
+    "branch": "MultiRegion",
+    "commit": "7d4464ef2d0cc227029cf0fc1036228c1c8797bf",
+    "note": "Guided initial/goal selection on the wave, compact Next/Run controls and responsive header; applied to the free-box model without changing its propagation."
+  },
   "patch": "presentation.patch",
   "sha256": {
-    "free-box/index.html": "b29150e3ed701bacf3a87309e34d2290d1e9e7b86956ca675112f233626cf62f",
-    "free-box/main.js": "41fdd555b6ceeac9d83b48180db24e8c46454165a02a0a0ecd0b4db24643c029",
-    "wave-hadamard/index.html": "1b9a13a98338726906445ead897ecb8896ecdbef615794027c693e997ee1c1b0",
-    "wave-hadamard/main.js": "e739fcd9343291fdd0a876fa722d296ed5aedee12d4020cd8ae5fb581457e634",
+    "free-box/index.html": "684b3fd65accda34412238bc95d20f5d8f85caa2ffde3082b02fe0cdb3b32a77",
+    "free-box/main.js": "96f64bc4c51f09af8a5dcb936481491339a1cf9de4f3f3bd17f8079e3ae1a8c2",
+    "free-box/shaders/multiregion_render.frag": "733495c44c8f14f334337b876094e10088fd633ee7474b40e301c15015b6acee",
+    "free-box/styles.css": "489fab93b2376b79cf7ddd7a953424ce52d5508cdc6c6bdae1d02e192a3db802",
     "spin/index.html": "43634600ac20c2e36e72761d0f6a7e35b42183b661b25ba2304e7e7218d2b690",
-    "spin/main.js": "425a24fc09dcab581ccab4f92688ec846cc3d0f17910f1be83df12fc54416642"
+    "spin/main.js": "425a24fc09dcab581ccab4f92688ec846cc3d0f17910f1be83df12fc54416642",
+    "wave-hadamard/index.html": "1b9a13a98338726906445ead897ecb8896ecdbef615794027c693e997ee1c1b0",
+    "wave-hadamard/main.js": "e739fcd9343291fdd0a876fa722d296ed5aedee12d4020cd8ae5fb581457e634"
   }
 }

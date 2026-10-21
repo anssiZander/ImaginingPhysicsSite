@@ -163,6 +163,18 @@ test('the spin example marks up at the upper right and amplifies 1/32 with four 
   }
 });
 
+test('free-box searches amplify from selected nonzero inputs across every supported grid',()=>{
+  for(const side of [2,3,4,5])for(const initial of [1,side*side-1])for(const target of [0,initial]) {
+    const model=free.gridModel(side),theta=Math.asin(1/side);
+    let state=free.evolveGate(free.basisState(initial,side),'prepare',1,target,initial);
+    for(let round=1;round<=model.iterations;round++) {
+      for(const kind of ['oracle','inverse','reference','forward'])state=free.evolveGate(state,kind,1,target,initial);
+      near(free.probabilities(state)[target],Math.sin((2*round+1)*theta)**2);
+      near(free.normSquared(state),1);
+    }
+  }
+});
+
 test('combined animation transports the current mean with every real column',()=>{
   const sim=new ordinary.SearchSimulation(); sim.setCombineMixer(true);
   for(let k=0;k<2;k++){sim.startNext();sim.advance(4);}

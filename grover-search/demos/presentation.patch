@@ -1,5 +1,4 @@
 diff --git a/free-box/index.html b/free-box/index.html
-index 8fcf93b..bb957be 100644
 --- a/free-box/index.html
 +++ b/free-box/index.html
 @@ -5,7 +5,7 @@
@@ -7,11 +6,29 @@ index 8fcf93b..bb957be 100644
    <title>Grover Search 2D — 16 Regions · Free Mixing</title>
    <link rel="icon" href="data:,"/>
 -  <link rel="stylesheet" href="./styles.css?v=20261014-particles"/>
-+  <link rel="stylesheet" href="./styles.css?v=20261021-flow"/>
++  <link rel="stylesheet" href="./styles.css?v=20261021-guided"/>
  </head>
  <body>
  <div id="wrap">
-@@ -32,17 +32,8 @@
+@@ -15,42 +15,30 @@
+       <div class="section">Search space</div>
+       <div class="row"><label for="gridSize">Grid size</label><input id="gridSize" type="range" min="2" max="5" step="1" value="4" aria-describedby="gridSummary"/><span id="gridSizeValue" class="val">4×4</span></div>
+       <p id="gridSummary" class="note">16 spatial states. Changing size resets the search.</p>
+-      <div class="section">Choose the goal box</div>
+-      <div id="goalGrid" role="group" aria-label="Select one of 16 marked modes in the same layout as the wave"></div>
+-      <p id="targetSummary" class="note"></p>
+       <div class="section">Gates</div>
+       <div class="ops">
+-        <button id="prepare">Prepare balanced state</button>
+-        <button id="oracle">Oracle · |1111⟩</button>
+-        <button id="inverse">A† · forward wait 7T</button>
+-        <button id="reference">Reference phase |0000⟩</button>
+-        <button id="forward">Forward mixer A</button>
+         <button id="next">Apply next operation</button>
+-        <button id="full" class="full">Run full search · 3 iterations</button>
++        <button id="full" class="full">Run full search</button>
+       </div>
+       <div id="progressTrack"><div id="progressBar"></div></div>
        <div id="stageStatus" class="status" role="status"></div>
        <div class="section">Playback &amp; wave</div>
        <div class="row"><label for="speed">Gate speed</label><input id="speed" type="range" min="0.1" max="3" step="0.05" value="1"/><span id="speedValue" class="val">1.00×</span></div>
@@ -30,16 +47,22 @@ index 8fcf93b..bb957be 100644
      </div>
      <div class="btnrow"><button id="reset">Reset (R)</button><button id="pause">Pause</button></div>
    </aside>
-@@ -50,7 +41,7 @@
+ 
    <main id="stage">
-     <header id="waveHeader"><div><span id="stateCountLabel" class="eyebrow">FREE BOX EVOLUTION · 16 LOGICAL MODES</span><h1>Amplitude amplification</h1></div><div class="targetBadge"><span id="waveTarget">MARKED |1111⟩</span><b id="waveProbability">0.0%</b></div></header>
+-    <header id="waveHeader"><div><span id="stateCountLabel" class="eyebrow">FREE BOX EVOLUTION · 16 LOGICAL MODES</span><h1>Amplitude amplification</h1></div><div class="targetBadge"><span id="waveTarget">MARKED |1111⟩</span><b id="waveProbability">0.0%</b></div></header>
++    <header id="waveHeader"><div class="waveHeading"><span id="stateCountLabel" class="eyebrow">FREE BOX EVOLUTION · 16 LOGICAL MODES</span><h1>Grover in a box</h1></div><div class="stateBadges"><div class="initialBadge"><span id="waveInitial">INITIAL |0000⟩</span></div><div class="targetBadge"><span id="waveTarget">MARKED |1111⟩</span><b id="waveProbability">0.0%</b></div></div>
++    <div id="selectionGuide" data-step="initial">
++      <div class="selectionMessage" role="status" aria-live="polite"><strong id="selectionTitle">1 · Initial state (green)</strong><p id="selectionHint">Click an initial square, then choose the goal. Or run with the current choices.</p></div>
++      <div class="selectionActions"><button id="selectionBack" type="button" hidden>Back: initial</button><button id="selectionNext" type="button">Next: choose goal</button></div>
++    </div>
++    </header>
      <div id="waveArea"><canvas id="c" aria-label="Continuous two-dimensional probability wave with 16 outcome regions"></canvas><div id="waveLabels" aria-hidden="true"></div><div id="loading">Preparing the wave…</div><div id="error" role="alert" hidden></div></div>
 -    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Probability flow overlays"><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Particles</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span>Hue = phase · arrows = probability current · dots follow j / ρ</span></footer>
-+    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Probability flow overlays"><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span>Hue = phase · arrows = probability current · tracers show probability flow</span></footer>
++    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Hue = phase · brightness = density · tracers show probability flow</span></footer>
    </main>
  
    <aside id="rightColumn">
-@@ -77,57 +68,15 @@
+@@ -77,57 +65,15 @@
        <div class="head"><h3>State diagnostics</h3></div>
        <div class="metrics"><div>Marked mode<b id="modeProbability">0.0%</b></div><div>Inside goal box<b id="boxProbability">0.0%</b></div></div>
        <div class="normLine">Total probability <b id="normValue">1.000000</b></div>
@@ -89,23 +112,23 @@ index 8fcf93b..bb957be 100644
 -        </figcaption>
 -      </figure>
 -    </details>
-+
-       <div class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
+-      <div class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
 -      <details class="theory"><summary>About the wave and gates</summary><p>Choose N = 2, 3, 4 or 5. The box and mass stay fixed: T = T<sub>rev</sub>/(2N), and the inverse is a positive-time wait of (2N−1)T. There is one scalar wave and no spin channel.</p><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so logical-mode probability differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. The input is the lower-left packet |0,0⟩ (|0000⟩ at 4×4).</p><div class="math">ℋ = −ℏ²∇²/(2m)<br>A = U(T), &nbsp; A† = U((2N−1)T), &nbsp; U(2NT) = I</div><p>Preparation and forward mixing wait for T = πℏ/(NE₁). The inverse waits forward for (2N−1)T under the same positive kinetic Hamiltonian. The fixed revival time is 19.2 gate-time seconds. At the default 4×4 size, T is 2.4 and 7T is 16.8. Both axes evolve simultaneously.</p><p>Preparation gives equal probabilities with definite relative phases. The Bloch sphere uses those phases in its marked/unmarked basis. Oracle and reference pulses remain ideal mode-projector phase operations. The first optimal peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively.</p><div class="math">Free mixing: j = (ℏ/m) Im(ψ*∇ψ)<br>Phase pulses: j = ∇χ, &nbsp; ∇²χ = −∂ρ/∂t<br>Particle velocity: v = j / ρ</div><p>During free evolution the arrows and particles use the ordinary Bohmian current. During the ideal nonlocal phase pulses they use the chosen conserved curl-free transport. Every stage has zero normal flux at the outer walls.</p><p>Compare particle fractions with “Inside goal box.” Arrow lengths show current strength on a compressed scale. Pause and manual gate checkpoints hold the wave, current, particles, and trails still for inspection.</p></details>
-+      <details class="theory"><summary>About the wave and gates</summary><p>Choose N = 2, 3, 4 or 5. The box and mass stay fixed: T = T<sub>rev</sub>/(2N), and the inverse is a positive-time wait of (2N−1)T. There is one scalar wave and no spin channel.</p><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so logical-mode probability differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. The input is the lower-left packet |0,0⟩ (|0000⟩ at 4×4).</p><div class="math">ℋ = −ℏ²∇²/(2m)<br>A = U(T), &nbsp; A† = U((2N−1)T), &nbsp; U(2NT) = I</div><p>Preparation and forward mixing wait for T = πℏ/(NE₁). The inverse waits forward for (2N−1)T under the same positive kinetic Hamiltonian. The fixed revival time is 19.2 gate-time seconds. At the default 4×4 size, T is 2.4 and 7T is 16.8. Both axes evolve simultaneously.</p><p>Preparation gives equal probabilities with definite relative phases. Oracle and reference pulses remain ideal mode-projector phase operations. The first optimal peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively.</p><div class="math">Free mixing: j = (ℏ/m) Im(ψ*∇ψ)<br>Phase pulses: j = ∇χ, &nbsp; ∇²χ = −∂ρ/∂t<br>Tracer transport: v = j / ρ</div><p>During free evolution the arrows show the Schrödinger probability current. During the ideal nonlocal phase pulses they show the chosen conserved curl-free current. Yellow tracers move with v = j / ρ to visualize the evolving density. They are visualization samples, and adding more tracers changes only the sampling detail. Every stage has zero normal flux at the outer walls.</p><p>Compare tracer fractions with “Inside goal box.” Arrow lengths show current strength on a compressed scale. Pause and manual gate checkpoints hold the wave, current, tracers, and trails still for inspection.</p></details>
++
++      <div id="phaseLegendPanel" class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
++      <details class="theory"><summary>About the wave and gates</summary><p>Choose N = 2, 3, 4 or 5. The box and mass stay fixed: T = T<sub>rev</sub>/(2N), and the inverse is a positive-time wait of (2N−1)T. There is one scalar wave and no spin channel.</p><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so logical-mode probability differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. Select the initial packet and goal directly on the wave using the guide beside the title. The default input is the lower-left packet |0,0⟩ (|0000⟩ at 4×4). The reference pulse acts on the selected input.</p><div class="math">ℋ = −ℏ²∇²/(2m)<br>A = U(T), &nbsp; A† = U((2N−1)T), &nbsp; U(2NT) = I</div><p>Preparation and forward mixing wait for T = πℏ/(NE₁). The inverse waits forward for (2N−1)T under the same positive kinetic Hamiltonian. The fixed revival time is 19.2 gate-time seconds. At the default 4×4 size, T is 2.4 and 7T is 16.8. Both axes evolve simultaneously.</p><p>Preparation gives equal probabilities with definite relative phases. Oracle and reference pulses remain ideal mode-projector phase operations. The first optimal peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively.</p><div class="math">Free mixing: j = (ℏ/m) Im(ψ*∇ψ)<br>Phase pulses: j = ∇χ, &nbsp; ∇²χ = −∂ρ/∂t<br>Tracer transport: v = j / ρ</div><p>During free evolution the arrows show the Schrödinger probability current. During the ideal nonlocal phase pulses they show the chosen conserved curl-free current. Yellow tracers move with v = j / ρ to visualize the evolving density. They are visualization samples, and adding more tracers changes only the sampling detail. Every stage has zero normal flux at the outer walls.</p><p>Compare tracer fractions with “Inside goal box.” Arrow lengths show current strength on a compressed scale. Pause and manual gate checkpoints hold the wave, current, tracers, and trails still for inspection.</p></details>
      </section>
    </aside>
  </div>
  <script src="./recording.js?v=20261014-particles"></script>
 -<script type="module" src="./main.js?v=20261014-particles"></script>
-+<script type="module" src="./main.js?v=20261021-flow"></script>
++<script type="module" src="./main.js?v=20261021-guided"></script>
  </body>
  </html>
 diff --git a/free-box/main.js b/free-box/main.js
-index 042c2c3..39e1b07 100644
 --- a/free-box/main.js
 +++ b/free-box/main.js
-@@ -1,28 +1,23 @@
+@@ -1,34 +1,30 @@
  import { SearchSimulation, expectedProbability, probabilities,
    sineCoefficients, boxProbability } from './multiregion-core.js?v=20261014-particles';
 -import { createGroverGeometry } from './grover-geometry.js?v=20261014-particles';
@@ -119,14 +142,15 @@ index 042c2c3..39e1b07 100644
 -const params = { speed: 1, visGain: .65, visGamma: .55, showPhase: true, showGrid: true,
 -  showCurrent: true, showParticles: true, showTrails: true, particleCount: 4000,
 -  particleSize: 3.5, arrowGrid: 20, currentGain: 2.5, trailHalfLife: 1.5 };
-+const params = { speed: 1, visGain: .8, visGamma: .55, showPhase: true, showGrid: true,
++const params = { speed: 1, visGain: .8, visGamma: .55, showPhase: true, showGrid: true, showMarkers: true,
 +  showCurrent: true, showParticles: true, showTrails: true, particleCount: 25000,
 +  particleSize: 1.5, arrowGrid: 16, currentGain: 1.5, trailHalfLife: .1 };
  const byId = id => document.getElementById(id);
  const dom = Object.fromEntries(['gridSize', 'gridSizeValue', 'gridSummary', 'appTitle', 'stateCountLabel',
    'circuitXLabel', 'circuitYLabel', 'circuitTitle', 'circuitDescription', 'inverseCaption', 'c', 'waveArea', 'waveLabels', 'stage', 'waveHeader', 'waveFooter',
-   'goalGrid', 'targetSummary', 'prepare', 'oracle', 'inverse', 'reference', 'forward', 'next', 'full',
+-  'goalGrid', 'targetSummary', 'prepare', 'oracle', 'inverse', 'reference', 'forward', 'next', 'full',
 -  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue', 'brightness', 'brightnessValue',
++  'selectionGuide', 'selectionTitle', 'selectionHint', 'selectionBack', 'selectionNext', 'markersToggle', 'waveInitial', 'waveLegend', 'phaseLegendPanel', 'next', 'full',
 +  'reset', 'pause', 'progressBar', 'stageStatus', 'speed', 'speedValue',
    'phaseToggle', 'gridToggle', 'ui', 'uibody', 'minui', 'circuitPanel', 'circuitToggle', 'circuitStatus',
    'circuitTarget', 'circuitReadout', 'iterationTrack', 'modeProbability', 'boxProbability', 'normValue',
@@ -141,9 +165,70 @@ index 042c2c3..39e1b07 100644
  const canvas = dom.c;
  let gl, waveTexture, waveFbo, vao, reconstruction, renderer, flow, ready = false;
  let waveDirty = true, renderDirty = true, frameRecordingActive = false, lastTime = null, glError = 0;
-@@ -84,24 +79,10 @@ function reset() { simulation.reset(); flow?.reset(params.particleCount,simulati
- function startNext() { if (simulation.startNext()) { markChanged(); syncUi(); return true; } return false; }
- function runFull() { if (simulation.runFull()) { flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); return true; } return false; }
+ let lastUiKey = '', previousBusy = null, cachedBoxProbability = 0;
+-const targetButtons = [], waveCells = [];
+-const gateButtons = ['prepare', 'oracle', 'inverse', 'reference', 'forward'];
++let selectionStep = 'initial', lastSelectionKey = '';
++const waveCells = [];
++const circuitInputs = Array.from(document.querySelectorAll('.circuitInput'));
+ const circuitGates = Array.from(document.querySelectorAll('[data-circuit-kind]'));
+ 
+ function formatProbability(p) { return `${(100 * Math.max(0, Math.min(1, p))).toFixed(1)}%`; }
+@@ -36,11 +32,6 @@
+ 
+ function makeTargetGrid() {
+   const { side, stateCount, labels: LABELS, iterations, inverseFactor } = simulation.model;
+-  targetButtons.length = 0; dom.goalGrid.replaceChildren();
+-  dom.goalGrid.setAttribute('aria-label', 'Select one of ' + stateCount + ' marked modes in the same layout as the wave');
+-  dom.inverse.textContent = 'A† · forward wait ' + inverseFactor + 'T';
+-  dom.reference.textContent = 'Reference phase |' + LABELS[0] + '⟩';
+-  dom.full.textContent = 'Run full search · ' + iterations + ' iterations';
+   waveCells.length = 0; dom.waveLabels.replaceChildren();
+   document.documentElement.style.setProperty('--grid-side', side);
+   dom.gridSize.value = side; dom.gridSizeValue.textContent = side + '×' + side;
+@@ -58,20 +49,25 @@
+   dom.full.title = 'Prepare and run ' + iterations + ' Grover iterations';
+   dom.iterationTrack.innerHTML = Array.from({ length: iterations }, (_, i) => '<span data-iteration="' + (i+1) + '">Iteration ' + (i+1) + '<b>—</b></span>').join('');
+   for (let y = side - 1; y >= 0; y--) for (let x = 0; x < side; x++) {
+-    const q = side * x + y, button = document.createElement('button');
+-    button.type = 'button'; button.dataset.target = q;
+-    button.setAttribute('aria-label', `Mark |${LABELS[q]}⟩, column ${x + 1}, row ${y + 1} from bottom`);
+-    button.innerHTML = `<span>|${LABELS[q]}⟩</span><b>0.0%</b><i></i>`;
+-    button.addEventListener('click', () => chooseTarget(q));
+-    dom.goalGrid.append(button); targetButtons[q] = button;
++    const q = side * x + y;
+     const cell = document.createElement('div'); cell.className = 'waveCell'; cell.dataset.region = q;
+-    cell.innerHTML = `<span>|${LABELS[q]}⟩</span><b>0.0%</b>`;
++    cell.innerHTML = `<span>|${LABELS[q]}⟩</span><span class="initialTag"></span><span class="goalTag"></span><b>0.0%</b>`;
+     dom.waveLabels.append(cell); waveCells[q] = cell;
+   }
+ }
+ 
++function chooseInitial(q) {
++  if (!simulation.setInitial(q)) return false;
++  flow?.reset(params.particleCount,simulation.initial,simulation.model.side);
++  markChanged(); syncUi(); return true;
++}
++function setSelectionStep(step) {
++  if (simulation.active) return false;
++  selectionStep = step; lastUiKey = ''; syncUi(); layout(); return true;
++}
+ function setGridSize(value) {
+   if (!simulation.setGridSize(Number(value))) return false;
++  selectionStep = 'initial';
+   flow?.reset(params.particleCount, simulation.initial, simulation.model.side);
+   makeTargetGrid(); markChanged(); syncUi(); layout(); return true;
+ }
+@@ -80,28 +76,14 @@
+   flow?.reset(params.particleCount,simulation.initial,simulation.model.side);
+   markChanged(); syncUi(); return true;
+ }
+-function reset() { simulation.reset(); flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); }
+-function startNext() { if (simulation.startNext()) { markChanged(); syncUi(); return true; } return false; }
+-function runFull() { if (simulation.runFull()) { flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); return true; } return false; }
++function reset() { simulation.reset(); selectionStep = 'initial'; flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); layout(); }
++function startNext() { if (simulation.startNext()) { selectionStep = 'ready'; markChanged(); syncUi(); layout(); return true; } return false; }
++function runFull() { if (simulation.runFull()) { selectionStep = 'ready'; flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); layout(); return true; } return false; }
  function togglePause() { simulation.paused = !simulation.paused; lastUiKey = ''; syncUi(); }
 -function particleCountFromSlider() {
 -  // Equal thumb distances multiply the count; round to 100 for readable steps.
@@ -169,16 +254,94 @@ index 042c2c3..39e1b07 100644
    reset(); return true;
  }
  
-@@ -137,7 +118,6 @@ function syncUi() {
+@@ -110,40 +92,57 @@
+   const gate = simulation.active || simulation.last;
+   const kind = gate?.kind || 'input', progress = simulation.active?.progress ?? (simulation.last ? 1 : 0);
+   const iteration = gate?.iteration || 0, busy = !!simulation.active, complete = simulation.completed === GATES.length;
+-  const key = `${simulation.revision}/${simulation.target}/${simulation.completed}/${kind}/${progress}/${busy}/${simulation.paused}`;
++  const key = `${simulation.revision}/${simulation.target}/${simulation.completed}/${kind}/${progress}/${busy}/${simulation.paused}/${selectionStep}/${params.showMarkers}`;
+   if (key === lastUiKey) return;
+   lastUiKey = key;
+-  const p = probabilities(simulation.amplitudes), target = simulation.target;
++  const p = probabilities(simulation.amplitudes), target = simulation.target, initial = simulation.initial;
+   cachedBoxProbability = boxProbability(simulation.amplitudes, target);
+   for (let q = 0; q < STATE_COUNT; q++) {
+-    const button = targetButtons[q], text = formatProbability(p[q]), isTarget = q === target;
+-    button.classList.toggle('selected', isTarget);
+-    button.setAttribute('aria-pressed', String(isTarget)); button.disabled = busy;
+-    button.querySelector('b').textContent = text;
+-    button.querySelector('i').style.width = text;
++    const isTarget = params.showMarkers && q === target, isInitial = params.showMarkers && q === initial;
+     waveCells[q].classList.toggle('marked', isTarget);
+-    waveCells[q].querySelector('b').textContent = text;
+-    button.dataset.probability = p[q];
++    waveCells[q].classList.toggle('initial', isInitial);
++    waveCells[q].querySelector('b').textContent = formatProbability(p[q]);
++    waveCells[q].querySelector('.initialTag').textContent = isInitial ? 'START' : '';
++    waveCells[q].querySelector('.goalTag').textContent = isTarget ? 'GOAL' : '';
+   }
+   const targetText = `|${LABELS[target]}⟩`;
+-  dom.targetSummary.textContent = `Goal ${targetText} · column ${Math.floor(target / side) + 1}, row ${(target % side) + 1} from bottom`;
++  const initialText = `|${LABELS[initial]}⟩`;
++  dom.waveInitial.textContent = `INITIAL ${initialText}`;
++  circuitInputs.forEach((element, axis) => { element.textContent = '|'+(axis === 0 ? Math.floor(initial/side) : initial%side)+'⟩'; });
+   dom.waveTarget.textContent = `MARKED ${targetText}`;
++  const selectionKey = selectionStep + '/' + busy;
++  if (selectionKey !== lastSelectionKey) {
++    lastSelectionKey = selectionKey;
++    dom.selectionGuide.dataset.step = selectionStep;
++    dom.selectionTitle.textContent = busy ? 'Selections held during the search' : {
++      initial: '1 · Initial state (green)',
++      goal: '2 · Goal state (red)',
++      ready: 'Initial and goal states are ready',
++    }[selectionStep];
++    dom.selectionHint.textContent = busy ? 'Reset to choose different states. You can hide the markers below.' : {
++      initial: 'Click an initial square, then choose the goal. Or run with the current choices.',
++      goal: 'Click a goal square. Then select Done, or run now with the current choices.',
++      ready: 'Run the search, or select “Choose states” to pick a new initial state and goal.',
++    }[selectionStep];
++    dom.selectionBack.hidden = selectionStep !== 'goal';
++    dom.selectionNext.textContent = { initial: 'Next: choose goal', goal: 'Done', ready: 'Choose states' }[selectionStep];
++    dom.selectionBack.disabled = busy; dom.selectionNext.disabled = busy;
++    dom.waveArea.classList.toggle('selecting', selectionStep !== 'ready');
++  }
+   dom.waveProbability.textContent = formatProbability(p[target]);
+   dom.modeProbability.textContent = formatProbability(p[target]);
+   dom.boxProbability.textContent = formatProbability(cachedBoxProbability);
+   dom.normValue.textContent = p.reduce((sum, value) => sum + value, 0).toFixed(6);
+-  const nextKind = GATES[simulation.completed]?.kind;
+-  for (const id of gateButtons) dom[id].disabled = busy || nextKind !== id;
++  const nextGate = GATES[simulation.completed];
++  dom.next.title = nextGate?.kind === 'reference' ? 'Reference phase '+initialText : nextGate?.name || 'Search complete';
    dom.next.disabled = busy || complete;
    dom.full.disabled = busy;
    dom.pause.textContent = simulation.paused ? 'Resume' : 'Pause';
 -  dom.particleCount.disabled = busy;
-   dom.oracle.textContent = `Oracle · ${targetText}`;
+-  dom.oracle.textContent = `Oracle · ${targetText}`;
    dom.progressBar.style.width = `${100 * progress}%`;
    const round = iteration ? `Round ${iteration}/${ITERATIONS} · ` : '';
-@@ -175,9 +155,6 @@ function syncUi() {
-     forward: 'Free evolution for T completes the reflection. Unmarked contributions cancel and the marked mode grows.',
+   const status = complete ? 'Complete · ' + ITERATIONS + ' Grover iterations' : busy
+     ? `${simulation.paused ? 'Paused' : 'Running'} · ${round}${gate.name} · ${Math.round(100 * progress)}%`
+-    : gate ? `${round}${gate.name} complete` : 'Ready · input |'+LABELS[0]+'⟩';
++    : gate ? `${round}${gate.name} complete` : 'Ready · input '+initialText;
+   dom.stageStatus.textContent = status;
+   dom.circuitStatus.textContent = status;
+   dom.circuitTarget.textContent = `w = ${targetText}`;
+@@ -167,26 +166,24 @@
+     marker.querySelector('b').textContent = result ? formatProbability(result.targetProbability) : '—';
+   }
+   const descriptions = {
+-    input: 'Begin in one localized mode. Prepare the balanced state to start the search.',
+-    prepare: 'Free-box evolution for T prepares '+(100/STATE_COUNT).toFixed(3)+'% in each of '+STATE_COUNT+' logical modes, with definite relative phases.',
++    input: 'Start in '+initialText+' and search for '+targetText+'. Green marks the initial position; red marks the goal.',
++    prepare: 'Free-box evolution for T prepares '+(100/STATE_COUNT).toFixed(3)+'% in each of '+STATE_COUNT+' modes, with definite relative phases.',
+     oracle: 'Only the marked mode changes phase. Its probability stays fixed while its contribution interferes differently in space.',
+-    inverse: 'Keep evolving forward under the same free Hamiltonian for '+inverseFactor+'T. The full revival at '+(2*side)+'T makes this A†.',
+-    reference: 'The |'+LABELS[0]+'⟩ coefficient turns through π while every other logical coefficient stays fixed.',
+-    forward: 'Free evolution for T completes the reflection. Unmarked contributions cancel and the marked mode grows.',
++    inverse: 'The inverse is reached by waiting forward for '+inverseFactor+'T under the same free Hamiltonian.',
++    reference: 'The '+initialText+' coefficient turns through π while every other logical coefficient stays fixed.',
++    forward: 'A forward wait of T completes the reflection. Unmarked contributions cancel and the marked mode grows.',
    };
    dom.gateDescription.textContent = complete ? (100*expectedProbability(ITERATIONS,side)).toFixed(3)+'% marked-mode probability after '+ITERATIONS+' iterations.' : descriptions[kind];
 -  const stepKey = `${simulation.revision}/${target}/${gate?.index ?? -1}`;
@@ -187,7 +350,8 @@ index 042c2c3..39e1b07 100644
    document.documentElement.dataset.stage = String(simulation.completed);
    document.documentElement.dataset.gate = kind;
    document.documentElement.dataset.progress = String(progress);
-@@ -185,8 +162,8 @@ function syncUi() {
+   document.documentElement.dataset.target = String(target);
++  document.documentElement.dataset.initial = String(initial);
    if (flow) {
      const stats = flow.statistics(target, progress, !busy || simulation.paused);
      dom.particleProbability.textContent = formatProbability(stats.boxProbability);
@@ -198,21 +362,35 @@ index 042c2c3..39e1b07 100644
      document.documentElement.dataset.particleFailures = String(stats.failures);
      document.documentElement.dataset.particleLag = String(stats.maxLag);
    }
-@@ -194,13 +171,11 @@ function syncUi() {
+@@ -194,16 +191,23 @@
  }
  
  function installEvents() {
 -  syncParticleCountSlider();
    dom.gridSize.addEventListener('input', () => setGridSize(dom.gridSize.value));
-   gateButtons.forEach(id => dom[id].addEventListener('click', startNext));
+-  gateButtons.forEach(id => dom[id].addEventListener('click', startNext));
++  dom.selectionBack.addEventListener('click', () => setSelectionStep('initial'));
++  dom.selectionNext.addEventListener('click', () => setSelectionStep({ initial: 'goal', goal: 'ready', ready: 'initial' }[selectionStep]));
++  dom.markersToggle.addEventListener('click', () => {
++    params.showMarkers = !params.showMarkers;
++    dom.markersToggle.setAttribute('aria-pressed', String(params.showMarkers));
++    syncUi(); renderDirty = true;
++  });
    dom.next.addEventListener('click', startNext); dom.full.addEventListener('click', runFull);
    dom.reset.addEventListener('click', reset); dom.pause.addEventListener('click', togglePause);
    dom.speed.addEventListener('input', () => { params.speed = Number(dom.speed.value); dom.speedValue.textContent = `${params.speed.toFixed(2)}×`; });
 -  dom.brightness.addEventListener('input', () => { params.visGain = Number(dom.brightness.value); dom.brightnessValue.textContent = params.visGain.toFixed(2); renderDirty = true; });
    dom.phaseToggle.addEventListener('click', () => {
      params.showPhase = !params.showPhase; dom.phaseToggle.textContent = params.showPhase ? 'ON' : 'OFF';
-     dom.phaseToggle.setAttribute('aria-pressed', String(params.showPhase)); renderDirty = true;
-@@ -217,20 +192,6 @@ function installEvents() {
+-    dom.phaseToggle.setAttribute('aria-pressed', String(params.showPhase)); renderDirty = true;
++    dom.phaseToggle.setAttribute('aria-pressed', String(params.showPhase));
++    dom.phaseLegendPanel.hidden = !params.showPhase;
++    dom.waveLegend.textContent = params.showPhase ? 'Hue = phase · brightness = density · tracers show probability flow' : 'Color = density · arrows = probability current · tracers show probability flow';
++    renderDirty = true;
+   });
+   dom.gridToggle.addEventListener('click', () => {
+     params.showGrid = !params.showGrid; dom.gridToggle.textContent = params.showGrid ? 'ON' : 'OFF';
+@@ -217,20 +221,6 @@
        renderDirty = true;
      });
    }
@@ -233,16 +411,179 @@ index 042c2c3..39e1b07 100644
    dom.minui.addEventListener('click', () => {
      dom.uibody.hidden = !dom.uibody.hidden; dom.minui.textContent = dom.uibody.hidden ? '+' : '−';
      dom.minui.setAttribute('aria-expanded', String(!dom.uibody.hidden));
-@@ -333,6 +294,7 @@ function advance(seconds) {
+@@ -240,17 +230,20 @@
+     dom.circuitToggle.textContent = collapsed ? '+' : '−'; dom.circuitToggle.setAttribute('aria-expanded', String(!collapsed));
+   });
+   canvas.addEventListener('click', event => {
++    if (simulation.active || selectionStep === 'ready') return;
+     const bounds = canvas.getBoundingClientRect(), side = simulation.model.side;
+     const x = Math.min(side - 1, Math.max(0, Math.floor(side * (event.clientX - bounds.left) / bounds.width)));
+     const y = Math.min(side - 1, Math.max(0, Math.floor(side * (bounds.bottom - event.clientY) / bounds.height)));
+-    chooseTarget(side * x + y);
++    if (selectionStep === 'initial') chooseInitial(side * x + y);
++    else chooseTarget(side * x + y);
+   });
+   window.addEventListener('keydown', event => {
+     if (event.target.matches('input,button,summary,[contenteditable]')) return;
+     if (event.code === 'Space') { event.preventDefault(); togglePause(); }
+     if (event.key.toLowerCase() === 'r') reset();
+   });
+-  new ResizeObserver(layout).observe(dom.stage);
++  const layoutObserver = new ResizeObserver(layout);
++  for (const element of [dom.stage, dom.waveHeader, dom.waveFooter]) layoutObserver.observe(element);
+   window.addEventListener('resize', layout);
+ }
+ 
+@@ -279,6 +272,7 @@
+   return { program, uniforms: Object.fromEntries(uniforms.map(name => [name, gl.getUniformLocation(program, name)])) };
+ }
+ async function loadShader(name) {
++  // Keep fetched shaders on the same release as the module that compiles them.
+   const url = new URL(`./shaders/${name}`, import.meta.url);
+   url.search = new URL(import.meta.url).search;
+   const response = await fetch(url);
+@@ -303,9 +297,10 @@
+   gl.uniform1f(u.uVisGain, params.visGain); gl.uniform1f(u.uVisGamma, params.visGamma);
+   gl.uniform1i(u.uShowPhase, params.showPhase ? 1 : 0); gl.uniform1i(u.uShowGrid, params.showGrid ? 1 : 0);
+   gl.uniform1i(u.uSide, simulation.model.side);
+-  gl.uniform1i(u.uTarget, simulation.target);
++  gl.uniform1i(u.uTarget, simulation.target); gl.uniform1i(u.uInitial, simulation.initial);
++  gl.uniform1i(u.uShowMarkers, params.showMarkers ? 1 : 0);
+   const gate = simulation.active;
+-  gl.uniform1i(u.uGateRegion, gate?.kind === 'oracle' ? simulation.target : gate?.kind === 'reference' ? 0 : -1);
++  gl.uniform1i(u.uGateRegion, gate?.kind === 'oracle' ? simulation.target : gate?.kind === 'reference' ? simulation.initial : -1);
+   gl.uniform1f(u.uGateFlash, gate ? Math.sin(Math.PI * gate.progress) : 0);
+   gl.uniform1f(u.uPixelSize, 1 / canvas.width);
+   gl.drawArrays(gl.TRIANGLES, 0, 3);
+@@ -333,8 +328,9 @@
  // reproducible browser verification page. Reads expose the actual GPU texture.
  const api = {
    isReady: () => ready,
 +  viewerSettings: () => ({ ...params }),
    state: () => ({ ...simulation.snapshot(), boxProbability: cachedBoxProbability, grid: GRID, speed: params.speed }),
-   reset, setTarget: chooseTarget, startNext, runFull, togglePause,
+-  reset, setTarget: chooseTarget, startNext, runFull, togglePause,
++  reset, setTarget: chooseTarget, setInitial: chooseInitial, startNext, runFull, togglePause,
    setParticleCount, setGridSize,
+   readParticles: () => flow.readParticles(),
+   readFlow: () => { if (simulation.active) flow.prepare(simulation.active, simulation.target); return flow.readField(simulation.active?.progress ?? 1); },
+@@ -369,7 +365,7 @@
+     loadShader('fullscreen.vert'), loadShader('mode_wave.frag'), loadShader('multiregion_render.frag'),
+   ]);
+   reconstruction = createProgram(vertex, waveSource, ['uCoefficients[0]', 'uGridSize', 'uSide']);
+-  renderer = createProgram(vertex, renderSource, ['uSide', 'uWave', 'uVisGain', 'uVisGamma', 'uShowPhase', 'uShowGrid', 'uTarget', 'uGateRegion', 'uGateFlash', 'uPixelSize']);
++  renderer = createProgram(vertex, renderSource, ['uSide', 'uWave', 'uVisGain', 'uVisGamma', 'uShowPhase', 'uShowGrid', 'uShowMarkers', 'uTarget', 'uInitial', 'uGateRegion', 'uGateFlash', 'uPixelSize']);
+   waveTexture = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, waveTexture);
+   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, linear ? gl.LINEAR : gl.NEAREST);
+   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, linear ? gl.LINEAR : gl.NEAREST);
+@@ -381,7 +377,7 @@
+   if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) throw new Error('Could not create the floating-point wave texture.');
+   const initializedFlow = new FlowRenderer(gl, GRID, loadShader, createProgram);
+   await initializedFlow.init(vertex); flow = initializedFlow;
+-  flow.reset(params.particleCount,simulation.initial,simulation.model.side);
++  flow?.reset(params.particleCount,simulation.initial,simulation.model.side);
+   ready = true; lastUiKey = ''; syncUi(); dom.loading.hidden = true; document.documentElement.dataset.webgl2 = 'ready';
+   document.documentElement.dataset.viewMode = 'single'; render();
+   requestAnimationFrame(function loop(now) {
+diff --git a/free-box/shaders/multiregion_render.frag b/free-box/shaders/multiregion_render.frag
+--- a/free-box/shaders/multiregion_render.frag
++++ b/free-box/shaders/multiregion_render.frag
+@@ -9,6 +9,8 @@
+ uniform int uShowGrid;
+ uniform int uTarget;
+ uniform int uSide;
++uniform int uInitial;
++uniform int uShowMarkers;
+ uniform int uGateRegion;
+ uniform float uGateFlash;
+ uniform float uPixelSize;
+@@ -51,13 +53,28 @@
+     float lines = 1.0 - smoothstep(.6 * uPixelSize, 1.7 * uPixelSize, min(nearest.x, nearest.y));
+     col = mix(col, vec3(.18,.55,.72), .45 * lines);
+   }
+-  vec2 d = abs(uv - regionCenter(uTarget));
+-  float edge = min(abs(d.x - (.5/float(uSide)-.002)), abs(d.y - (.5/float(uSide)-.002)));
+-  float within = step(d.x, .5/float(uSide)) * step(d.y, .5/float(uSide));
+-  float glow = within * (1.0 - smoothstep(.004, .025, edge));
+-  float border = within * (1.0 - smoothstep(.7 * uPixelSize, 2.2 * uPixelSize, edge));
+-  col = mix(col, col * vec3(1.06,.76,.80) + vec3(.13,.005,.012), .20 * regionMask(uv, uTarget));
+-  col += vec3(1.0,.015,.035) * (.34 * glow + 1.05 * border);
+-  if (uGateRegion >= 0) col += vec3(1.0,.28,.72) * regionMask(uv, uGateRegion) * uGateFlash * .16;
++  if (uShowMarkers == 1) {
++    vec2 d = abs(uv - regionCenter(uTarget));
++    float halfCell=.5/float(uSide),inset=halfCell-2.0*uPixelSize;
++    float edge = min(abs(d.x - inset), abs(d.y - inset));
++    float within = step(d.x, halfCell) * step(d.y, halfCell);
++    float glow = within * (1.0 - smoothstep(.004, .025, edge));
++    float border = within * (1.0 - smoothstep(.7 * uPixelSize, 2.2 * uPixelSize, edge));
++    col = mix(col, col * vec3(1.06,.76,.80) + vec3(.13,.005,.012), .20 * regionMask(uv, uTarget));
++    col += vec3(1.0,.015,.035) * (.34 * glow + 1.05 * border);
++    // An inner green outline keeps both choices visible when they share a cell.
++    d = abs(uv - regionCenter(uInitial));
++    float initialInset = uInitial == uTarget ? 8.0 : 2.0;
++    inset = halfCell - initialInset * uPixelSize;
++    edge = min(abs(d.x - inset), abs(d.y - inset));
++    float extent = min(halfCell, inset + 2.2 * uPixelSize);
++    within = step(d.x, extent) * step(d.y, extent);
++    glow = within * (1.0 - smoothstep(.004, .025, edge));
++    border = within * (1.0 - smoothstep(.7 * uPixelSize, 2.2 * uPixelSize, edge));
++    col += vec3(.025,.11,.035) * .18 * regionMask(uv, uInitial);
++    col += vec3(.08,1.0,.22) * .28 * glow;
++    col = mix(col,vec3(.08,1.0,.22),.94*border);
++    if (uGateRegion >= 0) col += vec3(1.0,.28,.72) * regionMask(uv, uGateRegion) * uGateFlash * .16;
++  }
+   fragColor = vec4(col, 1.0);
+ }
+diff --git a/free-box/styles.css b/free-box/styles.css
+--- a/free-box/styles.css
++++ b/free-box/styles.css
+@@ -7,17 +7,14 @@
+ button{padding:8px 10px;border-radius:8px;border:1px solid rgba(132,192,255,.26);background:rgba(68,130,210,.14);color:#e8f2ff;cursor:pointer}
+ button:hover:not(:disabled){background:rgba(86,150,232,.25);border-color:#5e9ed0}button:disabled{opacity:.42;cursor:not-allowed}button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #69d9ff;outline-offset:2px}
+ .mini{flex:0 0 30px;width:30px;height:27px;padding:0;display:grid;place-items:center;font-size:16px}.section{margin:16px 0 8px;font-size:11px;font-weight:700;color:#9fbce0;text-transform:uppercase;letter-spacing:1px}
+-#goalGrid{display:grid;grid-template-columns:repeat(var(--grid-side,4),minmax(0,1fr));gap:5px}#goalGrid button{position:relative;min-width:0;padding:8px 2px 10px;overflow:hidden;font-size:11px;text-align:center;background:rgba(22,42,68,.74)}
+-#goalGrid button span{display:block;font-weight:700}#goalGrid button b{display:block;margin-top:3px;font-size:10px;color:#8fb4d6;font-variant-numeric:tabular-nums;font-weight:500}#goalGrid button i{position:absolute;bottom:0;left:0;height:3px;width:0;background:linear-gradient(90deg,#37c8ff,#e055ff)}
+-#goalGrid button.selected{border-color:#ff5264;background:linear-gradient(145deg,rgba(136,26,50,.5),rgba(44,24,54,.8));box-shadow:0 0 14px rgba(255,45,67,.13)}#goalGrid button.selected b{color:#ffd4d9}#goalGrid button.selected i{background:#ff6376}
+-.note{font-size:10px;color:#9fbce0;line-height:1.5}#targetSummary{margin:8px 0 0}.ops{display:grid;grid-template-columns:1fr 1fr;gap:7px}.ops button{font-size:12px;min-height:44px;padding:7px 5px}.ops .full{grid-column:1/-1;background:rgba(132,64,210,.2);border-color:rgba(194,120,255,.45)}
+-.flowSettings{border-top:1px solid rgba(132,192,255,.15);padding-top:10px;margin-top:14px}.flowSettings summary{font-size:11px;color:#9fbce0;cursor:pointer}.flowToggles{display:flex;justify-content:center;gap:6px;margin:5px 0}.flowToggles button{padding:4px 9px;font-size:10px;color:#8397ac;background:rgba(31,48,70,.32)}.flowToggles button[aria-pressed=true]{color:#d9f1ff;border-color:rgba(104,206,255,.55);background:rgba(32,84,121,.3)}.flowToggles #particlesToggle[aria-pressed=true],.flowToggles #trailsToggle[aria-pressed=true]{color:#ffea9b;border-color:rgba(237,204,103,.42)}.particleMetric{display:flex;justify-content:space-between;font-size:10px;color:#aac0d8;margin-top:10px}.particleMetric b{font-weight:600;color:#ffe386}#flowStatus{font-size:9px;margin-top:4px}
++.note{font-size:10px;color:#9fbce0;line-height:1.5}.ops{display:grid;grid-template-columns:1fr 1fr;gap:7px}.ops button{font-size:12px;min-height:44px;padding:7px 5px}.ops .full{background:rgba(132,64,210,.2);border-color:rgba(194,120,255,.45)}
++.flowSettings{border-top:1px solid rgba(132,192,255,.15);padding-top:10px;margin-top:14px}.flowSettings summary{font-size:11px;color:#9fbce0;cursor:pointer}.flowToggles{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:5px 0}.flowToggles button{padding:4px 9px;font-size:10px;color:#8397ac;background:rgba(31,48,70,.32)}.flowToggles button[aria-pressed=true]{color:#d9f1ff;border-color:rgba(104,206,255,.55);background:rgba(32,84,121,.3)}.flowToggles #particlesToggle[aria-pressed=true],.flowToggles #trailsToggle[aria-pressed=true]{color:#ffea9b;border-color:rgba(237,204,103,.42)}.particleMetric{display:flex;justify-content:space-between;font-size:10px;color:#aac0d8;margin-top:10px}.particleMetric b{font-weight:600;color:#ffe386}#flowStatus{font-size:9px;margin-top:4px}
+ .btnrow{display:flex;gap:8px;margin-top:12px}.btnrow button{flex:1;font-size:12px}.status{margin-top:8px;min-height:34px;font-size:11px;line-height:1.5;color:#b9cce5}
+ #progressTrack{height:5px;border-radius:999px;background:rgba(90,130,180,.18);overflow:hidden;margin-top:10px}#progressBar{height:100%;width:0;background:linear-gradient(90deg,#3ec6ff,#d65cff)}
+ .row{display:flex;align-items:center;gap:7px;margin:10px 0;font-size:11px;color:#b9cce5}.row label{flex:0 0 69px}.row input[type=range]{flex:1;min-width:0;accent-color:#258fff}.val{flex:0 0 42px;text-align:right;color:#fff;font-variant-numeric:tabular-nums}.row button{padding:5px 8px;font-size:10px}.row span:nth-of-type(2){margin-left:auto}
+-#stage{min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px}#waveHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;flex-shrink:0}
++#stage{min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px}#waveHeader{display:grid;grid-template-columns:minmax(160px,.8fr) minmax(0,1.2fr);align-items:center;gap:5px 14px;width:100%;flex-shrink:0}
+ .eyebrow{font-size:9px;letter-spacing:1.4px;color:#7c9dbc}h1{margin:5px 0 0;font-size:clamp(14px,1.55vw,23px);font-weight:550;letter-spacing:-.4px;color:#e6f3ff}.targetBadge{padding:8px 11px;border:1px solid rgba(255,78,99,.48);border-radius:8px;background:rgba(109,20,38,.25);text-align:right;white-space:nowrap}.targetBadge span{display:block;font-size:10px;font-weight:750;color:#ffb4c2}.targetBadge b{font-size:18px;line-height:1.4;color:#ffe4e7;font-variant-numeric:tabular-nums}
+-#waveArea{position:relative;flex-shrink:0;box-shadow:0 0 40px rgba(37,136,213,.10);border:1px solid rgba(93,215,240,.35)}#c{width:100%;height:100%;display:block;cursor:crosshair}#waveArea.busy #c{cursor:default}
++#waveArea{position:relative;flex-shrink:0;box-shadow:0 0 40px rgba(37,136,213,.10);border:1px solid rgba(93,215,240,.35)}#c{width:100%;height:100%;display:block;cursor:default}#waveArea.selecting #c{cursor:crosshair}#waveArea.busy #c{cursor:default}
+ #waveLabels{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--grid-side,4),1fr);grid-template-rows:repeat(var(--grid-side,4),1fr);pointer-events:none}.waveCell{position:relative;padding:8px;font-size:clamp(9px,.85vw,12px);font-weight:650;text-shadow:0 1px 4px #000,0 0 4px #000;color:#d4e7f1}.waveCell b{position:absolute;bottom:7px;right:8px;font-size:11px;font-variant-numeric:tabular-nums;font-weight:550;color:#c6dce8}.waveCell.marked{color:#ffd0d7}.waveCell.marked b{color:#ffe9b4}
+ #waveFooter{width:100%;flex-shrink:0;min-height:76px;text-align:center;font-size:11px;color:#8aa9c6;line-height:1.55}#waveFooter p{margin:0 0 8px;color:#c4d7ec;font-size:12px}#waveFooter>span{font-size:10px;color:#637e99}
+ #loading,#error{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center;background:#061124;color:#b5d9ef;font-size:13px}#error{color:#ffc0c9}
+@@ -33,6 +30,23 @@
+ .phaseLegend{display:flex;align-items:center;gap:14px;margin:12px 0}.phaseWheel{position:relative;flex:0 0 76px;height:76px;border-radius:50%;background:conic-gradient(from 90deg,#ff0000,#80ff00,#00ffff,#8000ff,#ff0000);border:1px solid rgba(220,240,255,.35)}.phaseWheel:after{content:'';position:absolute;inset:23px;border-radius:50%;background:rgba(5,16,36,.94)}.phaseLabels{font-size:10px;line-height:1.6;color:#c8d9ef}.phaseLabels b{color:#fff}.theory{color:#abc1da;font-size:11px;line-height:1.55;margin:14px 0 35px}.theory summary{color:#cce9ff;cursor:pointer}.theory p{margin:10px 0}.math{padding:8px 10px;border:1px solid rgba(132,192,255,.18);border-radius:8px;background:rgba(8,23,51,.54);color:#eef7ff;font-family:"Cambria Math","Times New Roman",serif;font-size:15px}
+ @media(min-width:1600px){#wrap{grid-template-columns:320px minmax(0,1fr) 380px;gap:20px}}
+ @media(max-width:1100px){html,body{overflow:auto}#wrap{height:auto;min-height:100%;grid-template-columns:270px minmax(0,1fr);grid-template-rows:minmax(680px,calc(100vh - 24px)) auto}#rightColumn{grid-column:1/-1;display:grid;grid-template-columns:300px minmax(0,1fr);align-items:start}#info{max-height:720px}.groverGeometry svg{max-width:360px}}
+-@media(max-width:650px){#wrap{display:flex;flex-direction:column;padding:9px}#ui{max-height:none}#stage{height:calc(100vw + 110px);min-height:380px}#rightColumn{display:flex}#goalGrid button{padding:8px}#info{max-height:none}.waveCell{padding:5px}.waveCell b{font-size:9px;bottom:5px;right:5px}#waveHeader h1{font-size:17px}}
++@media(max-width:650px){#wrap{display:flex;flex-direction:column;padding:9px}#ui{max-height:none}#stage{height:calc(100vw + 110px);min-height:380px}#rightColumn{display:flex}#info{max-height:none}.waveCell{padding:5px}.waveCell b{font-size:9px;bottom:5px;right:5px}#waveHeader h1{font-size:17px}}
++
++.stateBadges{display:flex;gap:7px;align-items:stretch;flex-shrink:0}.initialBadge{display:flex;align-items:center;padding:8px;border:1px solid rgba(72,237,124,.5);border-radius:8px;background:rgba(16,78,42,.25);color:#a3ffc1;font-size:10px;font-weight:750;white-space:nowrap}
++.waveCell .initialTag,.waveCell .goalTag{display:block;width:max-content;margin-top:3px;font-size:9px;line-height:1.3;font-weight:750;letter-spacing:.04em}.waveCell .initialTag{color:#91ffb0}.waveCell .goalTag{color:#ffadbb}.waveCell .initialTag:empty,.waveCell .goalTag:empty{display:none}
++@media(max-width:650px){.stateBadges{flex-direction:column;gap:4px}.initialBadge{padding:4px 5px;font-size:9px}}
++
++/* The guide shares the title margin instead of reserving a row above the wave. */
++.waveHeading{grid-column:1;grid-row:1;min-width:0}#waveHeader .eyebrow{font-size:8px;letter-spacing:.7px}#waveHeader h1{margin-top:3px}
++#waveHeader .stateBadges{grid-column:1;grid-row:2;flex-wrap:wrap;gap:4px;flex-direction:row}#waveHeader .initialBadge,#waveHeader .targetBadge{padding:3px 5px;font-size:9px}
++#waveHeader .targetBadge{display:flex;align-items:center;gap:5px;text-align:left}#waveHeader .targetBadge span{font-size:9px}#waveHeader .targetBadge b{font-size:11px;line-height:1.2}
++#selectionGuide{grid-column:2;grid-row:1 / span 2;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 8px}
++.selectionMessage{display:contents}#selectionTitle{grid-column:1;grid-row:1;font-size:12px;color:#a3ffc1}#selectionHint{grid-column:1 / -1;grid-row:2;margin:0;font-size:11px;line-height:1.4;color:#a8bfd5}
++#selectionGuide[data-step=goal] #selectionTitle{color:#ffb4c2}#selectionGuide[data-step=ready] #selectionTitle{color:#d9e6f8}
++.selectionActions{grid-column:2;grid-row:1;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px}.selectionActions button{font-size:10px;padding:5px 7px}#selectionNext{border-color:rgba(104,206,255,.55)}
++.flowToggles #markersToggle[aria-pressed=true]{color:#b9ffd0;border-color:rgba(72,237,124,.45)}
++@media(max-width:650px){#waveHeader{grid-template-columns:minmax(125px,.8fr) minmax(0,1.2fr);gap:5px 9px}#selectionGuide{grid-template-columns:1fr}#selectionTitle{grid-column:1;grid-row:1}#selectionHint{grid-column:1;grid-row:2;font-size:10px}.selectionActions{grid-column:1;grid-row:3;justify-content:flex-start}}
++
++@media(max-width:650px){#stage{height:calc(100vw + 250px)}}
+ 
+ #particleCountValue{flex-basis:56px}
 diff --git a/spin/index.html b/spin/index.html
-index 2b42d6d..c1673c2 100644
 --- a/spin/index.html
 +++ b/spin/index.html
 @@ -5,7 +5,7 @@
@@ -362,7 +703,6 @@ index 2b42d6d..c1673c2 100644
  </body>
  </html>
 diff --git a/spin/main.js b/spin/main.js
-index fad9aaa..8d11b11 100644
 --- a/spin/main.js
 +++ b/spin/main.js
 @@ -1,29 +1,25 @@
@@ -403,7 +743,7 @@ index fad9aaa..8d11b11 100644
  const canvas = dom.c;
  let gl, waveTexture, waveFbo, vao, reconstruction, renderer, flow, ready = false;
  let waveDirty = true, renderDirty = true, frameRecordingActive = false, lastTime = null, glError = 0;
-@@ -97,24 +93,10 @@ function reset() { simulation.reset(); selectionStep = 'initial'; flow?.reset(pa
+@@ -97,24 +93,10 @@
  function startNext() { if (simulation.startNext()) { selectionStep = 'ready'; markChanged(); syncUi(); layout(); return true; } return false; }
  function runFull() { if (simulation.runFull()) { selectionStep = 'ready'; flow?.reset(params.particleCount,simulation.model.side,simulation.initial); markChanged(); syncUi(); layout(); return true; } return false; }
  function togglePause() { simulation.paused = !simulation.paused; lastUiKey = ''; syncUi(); }
@@ -431,7 +771,7 @@ index fad9aaa..8d11b11 100644
    reset(); return true;
  }
  
-@@ -179,7 +161,6 @@ function syncUi() {
+@@ -179,7 +161,6 @@
    dom.next.disabled = busy || complete;
    dom.full.disabled = busy;
    dom.pause.textContent = simulation.paused ? 'Resume' : 'Pause';
@@ -439,7 +779,7 @@ index fad9aaa..8d11b11 100644
    dom.progressBar.style.width = `${100 * progress}%`;
    const round = iteration ? `Round ${iteration}/${ITERATIONS} · ` : '';
    const status = complete ? 'Complete · '+ITERATIONS+' Grover iterations' : busy
-@@ -216,9 +197,6 @@ function syncUi() {
+@@ -216,9 +197,6 @@
      forward: 'Free evolution plus the forward spin rotation completes the reflection. Unmarked contributions cancel and the marked mode grows.',
    };
    dom.gateDescription.textContent = complete ? (100*expectedProbability(ITERATIONS,side)).toFixed(3)+'% in the marked position–spin state after '+ITERATIONS+' iterations.' : descriptions[kind];
@@ -449,7 +789,7 @@ index fad9aaa..8d11b11 100644
    document.documentElement.dataset.stage = String(simulation.completed);
    document.documentElement.dataset.gate = kind;
    document.documentElement.dataset.progress = String(progress);
-@@ -228,7 +206,7 @@ function syncUi() {
+@@ -228,7 +206,7 @@
      const stats = flow.statistics(target, progress, !busy || simulation.paused);
      dom.particleProbability.textContent = formatProbability(stats.boxProbability);
      const model = ['input','prepare','inverse','forward'].includes(kind) ? 'Pauli flow · full spin current' : 'spin current + conserved gate transport';
@@ -458,7 +798,7 @@ index fad9aaa..8d11b11 100644
      document.documentElement.dataset.particleFailures = String(stats.failures);
      document.documentElement.dataset.particleLag = String(stats.maxLag);
    }
-@@ -236,7 +214,6 @@ function syncUi() {
+@@ -236,7 +214,6 @@
  }
  
  function installEvents() {
@@ -466,7 +806,7 @@ index fad9aaa..8d11b11 100644
    dom.selectionBack.addEventListener('click', () => setSelectionStep('initial'));
    dom.selectionNext.addEventListener('click', () => setSelectionStep({ initial: 'goal', goal: 'ready', ready: 'initial' }[selectionStep]));
    dom.markersToggle.addEventListener('click', () => {
-@@ -248,7 +225,6 @@ function installEvents() {
+@@ -248,7 +225,6 @@
    dom.next.addEventListener('click', startNext); dom.full.addEventListener('click', runFull);
    dom.reset.addEventListener('click', reset); dom.pause.addEventListener('click', togglePause);
    dom.speed.addEventListener('input', () => { params.speed = Number(dom.speed.value); dom.speedValue.textContent = `${params.speed.toFixed(2)}×`; });
@@ -474,7 +814,7 @@ index fad9aaa..8d11b11 100644
    dom.gridToggle.addEventListener('click', () => {
      params.showGrid = !params.showGrid; dom.gridToggle.textContent = params.showGrid ? 'ON' : 'OFF';
      dom.gridToggle.setAttribute('aria-pressed', String(params.showGrid));
-@@ -261,27 +237,13 @@ function installEvents() {
+@@ -261,27 +237,13 @@
        renderDirty = true;
      });
    }
@@ -503,7 +843,7 @@ index fad9aaa..8d11b11 100644
    dom.minui.addEventListener('click', () => {
      dom.uibody.hidden = !dom.uibody.hidden; dom.minui.textContent = dom.uibody.hidden ? '+' : '−';
      dom.minui.setAttribute('aria-expanded', String(!dom.uibody.hidden));
-@@ -385,6 +347,7 @@ function advance(seconds) {
+@@ -385,6 +347,7 @@
  // reproducible browser verification page. Reads expose the actual GPU texture.
  const api = {
    isReady: () => ready,
@@ -512,7 +852,6 @@ index fad9aaa..8d11b11 100644
    reset, setTarget: chooseTarget, selectCell: chooseCell, startNext, runFull, togglePause,
    setInitial: chooseInitial, selectInitialCell: chooseInitialCell,
 diff --git a/wave-hadamard/index.html b/wave-hadamard/index.html
-index 00dfc35..51753ba 100644
 --- a/wave-hadamard/index.html
 +++ b/wave-hadamard/index.html
 @@ -5,7 +5,7 @@
@@ -615,7 +954,6 @@ index 00dfc35..51753ba 100644
  </body>
  </html>
 diff --git a/wave-hadamard/main.js b/wave-hadamard/main.js
-index 605684f..2483d77 100644
 --- a/wave-hadamard/main.js
 +++ b/wave-hadamard/main.js
 @@ -1,28 +1,23 @@
@@ -654,7 +992,7 @@ index 605684f..2483d77 100644
  const canvas = dom.c;
  let gl, waveTexture, waveFbo, vao, reconstruction, renderer, flow, ready = false;
  let waveDirty = true, renderDirty = true, frameRecordingActive = false, lastTime = null, glError = 0;
-@@ -85,24 +80,10 @@ function reset() { simulation.reset(); selectionStep = 'initial'; flow?.reset(pa
+@@ -85,24 +80,10 @@
  function startNext() { if (simulation.startNext()) { selectionStep = 'ready'; markChanged(); syncUi(); layout(); return true; } return false; }
  function runFull() { if (simulation.runFull()) { selectionStep = 'ready'; flow?.reset(params.particleCount,simulation.initial,simulation.model.side); markChanged(); syncUi(); layout(); return true; } return false; }
  function togglePause() { simulation.paused = !simulation.paused; lastUiKey = ''; syncUi(); }
@@ -682,7 +1020,7 @@ index 605684f..2483d77 100644
    reset(); return true;
  }
  
-@@ -157,7 +138,6 @@ function syncUi() {
+@@ -157,7 +138,6 @@
    dom.next.disabled = busy || complete;
    dom.full.disabled = busy;
    dom.pause.textContent = simulation.paused ? 'Resume' : 'Pause';
@@ -690,7 +1028,7 @@ index 605684f..2483d77 100644
    dom.progressBar.style.width = `${100 * progress}%`;
    const round = iteration ? `Round ${iteration}/${ITERATIONS} · ` : '';
    const status = complete ? 'Complete · ' + ITERATIONS + ' Grover iterations' : busy
-@@ -194,9 +174,6 @@ function syncUi() {
+@@ -194,9 +174,6 @@
      forward: 'The forward mixer completes the reflection. Unmarked contributions cancel and the marked mode grows.',
    };
    dom.gateDescription.textContent = complete ? (100*expectedProbability(ITERATIONS,side)).toFixed(3)+'% marked-mode probability after '+ITERATIONS+' iterations.' : descriptions[kind];
@@ -700,7 +1038,7 @@ index 605684f..2483d77 100644
    document.documentElement.dataset.stage = String(simulation.completed);
    document.documentElement.dataset.gate = kind;
    document.documentElement.dataset.progress = String(progress);
-@@ -205,7 +182,7 @@ function syncUi() {
+@@ -205,7 +182,7 @@
    if (flow) {
      const stats = flow.statistics(target, progress, !busy || simulation.paused);
      dom.particleProbability.textContent = formatProbability(stats.boxProbability);
@@ -709,7 +1047,7 @@ index 605684f..2483d77 100644
      document.documentElement.dataset.particleFailures = String(stats.failures);
      document.documentElement.dataset.particleLag = String(stats.maxLag);
    }
-@@ -213,7 +190,6 @@ function syncUi() {
+@@ -213,7 +190,6 @@
  }
  
  function installEvents() {
@@ -717,7 +1055,7 @@ index 605684f..2483d77 100644
    dom.gridSize.addEventListener('input', () => setGridSize(dom.gridSize.value));
    dom.selectionBack.addEventListener('click', () => setSelectionStep('initial'));
    dom.selectionNext.addEventListener('click', () => setSelectionStep({ initial: 'goal', goal: 'ready', ready: 'initial' }[selectionStep]));
-@@ -225,12 +201,11 @@ function installEvents() {
+@@ -225,12 +201,11 @@
    dom.next.addEventListener('click', startNext); dom.full.addEventListener('click', runFull);
    dom.reset.addEventListener('click', reset); dom.pause.addEventListener('click', togglePause);
    dom.speed.addEventListener('input', () => { params.speed = Number(dom.speed.value); dom.speedValue.textContent = `${params.speed.toFixed(2)}×`; });
@@ -731,7 +1069,7 @@ index 605684f..2483d77 100644
      renderDirty = true;
    });
    dom.gridToggle.addEventListener('click', () => {
-@@ -245,20 +220,6 @@ function installEvents() {
+@@ -245,20 +220,6 @@
        renderDirty = true;
      });
    }
@@ -752,7 +1090,7 @@ index 605684f..2483d77 100644
    dom.minui.addEventListener('click', () => {
      dom.uibody.hidden = !dom.uibody.hidden; dom.minui.textContent = dom.uibody.hidden ? '+' : '−';
      dom.minui.setAttribute('aria-expanded', String(!dom.uibody.hidden));
-@@ -366,6 +327,7 @@ function advance(seconds) {
+@@ -366,6 +327,7 @@
  // reproducible browser verification page. Reads expose the actual GPU texture.
  const api = {
    isReady: () => ready,

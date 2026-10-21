@@ -23,7 +23,7 @@ let selectedDemo;
 function loadDemo(key) {
   if (!demos[key] || key === selectedDemo) return;
   selectedDemo = key;
-  const data = demos[key], src = new URL(`demos/${key}/index.html?v=20261021-flow`, import.meta.url).href;
+  const data = demos[key], src = new URL(`demos/${key}/index.html?v=20261021-guided`, import.meta.url).href;
   const iframe = document.createElement('iframe');
   iframe.src = src;
   iframe.title = `${data.title} — full interactive Grover simulation`;

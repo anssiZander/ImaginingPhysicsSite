@@ -64,12 +64,19 @@ require a server; opening the HTML with a `file:` URL is insufficient.
 SHA-256 of every copied file. Copies include their source license and keep their
 original source hashes. `demos/copy-edits.json` records the color-name changes.
 `demos/presentation.patch` records the homepage changes to the three wave viewers'
-HTML and entry scripts. `demos/presentation.json` records their published hashes.
+HTML and entry scripts, plus the free-box stylesheet and marker display shader.
+`demos/presentation.json` records their published hashes and the branch UI reference.
 The snapshot script applies the color edits and then the presentation patch;
 the integrity test checks the published overrides explicitly and compares all
 other files to the original source hashes. Scientific cores, current solvers,
-and rendering shaders are unchanged; branches are not mixed. The source
-repository is not modified.
+and wave reconstruction are unchanged. The source repository is not modified.
+
+The compact wave UI follows `MultiRegion` at `7d4464e` in the original project:
+choose the initial packet and goal on the main wave, with a guide beside the
+title and Next/Run controls in the sidebar. The free-box model adopts that UI
+while retaining its own free propagator, revival waits and current solver.
+Its green/red marker shader supports the chosen initial packet and hiding both
+markers. The controlled and spin viewers already use this guided layout.
 
 The wave viewers use 25,000 numerical tracers, 1.5px dots, a 0.1-second trail
 half-life, brightness 0.8, a 16×16 arrow grid, and arrow gain 1.5. Appearance

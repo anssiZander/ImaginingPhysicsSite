@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Grover Search 2D — 16 Regions · Free Mixing</title>
   <link rel="icon" href="data:,"/>
-  <link rel="stylesheet" href="./styles.css?v=20261021-flow"/>
+  <link rel="stylesheet" href="./styles.css?v=20261021-guided"/>
 </head>
 <body>
 <div id="wrap">
@@ -15,18 +15,10 @@
       <div class="section">Search space</div>
       <div class="row"><label for="gridSize">Grid size</label><input id="gridSize" type="range" min="2" max="5" step="1" value="4" aria-describedby="gridSummary"/><span id="gridSizeValue" class="val">4×4</span></div>
       <p id="gridSummary" class="note">16 spatial states. Changing size resets the search.</p>
-      <div class="section">Choose the goal box</div>
-      <div id="goalGrid" role="group" aria-label="Select one of 16 marked modes in the same layout as the wave"></div>
-      <p id="targetSummary" class="note"></p>
       <div class="section">Gates</div>
       <div class="ops">
-        <button id="prepare">Prepare balanced state</button>
-        <button id="oracle">Oracle · |1111⟩</button>
-        <button id="inverse">A† · forward wait 7T</button>
-        <button id="reference">Reference phase |0000⟩</button>
-        <button id="forward">Forward mixer A</button>
         <button id="next">Apply next operation</button>
-        <button id="full" class="full">Run full search · 3 iterations</button>
+        <button id="full" class="full">Run full search</button>
       </div>
       <div id="progressTrack"><div id="progressBar"></div></div>
       <div id="stageStatus" class="status" role="status"></div>
@@ -39,9 +31,14 @@
   </aside>
 
   <main id="stage">
-    <header id="waveHeader"><div><span id="stateCountLabel" class="eyebrow">FREE BOX EVOLUTION · 16 LOGICAL MODES</span><h1>Amplitude amplification</h1></div><div class="targetBadge"><span id="waveTarget">MARKED |1111⟩</span><b id="waveProbability">0.0%</b></div></header>
+    <header id="waveHeader"><div class="waveHeading"><span id="stateCountLabel" class="eyebrow">FREE BOX EVOLUTION · 16 LOGICAL MODES</span><h1>Grover in a box</h1></div><div class="stateBadges"><div class="initialBadge"><span id="waveInitial">INITIAL |0000⟩</span></div><div class="targetBadge"><span id="waveTarget">MARKED |1111⟩</span><b id="waveProbability">0.0%</b></div></div>
+    <div id="selectionGuide" data-step="initial">
+      <div class="selectionMessage" role="status" aria-live="polite"><strong id="selectionTitle">1 · Initial state (green)</strong><p id="selectionHint">Click an initial square, then choose the goal. Or run with the current choices.</p></div>
+      <div class="selectionActions"><button id="selectionBack" type="button" hidden>Back: initial</button><button id="selectionNext" type="button">Next: choose goal</button></div>
+    </div>
+    </header>
     <div id="waveArea"><canvas id="c" aria-label="Continuous two-dimensional probability wave with 16 outcome regions"></canvas><div id="waveLabels" aria-hidden="true"></div><div id="loading">Preparing the wave…</div><div id="error" role="alert" hidden></div></div>
-    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Probability flow overlays"><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span>Hue = phase · arrows = probability current · tracers show probability flow</span></footer>
+    <footer id="waveFooter"><p id="gateDescription"></p><div class="flowToggles" role="group" aria-label="Wave and probability flow overlays"><button id="markersToggle" aria-pressed="true" title="Show or hide the green initial and red goal markers">Initial / goal markers</button><button id="currentToggle" aria-pressed="true">Current arrows</button><button id="particlesToggle" aria-pressed="true">Tracers</button><button id="trailsToggle" aria-pressed="true">Trails</button></div><span id="waveLegend">Hue = phase · brightness = density · tracers show probability flow</span></footer>
   </main>
 
   <aside id="rightColumn">
@@ -71,12 +68,12 @@
       <div class="particleMetric">Tracers inside goal box <b id="particleProbability">—</b></div>
       <div id="flowStatus" class="note">Conserved probability flow</div>
 
-      <div class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
-      <details class="theory"><summary>About the wave and gates</summary><p>Choose N = 2, 3, 4 or 5. The box and mass stay fixed: T = T<sub>rev</sub>/(2N), and the inverse is a positive-time wait of (2N−1)T. There is one scalar wave and no spin channel.</p><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so logical-mode probability differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. The input is the lower-left packet |0,0⟩ (|0000⟩ at 4×4).</p><div class="math">ℋ = −ℏ²∇²/(2m)<br>A = U(T), &nbsp; A† = U((2N−1)T), &nbsp; U(2NT) = I</div><p>Preparation and forward mixing wait for T = πℏ/(NE₁). The inverse waits forward for (2N−1)T under the same positive kinetic Hamiltonian. The fixed revival time is 19.2 gate-time seconds. At the default 4×4 size, T is 2.4 and 7T is 16.8. Both axes evolve simultaneously.</p><p>Preparation gives equal probabilities with definite relative phases. Oracle and reference pulses remain ideal mode-projector phase operations. The first optimal peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively.</p><div class="math">Free mixing: j = (ℏ/m) Im(ψ*∇ψ)<br>Phase pulses: j = ∇χ, &nbsp; ∇²χ = −∂ρ/∂t<br>Tracer transport: v = j / ρ</div><p>During free evolution the arrows show the Schrödinger probability current. During the ideal nonlocal phase pulses they show the chosen conserved curl-free current. Yellow tracers move with v = j / ρ to visualize the evolving density. They are visualization samples, and adding more tracers changes only the sampling detail. Every stage has zero normal flux at the outer walls.</p><p>Compare tracer fractions with “Inside goal box.” Arrow lengths show current strength on a compressed scale. Pause and manual gate checkpoints hold the wave, current, tracers, and trails still for inspection.</p></details>
+      <div id="phaseLegendPanel" class="phaseLegend" aria-label="Phase color legend"><div class="phaseWheel" role="img" aria-label="Rainbow phase wheel"></div><div class="phaseLabels"><b>Phase hue</b><br>red: 0<br>yellow-green: +π/2<br>cyan: ±π<br>violet-blue: −π/2</div></div>
+      <details class="theory"><summary>About the wave and gates</summary><p>Choose N = 2, 3, 4 or 5. The box and mass stay fixed: T = T<sub>rev</sub>/(2N), and the inverse is a positive-time wait of (2N−1)T. There is one scalar wave and no spin channel.</p><p>Each box labels an orthogonal logical mode built from N sine eigenmodes along each axis, with N selectable from 2 to 5. Packets overlap, so logical-mode probability differs from probability inside its geometrical box.</p><p>Labels use binary position registers for 2×2 and 4×4, and |x,y⟩ for 3×3 and 5×5. Columns increase left to right; rows increase bottom to top. Select the initial packet and goal directly on the wave using the guide beside the title. The default input is the lower-left packet |0,0⟩ (|0000⟩ at 4×4). The reference pulse acts on the selected input.</p><div class="math">ℋ = −ℏ²∇²/(2m)<br>A = U(T), &nbsp; A† = U((2N−1)T), &nbsp; U(2NT) = I</div><p>Preparation and forward mixing wait for T = πℏ/(NE₁). The inverse waits forward for (2N−1)T under the same positive kinetic Hamiltonian. The fixed revival time is 19.2 gate-time seconds. At the default 4×4 size, T is 2.4 and 7T is 16.8. Both axes evolve simultaneously.</p><p>Preparation gives equal probabilities with definite relative phases. Oracle and reference pulses remain ideal mode-projector phase operations. The first optimal peak takes 1, 2, 3 or 3 iterations for 2×2, 3×3, 4×4 or 5×5 respectively.</p><div class="math">Free mixing: j = (ℏ/m) Im(ψ*∇ψ)<br>Phase pulses: j = ∇χ, &nbsp; ∇²χ = −∂ρ/∂t<br>Tracer transport: v = j / ρ</div><p>During free evolution the arrows show the Schrödinger probability current. During the ideal nonlocal phase pulses they show the chosen conserved curl-free current. Yellow tracers move with v = j / ρ to visualize the evolving density. They are visualization samples, and adding more tracers changes only the sampling detail. Every stage has zero normal flux at the outer walls.</p><p>Compare tracer fractions with “Inside goal box.” Arrow lengths show current strength on a compressed scale. Pause and manual gate checkpoints hold the wave, current, tracers, and trails still for inspection.</p></details>
     </section>
   </aside>
 </div>
 <script src="./recording.js?v=20261014-particles"></script>
-<script type="module" src="./main.js?v=20261021-flow"></script>
+<script type="module" src="./main.js?v=20261021-guided"></script>
 </body>
 </html>

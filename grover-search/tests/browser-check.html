@@ -231,6 +231,8 @@ try {
       check(api.particleStats().count===25000,`${key}: actual GPU tracer count is 25,000`);
       check(view.particleSize===1.5&&view.trailHalfLife===.1,`${key}: minimum dot size and trail duration`);
       check(!d.querySelector('#groverGeometry'),`${key}: Bloch sphere removed from viewer`);
+      check(!d.querySelector('#goalGrid,#prepare,#oracle,#inverse,#reference,#forward'),`${key}: compact branch controls replace the old sidebar grid and gate buttons`);
+      check(d.querySelector('#selectionGuide')&&d.querySelector('#selectionNext'),`${key}: initial and goal selection is guided on the wave`);
       check(!d.querySelector('#brightness,#particleCount,#particleSize,#trailHalfLife,#arrowGrid,#currentGain'),`${key}: appearance sliders removed`);
       check([...d.querySelectorAll('input[type=range]')].every(e=>['speed','gridSize'].includes(e.id)),`${key}: only search size and playback sliders remain`);
       check(!/bohm|guidance/i.test(d.body.textContent),`${key}: viewer describes probability flow`);
@@ -248,6 +250,35 @@ try {
     check(new URL($('demo-fullscreen').href).pathname===`/grover-search/demos/${key}/index.html`,`${key}: full-page link matches`);
     check(f.contentDocument.documentElement.dataset.webgl2!=='error',`${key}: no WebGL2 error`);
     check(!/\bgold(?:en)?\b/i.test(f.contentDocument.body.textContent),`${key}: display copy uses yellow`);
+    if(key!=='ordinary') {
+      const d=f.contentDocument;
+      api.reset();
+      const chooseCell=(x,y)=>{
+        const canvas=d.querySelector('#c'),r=canvas.getBoundingClientRect(),side=api.state().side;
+        canvas.dispatchEvent(new f.contentWindow.MouseEvent('click',{bubbles:true,clientX:r.left+(x+.5)*r.width/side,clientY:r.bottom-(y+.5)*r.height/side}));
+      };
+      const factor=key==='spin'?2:1;
+      chooseCell(1,2);
+      check(api.state().initial===6*factor,`${key}: canvas click selects the initial packet`);
+      d.querySelector('#selectionNext').click();chooseCell(2,1);
+      check(api.state().target===9*factor,`${key}: canvas click selects the goal packet`);
+      d.querySelector('#selectionNext').click();
+      check(d.querySelector('#selectionGuide').dataset.step==='ready',`${key}: selection guide completes`);
+      const before=Array.from(api.state().amplitudes);
+      d.querySelector('#markersToggle').click();
+      check(!api.viewerSettings().showMarkers&&Array.from(api.state().amplitudes).every((v,i)=>v===before[i]),`${key}: hiding the selection markers preserves the wave`);
+      d.querySelector('#markersToggle').click();
+      d.querySelector('#next').click();
+      check(d.querySelector('#selectionNext').disabled,`${key}: selections lock while a gate runs`);
+      api.advanceTime(5);
+      check(api.state().probabilities.every(p=>near(p,probability)),`${key}: displaced initial packet prepares balanced logical probabilities`);
+      check(api.particleStats().count===25000&&api.gpuInfo().error===0,`${key}: selected-input preparation preserves the tracer preset without GPU errors`);
+      frame.style.width='390px';
+      await new Promise(r=>setTimeout(r,150));
+      const guide=d.querySelector('#selectionGuide').getBoundingClientRect();
+      check(d.documentElement.scrollWidth<=f.contentWindow.innerWidth&&guide.right<=f.contentWindow.innerWidth,`${key}: guided viewer fits a phone viewport`);
+      frame.style.width='100%';
+    }
   }
   frame.style.width='390px';
   $('encoding').scrollIntoView({block:'start'});
