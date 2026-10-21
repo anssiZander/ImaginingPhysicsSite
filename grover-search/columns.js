@@ -99,4 +99,3 @@ function frame(time) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-
