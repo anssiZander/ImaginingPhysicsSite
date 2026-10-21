@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1019">
+  <meta name="description" content="Kepler orbits as rays of an action field. Explore inverse-square gravity, folding fronts, and multiple classical routes.">
+  <title>Orbits as Wave — Variational</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1019'/%3E%3Cellipse cx='32' cy='32' rx='25' ry='15' transform='rotate(-30 32 32)' fill='none' stroke='%235ae0d3' stroke-width='3'/%3E%3Ccircle cx='23' cy='37' r='5' fill='%23ffc779'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./action-wave.css">
+  <link rel="stylesheet" href="./orbit-wave.css">
+  <script type="module" src="./js/orbit-wave-scene.js"></script>
+</head>
+<body class="wave-page orbit-page">
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Variational home">
+      <svg viewBox="0 0 38 30" aria-hidden="true"><path d="M3 6Q12 42 35 7"/><circle cx="3" cy="6" r="2.5"/><circle cx="35" cy="7" r="2.5"/></svg>
+      <span>Variational<small>A CURVE LABORATORY</small></span>
+    </a>
+    <nav class="modes" aria-label="Choose a variational problem">
+      <a href="./index.html?scene=length"><span>01</span> Straight line</a>
+      <a href="./index.html?scene=catenary"><span>02</span> Catenary</a>
+      <a href="./index.html?scene=brachistochrone"><span>03</span> Brachistochrone</a>
+      <a href="./index.html?scene=dynamics"><span>04</span> Dynamics</a>
+      <a href="./action-wave.html"><span>05</span> Action as Wave</a>
+      <a href="./orbit-wave.html" aria-current="page"><span>06</span> Orbits as Wave</a>
+    </nav>
+    <button class="text-button math-button" id="math-open"><span aria-hidden="true">∫</span> The mathematics</button>
+  </header>
+  <main class="wave-workspace">
+    <section class="wave-field" aria-label="Orbital action fronts and rays">
+      <div class="wave-stage">
+        <canvas id="wave-canvas" tabindex="0" role="application" aria-label="Orbital action fronts. Left-click or drag to move B. Middle mouse drag pans. Wheel or plus and minus keys zoom. Arrow keys move B; Shift gives larger steps." aria-describedby="wave-help"></canvas>
+        <div class="wave-key" aria-label="Plot legend">
+          <span class="short-key"><i></i>Before caustic</span>
+          <span class="long-key" id="long-key"><i></i>After caustic</span>
+          <span class="caustic-key"><i></i>Caustic</span>
+        </div>
+        <div class="wave-view-controls"><span>Middle drag to pan · Wheel to zoom</span><output id="zoom-value">100%</output><button id="view-reset">Reset view</button></div>
+        <div id="front-sampling" class="front-sampling"></div>
+        <div class="wave-transport">
+          <button id="wave-play" aria-pressed="false">▶ Play</button>
+          <button id="wave-restart" title="Restart fronts and launched particles" aria-label="Restart fronts and launched particles">↺</button>
+          <label for="wave-time">Phase time</label>
+          <input id="wave-time" type="range" min="0" max="1" step="0.001" value="0" aria-label="Phase time">
+          <output id="wave-time-value">0.00 s</output><span class="slow-label">slow motion</span>
+        </div>
+      </div>
+    </section>
+    <aside class="wave-inspector" aria-label="Orbit controls">
+      <div class="wave-intro">
+        <span class="eyebrow">KEPLER → ACTION FRONTS</span>
+        <h1>Orbits as Wave</h1>
+        <p>One speed, every direction. Attraction bends the rays into ellipses.</p>
+        <div class="wave-equation"><math><mi mathvariant="bold">a</mi><mo>=</mo><mo>−</mo><mfrac><mi>μ</mi><msup><mi>r</mi><mn>2</mn></msup></mfrac><mover><mi mathvariant="bold">r</mi><mo>^</mo></mover><mspace width="1em"/><mi mathvariant="bold">p</mi><mo>=</mo><mo>∇</mo><mi>W</mi></math></div>
+      </div>
+      <div class="wave-settings">
+        <label class="wave-range" for="launch-speed"><span>Launch speed <output id="speed-value">1.80 m/s</output></span><input id="launch-speed" type="range" min="0.8" max="2.4" step="0.02" value="1.8"></label>
+        <div class="orbit-family"><span id="orbit-energy">Bound ellipses</span><output id="orbit-period"></output></div>
+        <label class="wave-range" for="front-spacing"><span>Action between fronts <output id="spacing-value">1.50 J·s</output></span><input id="front-spacing" type="range" min="0.5" max="3" step="0.1" value="1.5"></label>
+        <div><span class="setting-label">Action sheets</span><div class="wave-switch branch-switch" role="group" aria-label="Visible action sheets">
+          <button data-branch="before" aria-pressed="false">Before caustic</button><button data-branch="both" aria-pressed="true">Both</button><button data-branch="after" aria-pressed="false">After caustic</button>
+        </div></div>
+        <div class="wave-toggles"><label><input id="wave-fronts" type="checkbox" checked> Wave fronts</label><label><input id="ray-fan" type="checkbox" checked> Ray fan</label><label><input id="normals" type="checkbox" checked> Momentum arrows</label></div>
+        <div class="flight-controls"><button id="launch-fan">✦ Launch fan</button><output id="fan-time">One burst · 32 particles</output></div>
+      </div>
+      <section class="probe-panel" aria-label="Endpoint controls">
+        <div class="flight-controls"><button id="launch-particle">● Launch A → B</button><output id="flight-time"></output></div>
+        <div class="probe-actions"><button id="probe-caustic">Move B to caustic</button><button id="probe-reset">Reset B</button></div>
+      </section>
+      <div class="wave-notes">
+        <p id="wave-help">Drag B. Middle drag to pan; wheel to zoom. Play/Pause controls particles and waves together.</p>
+        <p>First circuit only. Paths can pass through the M marker. Cyan turns violet at the caustic.</p>
+        <p class="phase-note">Action fronts; brightness is not wave intensity.</p>
+      </div>
+    </aside>
+  </main>
+  <dialog id="math-dialog" aria-labelledby="math-title">
+    <div class="dialog-heading"><span class="eyebrow">INVERSE-SQUARE ATTRACTION</span><button id="math-close" aria-label="Close mathematics">×</button></div>
+    <h2 id="math-title">Elliptical rays. Folding action fronts.</h2>
+    <p>The attracting centre is O = (0, 0), the source is A = (−2.4, 0) m, the particle mass is 1 kg, and μ = GM = 8 m³/s². The acceleration has magnitude μ/r² and points inward. Fixing launch speed while varying direction produces a family of Kepler ellipses with one energy and one semimajor axis. The speed slider stays below escape speed, √(2μ/rₐ) ≈ 2.58 m/s.</p>
+    <h3>The action that supplies the fronts</h3>
+    <p>For each classical route, W = ∫p · dq is its abbreviated action measured from A. Each local sheet obeys |∇W|² = 2(E − V) and p = ∇W. The displayed curves have S = W − Et = kΔS at a common phase time. They cross trajectories at right angles. Particles cross the moving fronts and need not travel at their speed.</p>
+    <div class="equation"><math display="block"><mi>W</mi><mo>=</mo><msubsup><mo>∫</mo><mi>A</mi><mi>B</mi></msubsup><mi mathvariant="bold">p</mi><mo>·</mo><mi>d</mi><mi mathvariant="bold">q</mi><mspace width="1em"/><mi>S</mi><mo>=</mo><mi>W</mi><mo>−</mo><mi>E</mi><mi>t</mi></math></div>
+    <h3>The energy reference matters for moving phase lines</h3>
+    <p>We set V(r) = μ(1/rₐ − 1/r), so V(A) = 0 and E = v₀²/2 is positive. This additive constant leaves every force, orbit, momentum, and W unchanged. It makes the drawn phase levels advance along the rays. With the conventional zero at infinity, the same ellipses instead have negative energy ε = E − μ/rₐ, and levels of W − εt move the other way. Phase-line speed depends on this reference; the particle motion does not.</p>
+    <h3>Why more than two routes can arrive</h3>
+    <p>At fixed negative ε, every ellipse has a = −μ/(2ε). Two ellipses can join A to a generic B, and each can be traversed in either direction. That gives up to four arrival routes before a full circuit. Colors indicate whether each arriving ray has passed its caustic, rather than the identity of its ellipse. Both before-caustic routes can have cyan fronts at the same position with different momenta; likewise for violet. They remain separate action sheets.</p>
+    <p>The outer envelope is the ellipse |B| + |B − A| = 4a − |A|, with foci O and A. Routes merge there. All surviving trajectories return to A after T = 2π√(a³/μ), another focus where a unique action gradient does not exist. At A no arbitrary arrival arrow is assigned.</p>
+    <h3>One circuit and the central singularity</h3>
+    <p>This view shows only the first circuit. Further circuits repeat the geometry with added time T and added action 2π√(μa); there are infinitely many such later histories. M marks a point mass: its drawn disk is not a collision surface, so close orbits pass through it and continue. Only approaches within 10⁻⁶ m of the centre terminate, avoiding the singularity at r = 0. Elsewhere the force is exactly inverse square, with no softening or artificial precession.</p>
+    <h3>How the fronts are constructed</h3>
+    <p>Writing the position as a complex square z = u² and using dt = |u|² ds turns Kepler motion into u″ = (ε/2)u. We evaluate this oscillator analytically, including its physical time. Along it W = 2εt + 2μs. For each action level, we find the corresponding point on every launch direction and join neighboring points on each sheet. Folding fronts can overlap without being averaged into a single field. This is a classical phase construction: amplitudes, interference, diffraction, and Maslov phase corrections are not simulated.</p>
+    <p>Launch fan emits one set of 32 equal-speed particles. Launch A → B sends one dot along each visible route, with each dot waiting at B on arrival. Both use the same physical time as the flowing fronts. Play/Pause and Restart act on both sets; changing scenes or refreshing clears the experiment.</p>
+    <div class="lecture-links"><span>LECTURES &amp; BACKGROUND</span><a href="./lectures/01-calculus-of-variations.tex" download>01 — Calculus of Variations (.tex)</a><a href="./lectures/02-hamilton-action-wavefronts.tex" download>02 — Hamilton’s Principle, Wavefronts and Rays (.tex)</a><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6784690/" target="_blank" rel="noopener">Lambert’s theorem and projective dynamics</a><a href="https://archiv.ub.uni-heidelberg.de/volltextserver/7674/1/preto_thesis.pdf" target="_blank" rel="noopener">Levi-Civita regularization — Preto</a></div>
+  </dialog>
+</body>
+</html>

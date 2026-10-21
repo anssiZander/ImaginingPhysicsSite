@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1019">
+  <meta name="description" content="Grab a curve. Change an integral. Find the minimum. An interactive introduction to the calculus of variations.">
+  <title>Variational — a curve laboratory</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1019'/%3E%3Cpath d='M12 18Q24 62 52 20' fill='none' stroke='%235ae0d3' stroke-width='5'/%3E%3Ccircle cx='12' cy='18' r='4' fill='%23f3f5fb'/%3E%3Ccircle cx='52' cy='20' r='4' fill='%23f3f5fb'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Variational home">
+      <svg viewBox="0 0 38 30" aria-hidden="true"><path d="M3 6Q12 42 35 7"/><circle cx="3" cy="6" r="2.5"/><circle cx="35" cy="7" r="2.5"/></svg>
+      <span>Variational<small>A CURVE LABORATORY</small></span>
+    </a>
+    <nav class="modes" aria-label="Choose a variational problem">
+      <button data-mode="length" aria-pressed="false"><span>01</span> Straight line</button>
+      <button data-mode="catenary" aria-pressed="false"><span>02</span> Catenary</button>
+      <button data-mode="brachistochrone" aria-pressed="true"><span>03</span> Brachistochrone</button>
+      <button data-mode="dynamics" aria-pressed="false"><span>04</span> Dynamics</button>
+      <a href="./action-wave.html"><span>05</span> Action as Wave</a>
+      <a href="./orbit-wave.html"><span>06</span> Orbits as Wave</a>
+    </nav>
+    <button class="text-button math-button" id="math-open"><span aria-hidden="true">∫</span> The mathematics</button>
+  </header>
+
+  <main class="laboratory">
+    <div class="workspace">
+      <section class="world-pane" aria-labelledby="world-heading">
+        <div class="pane-heading"><h2 id="world-heading"><span class="section-number">01 /</span> The path</h2><span id="world-unit">metres · y ↓</span></div>
+        <div class="world-stage">
+          <canvas id="world" tabindex="0" role="application" aria-label="Editable curve. Drag vertically to deform it. Keyboard: left and right choose a point, up and down move it. Hold Shift for a larger movement." aria-describedby="curve-help"></canvas>
+          <div class="scene-caption" id="scene-caption"><span class="cursor-mark" aria-hidden="true">↕</span><span id="curve-help">Left-drag to shape. Right-drag to smooth.</span></div>
+          <div class="solution-badge" id="solution-badge" hidden>Exact solution shown</div>
+          <div class="actions" aria-label="Curve actions"><button class="secondary-button" id="new-curve"><span aria-hidden="true">↻</span> New curve</button><button class="primary-button" id="reveal">Reveal solution <span aria-hidden="true">↗</span></button></div>
+        </div>
+        <div class="world-controls">
+          <label class="brush-control" for="brush"><span>Reach</span><input id="brush" type="range" min="0.00375" max="0.28" step="0.00025" value="0.14" aria-label="Drag reach: slide left for fine details, right for broad changes" title="Left: finer details. Right: a broader pull."><span class="brush-size" id="brush-size">Broad</span></label>
+          <div class="control-options">
+            <span class="smoothing-hint" title="Hold the right mouse button and sweep along the curve. Repeated passes gradually soften bumps; Reach controls the neighborhood.">Right-drag to smooth</span>
+            <label class="guide-control" title="Neighbors follow more when you pull toward the solution, less when you pull away. The grabbed point keeps its full freedom."><input id="assist" type="checkbox" checked><span>Gentle assist</span></label>
+            <label class="guide-control"><input id="guide" type="checkbox"><span>Ghost solution</span></label>
+          </div>
+        </div>
+        <div class="dynamics-controls" id="dynamics-controls" hidden>
+          <label class="duration-control" for="duration">T <input id="duration" type="range" min="0.5" max="1.5" step="0.05" value="1" aria-label="Total travel time"><output id="duration-value">1.00 s</output></label>
+          <button id="play" aria-pressed="false" title="Play the edited motion in real time">▶ Play</button>
+          <input id="scrub" type="range" min="0" max="1" step="0.001" value="0" aria-label="Scrub time">
+          <output id="time-value">0.00 / 1.00 s</output>
+        </div>
+      </section>
+
+      <aside class="error-pane" aria-label="Error above the minimum">
+        <canvas id="error" role="img" aria-label="Error marker on a fixed linear scale, zero at the bottom and 100 at the roof. Error units are ten times the relative excess integral."></canvas>
+      </aside>
+
+      <section class="integral-pane" aria-labelledby="integral-heading">
+        <div class="pane-heading"><h2 id="integral-heading"><span class="section-number">02 /</span> The functional</h2><span class="live-label"><i></i> LIVE</span></div>
+        <div class="scoreboard">
+          <div class="current-score"><span class="score-symbol" id="score-symbol">T[y]</span><output id="integral-value">—</output><span class="score-unit" id="score-unit">s</span></div>
+          <div class="formula-block"><div id="formula"></div></div>
+          <div class="target-score"><span id="target-label">Cycloidal minimum</span><strong id="target-value">—</strong></div>
+        </div>
+        <div class="progress-area">
+          <div class="progress-copy"><span id="status-text">Follow the falling integral.</span><span id="gap-value">—</span></div>
+        </div>
+        <div class="graph-stage"><canvas id="graph" role="img" aria-label="Integrand versus curve parameter u. The signed shaded area is the value of the functional. The highlighted segment matches the edited part of the curve: green within the optimum tolerance, red when the integral increases outside that tolerance, yellow otherwise."></canvas></div>
+        <div class="graph-legend"><span><i class="swatch fill"></i><span id="area-label">Area = integral</span></span><span title="Green: near the optimum. Red: raising the integral away from the optimum. Yellow: default, including improving edits."><i class="swatch selected"></i><span id="variation-label">Your variation</span></span><span id="local-value">Move onto the curve</span></div>
+      </section>
+    </div>
+
+  </main>
+  <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
+  <dialog id="math-dialog" aria-labelledby="math-title">
+    <div class="dialog-heading"><span class="eyebrow">BEHIND THE CURVE</span><button id="math-close" aria-label="Close mathematics">×</button></div>
+    <h2 id="math-title">One curve. One number.</h2>
+    <div id="math-content"></div>
+    <div class="lecture-links"><span>FULL LECTURE SOURCES · LaTeX</span><a href="./lectures/01-calculus-of-variations.tex" download>01 — Calculus of variations ↗</a><a href="./lectures/02-hamilton-action-wavefronts.tex" download>02 — Action, wavefronts & rays ↗</a></div>
+  </dialog>
+  <noscript>This laboratory needs JavaScript. Enable it and open index.html through Live Server.</noscript>
+</body>
+</html>

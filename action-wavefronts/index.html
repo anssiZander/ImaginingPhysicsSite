@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="From falling projectiles to Kepler orbits: how Hamilton's action turns a family of trajectories into moving, folding wavefronts." />
+    <title>Gravity as wavefronts of action | Imagining Physics</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="article.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="container nav">
+        <a class="logo" href="../index.html">Imagining Physics</a>
+        <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+        <nav class="site-nav" aria-label="Main navigation">
+          <ul>
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../about.html">About</a></li>
+            <li><a href="../blog.html" class="active">Blog Posts</a></li>
+            <li><a href="../videos.html">Videos</a></li>
+            <li><a href="../shorts.html">Shorts</a></li>
+            <li><a href="../interactive.html">Interactive demos</a></li>
+            <li><a href="../shadertoy.html">Shadertoy</a></li>
+            <li><a href="../games.html">Games</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="action-post">
+<article>
+        <header class="post-header opening-layout">
+          <div class="opening-copy">
+            <p class="eyebrow">Classical mechanics · Visual essay</p>
+            <h1>Gravity as wavefronts of action</h1>
+            <p class="standfirst">A thrown particle traces a parabola. A whole family of throws can be drawn as a wave: a surface that spreads, bends and folds. Hamilton’s action connects the two pictures.</p>
+            <p class="opening-question">What are these surfaces, and why do the particles follow their normals?</p>
+          </div>
+          <figure class="opening-film">
+            <video id="opening-orbit" controls loop muted playsinline preload="metadata" width="720" height="1280" poster="media/optical-gravity.webp?v=final30" aria-label="Opening glimpse of OpticalGravity: particles follow elliptical orbits through folded action fronts." aria-describedby="opening-orbit-caption">
+              <source src="media/optical-gravity.mp4?v=final30" type="video/mp4" />
+              <a href="media/optical-gravity.mp4?v=final30">Watch the OpticalGravity excerpt</a>.
+            </video>
+            <figcaption id="opening-orbit-caption">A glimpse of <cite>OpticalGravity</cite>. We will build up to this picture from motion in uniform gravity.</figcaption>
+          </figure>
+        </header>
+
+        <section class="prose" aria-labelledby="action-title">
+          <h2 id="action-title">The action of a path</h2>
+          <p>For a path <math display="inline"><mi mathvariant="normal">𝐫</mi><mrow><mrow><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow></math>, the action is the time integral of kinetic energy minus potential energy:</p>
+          <div class="equation" tabindex="0" aria-label="Action is the integral of one half m times speed squared minus potential energy over time.">
+            <math display="block"><mi mathvariant="normal">𝒜</mi><mrow><mo stretchy="false">[</mo><mi mathvariant="normal">𝐫</mi><mo stretchy="false">]</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><msub><mi>t</mi><mi>A</mi></msub><msub><mi>t</mi><mi>B</mi></msub></msubsup><mrow><mrow><mo>(</mo><mfrac><mi>m</mi><mn>2</mn></mfrac><msup><mrow><mo>|</mo><mover><mi mathvariant="normal">𝐫</mi><mo>˙</mo></mover><mo>|</mo></mrow><mn>2</mn></msup><mo>−</mo><mi>V</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo stretchy="false">)</mo></mrow><mo>)</mo></mrow></mrow><mspace width=".2em" /><mi mathvariant="normal">d</mi><mi>t</mi></math>
+          </div>
+          <p>A physical path makes this integral stationary under small changes of the path with its endpoints and endpoint times fixed. “Stationary” means that the first-order change vanishes; it need not always be a minimum. The resulting equation of motion is Newton’s law.</p>
+        </section>
+
+        <section class="prose" aria-labelledby="principal-title">
+          <h2 id="principal-title">From fixed endpoints to free endpoints</h2>
+          <p>Keep the initial position and time fixed. For each possible arrival event <math display="inline"><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></math>, evaluate the action on a physical path connecting the two. The result is <em>Hamilton’s principal function</em>, <math display="inline"><mi>S</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><mi mathvariant="normal">𝒜</mi><mrow><mo stretchy="false">[</mo><msub><mi mathvariant="normal">𝐫</mi><mtext>cl</mtext></msub><mo stretchy="false">]</mo></mrow></math>. We have restricted the path functional to solutions of Newton’s law; its value is now a function of where and when the particle arrives. If several paths are possible, work on one smooth branch at a time.</p>
+          <p>Move the arrival point slightly, keeping its time fixed. In the first variation, the interior term vanishes by the equations of motion. The boundary term from integration by parts remains:</p>
+          <div class="equation" tabindex="0" aria-label="At fixed arrival time, d S equals momentum dot d r, so the gradient of S equals momentum equals mass times velocity.">
+            <math display="block"><mi mathvariant="normal">d</mi><mi>S</mi><mo>=</mo><mi mathvariant="normal">𝐩</mi><mo>·</mo><mi mathvariant="normal">d</mi><mi mathvariant="normal">𝐫</mi><mspace width=".7em" /><mo>⟹</mo><mspace width=".7em" /><mo>∇</mo><mi>S</mi><mo>=</mo><mi mathvariant="normal">𝐩</mi><mo>=</mo><mi>m</mi><mi mathvariant="normal">𝐯</mi><mo>.</mo></math>
+          </div>
+          <p>Here “free” means comparing paths with different endpoints; this change in action is generally nonzero. Allowing the arrival time to vary as well gives</p>
+          <div class="equation" tabindex="0" aria-label="d S equals momentum dot d r minus H d t. The partial derivative of S with respect to arrival time, at fixed arrival position, equals minus H.">
+            <math display="block"><mi mathvariant="normal">d</mi><mi>S</mi><mo>=</mo><mi mathvariant="normal">𝐩</mi><mo>·</mo><mi mathvariant="normal">d</mi><mi mathvariant="normal">𝐫</mi><mo>−</mo><mi>H</mi><mi mathvariant="normal">d</mi><mi>t</mi><mo>,</mo><mspace width="1em" /><mfrac><mrow><mo>∂</mo><mi>S</mi></mrow><mrow><mo>∂</mo><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>H</mi><mo>.</mo></math>
+          </div>
+          <p>Here <math display="inline"><mi>H</mi></math> is the total energy, kinetic plus potential; the partial time derivative holds the arrival position fixed. Replacing the momentum in that energy by <math display="inline"><mo>∇</mo><mi>S</mi></math> gives</p>
+          <div class="equation" tabindex="0" aria-label="The Hamilton–Jacobi equation: the partial time derivative of S plus the squared magnitude of its gradient divided by twice the mass plus the potential energy equals zero.">
+            <math display="block"><mfrac><mrow><mo>∂</mo><mi>S</mi></mrow><mrow><mo>∂</mo><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><msup><mrow><mo stretchy="false">|</mo><mo>∇</mo><mi>S</mi><mo stretchy="false">|</mo></mrow><mn>2</mn></msup><mrow><mn>2</mn><mi>m</mi></mrow></mfrac><mo>+</mo><mi>V</mi><mo>=</mo><mn>0</mn><mo>.</mo></math>
+          </div>
+          <p>This is the <em>Hamilton–Jacobi equation</em>: an equation for an action field over space and time. Its level surfaces have normals along the particle momentum. A precise connection to wave phase comes from writing a matter wave as an amplitude times a phase factor:</p>
+          <div class="equation" tabindex="0" aria-label="Psi equals amplitude a times the exponential of i S divided by h bar.">
+            <math display="block"><mi>ψ</mi><mo>=</mo><mi>a</mi><mspace width=".15em" /><msup><mi mathvariant="normal">e</mi><mrow><mi mathvariant="normal">i</mi><mi>S</mi><mo>/</mo><mi>ℏ</mi></mrow></msup><mo>.</mo></math>
+          </div>
+          <p>Here <math display="inline"><mi>a</mi></math> is the amplitude, and <math display="inline"><mi>S</mi><mo>/</mo><mi>ℏ</mi></math> is the phase angle; the reduced Planck constant <math display="inline"><mi>ℏ</mi></math> converts action into a dimensionless phase. Equal values of <math display="inline"><mi>S</mi></math> therefore describe equal-phase surfaces. The local wavevector is <math display="inline"><mi mathvariant="normal">𝐤</mi><mo>=</mo><mo>∇</mo><mi>S</mi><mo>/</mo><mi>ℏ</mi><mo>=</mo><mi mathvariant="normal">𝐩</mi><mo>/</mo><mi>ℏ</mi></math>: momentum fixes the direction of the phase normal and how closely the fronts are spaced.</p>
+          <p>Substituting this form into Schrödinger’s equation gives the Hamilton–Jacobi equation above with one additional term involving the spatial curvature of the amplitude. Where that term is negligible, classical action supplies the wave’s phase. This is the semiclassical approximation, closely related to geometrical optics. Near a caustic it can fail; diffraction and the wave amplitude need a fuller wave calculation.</p>
+        </section>
+
+        <section class="prose" aria-labelledby="abbreviated-title">
+          <h2 id="abbreviated-title">Abbreviated Action W</h2>
+          <p>Suppose the potential depends on position but not time. Energy is then conserved along each trajectory, and we can select a family sharing one value <math display="inline"><mi>E</mi></math>. We are now choosing paths by their energy rather than prescribing a common travel time.</p>
+          <p>For the corresponding fixed-energy solution, <math display="inline"><mfrac><mrow><mo>∂</mo><mi>S</mi></mrow><mrow><mo>∂</mo><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>E</mi></math>. Integrating in time gives <math display="inline"><mi>S</mi><mo>=</mo><mi>W</mi><mo>−</mo><mi>E</mi><mi>t</mi></math>. The spatial part <math display="inline"><mi>W</mi></math> is Hamilton’s <em>characteristic function</em>, or <em>abbreviated action</em>. It retains the momentum gradient, so its increment along a route is momentum dotted with displacement. Measured from departure at the source <math display="inline"><mi>A</mi></math>,</p>
+          <div class="equation" tabindex="0" aria-label="S sub j equals W sub j minus E t. W sub j is the integral from A to r along route j of momentum dot displacement.">
+            <math display="block"><msub><mi>S</mi><mi>j</mi></msub><mo>=</mo><msub><mi>W</mi><mi>j</mi></msub><mo>−</mo><mi>E</mi><mi>t</mi><mo>,</mo><mspace width="1em" /><msub><mi>W</mi><mi>j</mi></msub><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>;</mo><mi>E</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><msubsup><mo>∫</mo><mi>A</mi><mi mathvariant="normal">𝐫</mi></msubsup><mi mathvariant="normal">𝐩</mi><mo>·</mo><mi mathvariant="normal">d</mi><mi mathvariant="normal">𝐪</mi><mo>.</mo></math>
+          </div>
+          <p>The index <math display="inline"><mi>j</mi></math> distinguishes different routes to the same point. Each route carries its own action, giving a separate smooth branch of the function.</p>
+          <p>A moving front is a level surface <math display="inline"><msub><mi>S</mi><mi>j</mi></msub><mo>=</mo><mi>C</mi></math>. Equivalently,</p>
+          <div class="equation equation-key" tabindex="0" aria-label="W sub j of position and energy equals E t plus C.">
+            <math display="block"><msub><mi>W</mi><mi>j</mi></msub><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>;</mo><mi>E</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><mi>E</mi><mi>t</mi><mo>+</mo><mi>C</mi><mo>.</mo></math>
+          </div>
+          <p>One value of <math display="inline"><mi>C</mi></math> gives one front; several equally spaced values give a train of fronts. The clock <math display="inline"><mi>t</mi></math> advances the whole pattern. It is distinct from the travel time along any particular trajectory.</p>
+          <p>In this fixed-energy form, the momentum relation and the Hamilton–Jacobi equation become</p>
+          <div class="equation" tabindex="0" aria-label="Momentum equals the gradient of W. The squared gradient of W equals twice m times E minus V.">
+            <math display="block"><mi mathvariant="normal">𝐩</mi><mo>=</mo><mo>∇</mo><msub><mi>W</mi><mi>j</mi></msub><mo>,</mo><mspace width="1em" /><msup><mrow><mo>|</mo><mo>∇</mo><msub><mi>W</mi><mi>j</mi></msub><mo>|</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>2</mn><mi>m</mi><mrow><mo stretchy="false">(</mo><mi>E</mi><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo></mrow><mo>.</mo></math>
+          </div>
+          <p>The gradient is perpendicular to a level surface. Since momentum points along the particle’s velocity, the trajectories cross their action fronts at right angles. They are the rays of this wave picture.</p>
+        </section>
+
+        <section aria-labelledby="gravity-title">
+          <div class="prose">
+            <h2 id="gravity-title">Gravity</h2>
+            <p>Now take a uniform gravitational field pointing down. With height <math display="inline"><mi>z</mi></math> measured upwards and the source at <math display="inline"><mi>z</mi><mo>=</mo><mn>0</mn></math>, the potential is <math display="inline"><mi>V</mi><mo>=</mo><mi>m</mi><mi>g</mi><mi>z</mi></math>. Launching every particle with the same speed <math display="inline"><msub><mi>v</mi><mn>0</mn></msub></math> selects the common energy <math display="inline"><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>m</mi><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup></math>.</p>
+            <p>Let the launch direction vary freely. Some particles rise, some fall immediately, and each follows an ordinary projectile trajectory. The upward throws touch a common boundary: the violet curve in the first clip below. Rotate this picture around its vertical axis and the boundary becomes a surface. It is the <em>caustic</em> of this family of trajectories.</p>
+          </div>
+
+          <div class="image-pair front-pair">
+            <figure>
+              <video controls loop muted playsinline preload="metadata" width="1080" height="1068" poster="media/gravity-trajectories.webp?v=final30" aria-label="Eight-second side view: sixteen equal-speed projectile trajectories spread from a gold source beneath the violet caustic. Arrows show downward gravity." aria-describedby="trajectories-caption">
+                <source src="media/gravity-trajectories.mp4?v=final30" type="video/mp4" />
+                <a href="media/gravity-trajectories.mp4?v=final30">Watch the projectile trajectories</a>.
+              </video>
+              <figcaption id="trajectories-caption"><span class="figure-number">01</span>Equal launch speeds, different directions. The violet envelope marks the limit of reach.</figcaption>
+            </figure>
+            <figure>
+              <video controls loop muted playsinline preload="metadata" width="1080" height="720" poster="media/gravity-front.webp?v=final30" aria-label="A single action front expands and folds. The camera moves to a side view, holds for two seconds, then returns to an oblique view." aria-describedby="front-caption">
+                <source src="media/gravity-front.mp4?v=final30" type="video/mp4" />
+                <a href="media/gravity-front.mp4?v=final30">Watch a single action front</a>.
+              </video>
+              <figcaption id="front-caption"><span class="figure-number">02</span>A surface of equal action. The camera pauses at a side view, then returns to show the depth of the fold.</figcaption>
+            </figure>
+          </div>
+
+          <div class="prose">
+            <p>The second clip shows the action-front construction in this field. Along each trajectory, find the point where the abbreviated action reaches the chosen value. Joining those points gives a front; advancing the phase clock moves it. A typical reachable point has two routes from the source—a low, quick route and a higher, slower one—so the action has two branches.</p>
+            <p>Changing the launch speed changes <math display="inline"><mi>E</mi></math>, so it changes the equation for <math display="inline"><mi>W</mi></math> and the shapes of its fronts. A faster launch also raises the caustic and widens the reachable region.</p>
+          </div>
+
+          <div class="image-pair ray-pair" aria-label="Continuous action fronts and particle rays">
+            <figure>
+              <video controls loop muted playsinline preload="metadata" width="1080" height="1116" poster="media/gravity-family.webp?v=final30" aria-label="Fifteen-second animation of a continuous family of action fronts, seen obliquely and in side view." aria-describedby="family-caption">
+                <source src="media/gravity-family.mp4?v=final30" type="video/mp4" />
+                <a href="media/gravity-family.mp4?v=final30">Watch the continuous action fronts</a>.
+              </video>
+              <figcaption id="family-caption"><span class="figure-number">03</span>A continuous family of action fronts. The open section exposes both sheets; the camera turn reveals the shape of the surfaces.</figcaption>
+            </figure>
+            <figure>
+              <video controls loop muted playsinline preload="metadata" width="1080" height="1236" poster="media/gravity-rays.webp?v=final30" aria-label="Thirteen-second animation: a burst of equal-speed particles and sixteen trajectory guides emerges from the source and crosses the action fronts." aria-describedby="rays-caption">
+                <source src="media/gravity-rays.mp4?v=final30" type="video/mp4" />
+                <a href="media/gravity-rays.mp4?v=final30">Watch particles crossing the action fronts</a>.
+              </video>
+              <figcaption id="rays-caption"><span class="figure-number">04</span>The particles enter with their trajectories. Follow a bead through the surfaces: the trajectory is a ray, normal to its own action sheet.</figcaption>
+            </figure>
+          </div>
+
+          <div class="prose">
+            <p>There is an important distinction here. Particles launched together have the same <em>flight time</em>. At each instant they lie on a sphere whose centre falls under gravity. An action front instead joins points with the same action; those points can have different flight times. This is why the beads move through the surfaces.</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="fold-title">
+          <div class="prose">
+            <h2 id="fold-title">At the fold</h2>
+            <p>Follow one of the upward trajectories. It rises, turns and begins to fall. A little later, it touches the caustic tangentially. That contact is where the action sheet changes branch. Except for the straight-up throw, the contact occurs <em>after</em> the particle’s highest point.</p>
+            <p>At the caustic, the two routes to a point merge. The front folds there, and the particle continues smoothly onto the other sheet. The color change marks that transition.</p>
+          </div>
+
+          <div class="fold-feature">
+            <figure class="fold-film">
+              <video controls loop muted playsinline preload="metadata" width="1080" height="1308" poster="media/gravity-fold.webp?v=final30" aria-label="Sixteen-second side view: twenty-eight projectile trajectories meet the advancing fold in turn and change from apricot to violet. The word caustic follows the contact along the parabola." aria-describedby="fold-caption">
+                <source src="media/gravity-fold.mp4?v=final30" type="video/mp4" />
+                <a href="media/gravity-fold.mp4?v=final30">Watch the fold animation</a>.
+              </video>
+              <figcaption id="fold-caption"><span class="figure-number">05</span>Twenty-eight trajectories meet the fold. Launch times are staggered so that each bead reaches its caustic contact as the moving edge arrives. The curved label follows that contact along the parabola.</figcaption>
+            </figure>
+            <div class="fold-notes">
+              <p class="margin-title">Follow the change</p>
+              <p><span class="swatch apricot" aria-hidden="true"></span><strong>Apricot</strong><br />Before the trajectory touches the caustic.</p>
+              <p><span class="swatch pearl" aria-hidden="true"></span><strong>The bright edge</strong><br />The sheets meet at the caustic contact.</p>
+              <p><span class="swatch violet" aria-hidden="true"></span><strong>Violet</strong><br />The trajectory continues beyond its tangency, on the other action sheet.</p>
+              <p class="margin-small">The launch speed and gravitational field are the same for every bead. Their launch times are chosen to make the contact visible; they cross the front freely as they move.</p>
+            </div>
+          </div>
+
+          <div class="prose">
+            <p>In a vertical section, the caustic is the parabola</p>
+            <div class="equation" tabindex="0" aria-label="The caustic height is v zero squared divided by two g minus g rho squared divided by two v zero squared.">
+              <math display="block"><msub><mi>z</mi><mi>c</mi></msub><mrow><mo stretchy="false">(</mo><mi>ρ</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><mfrac><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup><mrow><mn>2</mn><mi>g</mi></mrow></mfrac><mo>−</mo><mfrac><mrow><mi>g</mi><msup><mi>ρ</mi><mn>2</mn></msup></mrow><mrow><mn>2</mn><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup></mrow></mfrac><mo>,</mo></math>
+            </div>
+            <p>where <math display="inline"><mi>ρ</mi></math> is horizontal distance from the source axis. Every upward ray touches this boundary from inside. The boundary is the envelope of the trajectories, and the fold of the action fronts is another way to see the same geometry.</p>
+
+            <details class="math-detail">
+              <summary>How the gravity fronts are calculated</summary>
+              <div class="detail-content">
+                <p>Let <math display="inline"><mi>T</mi></math> denote elapsed flight time and let <math display="inline"><mi>θ</mi></math> be the launch angle from the upward vertical. Write <math display="inline"><mi>c</mi><mo>=</mo><mi mathvariant="normal">cos</mi><mo>⁡</mo><mi>θ</mi></math>. The projectile follows</p>
+                <div class="equation" tabindex="0" aria-label="Rho equals v zero times the square root of one minus c squared times T. z equals v zero c T minus g T squared over two.">
+                  <math display="block"><mtable columnalign="left" rowspacing=".65em"><mtr><mtd><mi>ρ</mi><mo>=</mo><msub><mi>v</mi><mn>0</mn></msub><msqrt><mn>1</mn><mo>−</mo><msup><mi>c</mi><mn>2</mn></msup></msqrt><mi>T</mi><mo>,</mo></mtd></mtr><mtr><mtd><mi>z</mi><mo>=</mo><msub><mi>v</mi><mn>0</mn></msub><mi>c</mi><mi>T</mi><mo>−</mo><mfrac><mi>g</mi><mn>2</mn></mfrac><msup><mi>T</mi><mn>2</mn></msup><mo>.</mo></mtd></mtr></mtable></math>
+                </div>
+                <p>Along that trajectory, <math display="inline"><mi mathvariant="normal">𝐩</mi><mo>·</mo><mi mathvariant="normal">d</mi><mi mathvariant="normal">𝐪</mi><mo>=</mo><mi>m</mi><msup><mrow><mo>|</mo><mi mathvariant="normal">𝐯</mi><mo>|</mo></mrow><mn>2</mn></msup><mi mathvariant="normal">d</mi><mi>T</mi></math>. Integrating gives</p>
+                <div class="equation" tabindex="0" aria-label="W of c and T equals m times v zero squared T minus v zero g c T squared plus g squared T cubed over three.">
+                  <math display="block"><mi>W</mi><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>,</mo><mi>T</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><mi>m</mi><mrow><mo>(</mo><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup><mi>T</mi><mo>−</mo><msub><mi>v</mi><mn>0</mn></msub><mi>g</mi><mi>c</mi><msup><mi>T</mi><mn>2</mn></msup><mo>+</mo><mfrac><msup><mi>g</mi><mn>2</mn></msup><mn>3</mn></mfrac><msup><mi>T</mi><mn>3</mn></msup><mo>)</mo></mrow><mo>.</mo></math>
+                </div>
+                <p>For each direction, solve <math display="inline"><mi>W</mi><mrow><mrow><mo stretchy="false">(</mo><mi>c</mi><mo>,</mo><mi>T</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mi>E</mi><mi>t</mi><mo>+</mo><mi>C</mi></math> for <math display="inline"><mi>T</mi></math>, then put that time into the projectile equations. Those points form the front. Revolving the meridional curve gives the three-dimensional surface.</p>
+                <p>For an upward launch, the caustic contact occurs at <math display="inline"><msub><mi>T</mi><mi>c</mi></msub><mo>=</mo><mfrac><msub><mi>v</mi><mn>0</mn></msub><mrow><mi>g</mi><mi>c</mi></mrow></mfrac></math>. The top of the individual arc occurs earlier, at <math display="inline"><msub><mi>T</mi><mtext>top</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>v</mi><mn>0</mn></msub><mi>c</mi></mrow><mi>g</mi></mfrac></math>. This difference is why turning downwards and changing color are separate events.</p>
+              </div>
+            </details>
+
+            <details class="math-detail">
+              <summary>Where the initial speed enters Hamilton’s principal function</summary>
+              <div class="detail-content">
+                <p>There is another useful form of the principal function. Fix the source at the origin, the endpoint at <math display="inline"><mrow><mrow><mo stretchy="false">(</mo><mi>ρ</mi><mo>,</mo><mi>z</mi><mo stretchy="false">)</mo></mrow></mrow></math>, and the flight duration <math display="inline"><mi>T</mi></math>. The action evaluated along that classical path is</p>
+                <div class="equation compact-equation" tabindex="0" aria-label="S classical equals m times rho squared plus z squared over two T, minus m g z T over two, minus m g squared T cubed over twenty-four.">
+                  <math display="block"><msub><mi>S</mi><mtext>cl</mtext></msub><mo>=</mo><mfrac><mrow><mi>m</mi><mrow><mo stretchy="false">(</mo><msup><mi>ρ</mi><mn>2</mn></msup><mo>+</mo><msup><mi>z</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></mrow><mrow><mn>2</mn><mi>T</mi></mrow></mfrac><mo>−</mo><mfrac><mrow><mi>m</mi><mi>g</mi><mi>z</mi><mi>T</mi></mrow><mn>2</mn></mfrac><mo>−</mo><mfrac><mrow><mi>m</mi><msup><mi>g</mi><mn>2</mn></msup><msup><mi>T</mi><mn>3</mn></msup></mrow><mn>24</mn></mfrac><mo>.</mo></math>
+                </div>
+                <p>No launch speed appears explicitly: the endpoint and duration already determine the required initial velocity. To pick out our chosen speed, impose the energy condition</p>
+                <div class="equation" tabindex="0" aria-label="Minus the partial derivative of S classical with respect to T equals E equals one half m v zero squared.">
+                  <math display="block"><mo>−</mo><mfrac><mrow><mo>∂</mo><msub><mi>S</mi><mtext>cl</mtext></msub></mrow><mrow><mo>∂</mo><mi>T</mi></mrow></mfrac><mo>=</mo><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>m</mi><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup><mo>.</mo></math>
+                </div>
+                <p>At a typical reachable endpoint this selects two durations, <math display="inline"><msub><mi>T</mi><mi>j</mi></msub></math>. Each gives an abbreviated-action branch</p>
+                <div class="equation" tabindex="0" aria-label="W sub j of r and E equals S classical of r and T sub j plus E T sub j.">
+                  <math display="block"><msub><mi>W</mi><mi>j</mi></msub><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>;</mo><mi>E</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><msub><mi>S</mi><mtext>cl</mtext></msub><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>,</mo><msub><mi>T</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow><mo>+</mo><mi>E</mi><msub><mi>T</mi><mi>j</mi></msub><mo>.</mo></math>
+                </div>
+                <p>Finally use <math display="inline"><msub><mi>S</mi><mi>j</mi></msub><mrow><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><msub><mi>W</mi><mi>j</mi></msub><mrow><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo>;</mo><mi>E</mi><mo stretchy="false">)</mo></mrow></mrow><mo>−</mo><mi>E</mi><mi>t</mi></math> to move the fronts. The selected travel duration <math display="inline"><msub><mi>T</mi><mi>j</mi></msub></math> and the running phase clock <math display="inline"><mi>t</mi></math> have different jobs. Replacing one by the other would describe a different construction.</p>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section aria-labelledby="orbits-title">
+          <div class="prose">
+            <h2 id="orbits-title">From throws to orbits</h2>
+            <p>Now put an attracting mass above the source. The force points towards it and grows as the inverse square of distance. Choose a launch speed below escape speed, and the trajectories become Kepler ellipses.</p>
+            <p>The construction of the fronts is the same. Follow each orbit, accumulate its action and join points with equal values. The central mass is a focus of each ellipse. Different launch directions give different angular momenta, different close approaches and different paths through space.</p>
+          </div>
+
+          <div class="orbit-feature">
+            <figure>
+              <video controls loop muted playsinline preload="metadata" width="720" height="1280" poster="media/optical-gravity.webp?v=final30" aria-label="Excerpt from OpticalGravity showing elliptical particle orbits crossing a train of folded action surfaces." aria-describedby="orbit-caption">
+                <source src="media/optical-gravity.mp4?v=final30" type="video/mp4" />
+                <a href="media/optical-gravity.mp4?v=final30">Watch the OpticalGravity excerpt</a>.
+              </video>
+              <figcaption id="orbit-caption"><span class="figure-number">06</span>From <cite>OpticalGravity</cite>. The attracting mass is marked <math display="inline"><mi>M</mi></math> above the source. The pale outer ellipse is a section of the caustic; apricot and violet retain the same branch meaning as in uniform gravity.</figcaption>
+            </figure>
+            <div class="orbit-copy">
+              <p>The surfaces bend around the mass and fold at the caustic. The particle trajectories touch the same envelope, then continue on the other action sheet. After a full orbit, they return to their starting point.</p>
+              <p>Look near the mass, where the particles move fastest. The fronts are more closely spaced there: the gradient of action is larger, so a fixed change in action takes a shorter distance. This is the same momentum–gradient relation we used for the falling particles.</p>
+              <p>A particle can complete its orbit while a front is still making its way through the pattern. The speed of a phase surface and the speed of a particle are different quantities. Their geometric connection is the direction of motion: each ray follows the normal to its own smooth action sheet.</p>
+              <p class="orbit-note">Both animations use zero potential energy at the source. Choosing another energy zero leaves the trajectories unchanged, while changing how a fixed phase value moves in time.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="prose closing" aria-labelledby="optics-title">
+          <h2 id="optics-title">Why it looks like optics</h2>
+          <p>In optics, the same construction has a familiar name: the <em>eikonal equation</em>. Write the phase of a monochromatic wave as <math display="inline"><msub><mi>k</mi><mn>0</mn></msub><mi>χ</mi><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo stretchy="false">)</mo></mrow><mo>−</mo><mi>ω</mi><mi>t</mi></math>, where <math display="inline"><msub><mi>k</mi><mn>0</mn></msub><mo>=</mo><mi>ω</mi><mo>/</mo><mi>c</mi></math> is the vacuum wavenumber. The eikonal <math display="inline"><mi>χ</mi></math> has units of length. In a smooth, isotropic medium with refractive index <math display="inline"><mi>n</mi></math>, the short-wavelength limit of the wave equation gives</p>
+          <div class="equation" tabindex="0" aria-label="The optical eikonal equation: the squared magnitude of the gradient of chi equals the square of the refractive index at position r.">
+            <math display="block"><msup><mrow><mo stretchy="false">|</mo><mo>∇</mo><mi>χ</mi><mo stretchy="false">|</mo></mrow><mn>2</mn></msup><mo>=</mo><msup><mi>n</mi><mn>2</mn></msup><mrow><mo stretchy="false">(</mo><mi mathvariant="normal">𝐫</mi><mo stretchy="false">)</mo></mrow><mo>.</mo></math>
+          </div>
+          <p>At a fixed time, constant <math display="inline"><mi>χ</mi></math> surfaces are phase fronts, and the rays follow their normals. Compare this with the fixed-energy Hamilton–Jacobi equation:</p>
+          <div class="equation" tabindex="0" aria-label="The squared magnitude of the gradient of W equals twice the mass times E minus V, which equals the squared momentum magnitude.">
+            <math display="block"><msup><mrow><mo stretchy="false">|</mo><mo>∇</mo><mi>W</mi><mo stretchy="false">|</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>2</mn><mi>m</mi><mrow><mo stretchy="false">(</mo><mi>E</mi><mo>−</mo><mi>V</mi><mo stretchy="false">)</mo></mrow><mo>=</mo><msup><mi>p</mi><mn>2</mn></msup><mo>.</mo></math>
+          </div>
+          <p>Here <math display="inline"><mi>p</mi></math> is the momentum magnitude. Use the launch momentum <math display="inline"><msub><mi>p</mi><mn>0</mn></msub><mo>=</mo><mi>m</mi><msub><mi>v</mi><mn>0</mn></msub></math> as a constant scale: <math display="inline"><mi>W</mi><mo>/</mo><msub><mi>p</mi><mn>0</mn></msub></math> then has units of length and obeys the optical equation with an effective index <math display="inline"><msub><mi>n</mi><mtext>eff</mtext></msub><mo>=</mo><mi>p</mi><mo>/</mo><msub><mi>p</mi><mn>0</mn></msub></math>. Higher momentum gives more closely spaced action fronts, just as a higher refractive index gives more closely spaced optical fronts.</p>
+          <p>The optical path accumulates refractive index along a ray, just as <math display="inline"><mi>W</mi></math> accumulates momentum. Fermat’s principle and stationary abbreviated action express the same ray geometry. In both pictures, a caustic is an envelope of rays and a fold in their phase surfaces.</p>
+          <p>The colors label the action branches. The glow and transparency help us see the geometry; they do not represent a calculated wave amplitude. Interference, diffraction and the intensity near a caustic would require a further wave calculation.</p>
+          <p class="reference">For the Hamilton–Jacobi equation, its fixed-energy form and the connection to wave mechanics, see <a href="https://www.damtp.cam.ac.uk/user/tong/dynamics/dynhtml/S4.html" target="_blank" rel="noopener noreferrer">David Tong, <cite>Classical Dynamics</cite>, sections 4.7–4.8.1</a>. For the eikonal equation and optical path, see <a href="https://www.classe.cornell.edu/~ib38/teaching/p330/Lecture5.pdf#page=2" target="_blank" rel="noopener noreferrer">Ivan Bazarov, <cite>Geometric optics</cite>, page 2</a>.</p>
+        </section>
+      </article>
+    </main>
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <strong>Imagining Physics</strong>
+          <p>Visualizing physics through videos, simulations, shaders, and small games.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <ul class="footer-links">
+            <li><a href="../blog.html">Blog Posts</a></li>
+            <li><a href="../interactive.html">Interactive demos</a></li>
+            <li><a href="../about.html">About</a></li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+    <script src="../main.js"></script>
+    <script>
+      const openingFilm = document.getElementById('opening-orbit');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (!reducedMotion.matches) openingFilm.play().catch(() => {});
+      reducedMotion.addEventListener('change', event => {
+        if (event.matches) openingFilm.pause();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1171 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+\setlist{itemsep=2pt,topsep=4pt}
+
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\J}{\mathcal{J}}
+
+\title{Calculus of Variations:\\How to Differentiate a Curve}
+\author{Lecture notes and instructor calculations}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Duration:} 45 minutes.
+
+\textbf{Background:} Differentiation, integration by parts, and basic
+partial derivatives.
+
+\textbf{Scope:} One independent variable and one unknown function.
+
+\textbf{Central idea:}
+Ordinary calculus, but the variable is a whole curve.
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Time & Topic \\
+\midrule
+0--5 min   & The brachistochrone challenge \\
+5--11 min  & From functions to integral functionals \\
+11--18 min & What does ``vary the curve'' mean? \\
+18--30 min & Derive the Euler--Lagrange equation \\
+30--39 min & Solve a complete example \\
+39--43 min & Recover Newton's second law \\
+43--45 min & Three questions to finish \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{0--5 minutes: Begin with a race}
+
+Draw two points on the board: \(A\) above and to the left of \(B\).
+Draw a straight track and a curved track that drops steeply at first.
+
+\begin{quote}
+A bead starts from rest and slides without friction.
+Which track gets it to \(B\) first?
+\end{quote}
+
+Give the audience a moment to vote.
+
+The straight line has the shortest distance. But a steeper initial
+descent builds speed earlier. A longer journey can take less time
+if more of it happens at high speed.
+
+In June 1696, Johann Bernoulli challenged mathematicians to find the
+curve of fastest descent---the \emph{brachistochrone}.
+Solutions published in 1697 included those of Johann and Jacob
+Bernoulli, Leibniz, and Newton. The answer is an arc of a cycloid.
+A historical reference is given at the end of these notes.
+
+Ask:
+\begin{quote}
+Do the beads have different speeds when they reach \(B\)?
+\end{quote}
+
+They have the \textbf{same final speed}, because they have lost the
+same gravitational potential energy. Their travel times differ
+because their speeds differ along the way.
+
+Transition:
+\begin{quote}
+The unknown here is an entire curve.
+How do we differentiate with respect to that?
+\end{quote}
+
+\section*{5--11 minutes: A functional takes a function and returns a number}
+
+Ordinary calculus deals with maps such as
+\[
+f:\mathbb{R}\longrightarrow\mathbb{R},
+\qquad
+z\longmapsto f(z).
+\]
+
+A functional can take a whole function as its input:
+\[
+\J:\{\text{admissible functions}\}\longrightarrow\mathbb{R},
+\qquad
+y\longmapsto\J[y].
+\]
+
+The output could be a length, travel time, energy, or action.
+
+The form we will study is
+\[
+\boxed{
+\J[y]
+=
+\int_a^b F\bigl(x,y(x),y'(x)\bigr)\,\dd x.
+}
+\]
+
+Explain the three arguments:
+\begin{itemize}
+\item \(x\): where we are;
+\item \(y(x)\): the value of the curve there;
+\item \(y'(x)\): its slope there.
+\end{itemize}
+
+The integrand assigns a local contribution.
+The integral adds those contributions along the interval.
+
+\subsection*{Constructing the brachistochrone functional}
+
+Take
+\[
+A=(0,0),
+\qquad
+B=(b,h),
+\qquad
+b,h>0,
+\]
+and measure \(y\) \textbf{vertically downward}.
+
+Assume uniform gravity, no friction, and a bead released from rest.
+For a track represented as \(y=y(x)\), take \(y(x)>0\) for \(x>0\).
+
+Conservation of energy gives
+\[
+\frac12 mv^2=mgy,
+\]
+so
+\[
+v(y)=\sqrt{2gy}.
+\]
+
+An element of distance along the track is
+\[
+\dd s
+=
+\sqrt{\dd x^2+\dd y^2}
+=
+\sqrt{1+\left(\frac{\dd y}{\dd x}\right)^2}\,\dd x
+=
+\sqrt{1+y'^2}\,\dd x.
+\]
+
+Since \(\dd t=\dd s/v\),
+\[
+\dd t
+=
+\frac{\sqrt{1+y'^2}}{\sqrt{2gy}}\,\dd x.
+\]
+
+Therefore,
+\[
+\boxed{
+T[y]
+=
+\int_0^b
+\frac{\sqrt{1+y'(x)^2}}{\sqrt{2g\,y(x)}}\,\dd x,
+\qquad
+y(0)=0,\quad y(b)=h.
+}
+\]
+
+Point to the numerator and denominator:
+\begin{quote}
+A steep track adds distance, but getting lower increases speed.
+This integral keeps both accounts.
+\end{quote}
+
+We now have the quantity to optimize.
+What remains is learning how to differentiate it.
+
+\textit{Instructor detail.}
+The integral is improper at the release point \(y=0\).
+Use it for motivation; derive the general equation first under
+ordinary smoothness assumptions.
+
+\section*{11--18 minutes: Turn a wiggle into an ordinary variable}
+
+Fix the endpoint values:
+\[
+y(a)=\alpha,
+\qquad
+y(b)=\beta.
+\]
+
+Choose a smooth function \(\eta(x)\) satisfying
+\[
+\eta(a)=\eta(b)=0.
+\]
+
+Define a family of nearby curves:
+\[
+\boxed{
+y_\varepsilon(x)=y(x)+\varepsilon\eta(x).
+}
+\]
+
+Here:
+\begin{itemize}
+\item \(\eta(x)\) specifies the \textbf{shape} of the wiggle;
+\item \(\varepsilon\) specifies its \textbf{size and sign}.
+\end{itemize}
+
+Draw the original curve and two nearby curves, all sharing the
+same endpoints.
+
+The endpoint conditions are preserved:
+\[
+y_\varepsilon(a)
+=
+y(a)+\varepsilon\eta(a)
+=
+\alpha,
+\]
+and similarly,
+\[
+y_\varepsilon(b)=\beta.
+\]
+
+Differentiating with respect to \(x\),
+\[
+y_\varepsilon'(x)
+=
+y'(x)+\varepsilon\eta'(x).
+\]
+
+Emphasize:
+\begin{quote}
+Changing a curve also changes its slope.
+Those two changes are linked.
+\end{quote}
+
+For a fixed choice of \(\eta\), define the ordinary scalar function
+\[
+\Phi_\eta(\varepsilon)
+=
+\J[y+\varepsilon\eta].
+\]
+
+If \(y\) is a local minimum of \(\J\), then \(\varepsilon=0\)
+is a local minimum of \(\Phi_\eta\). Thus,
+\[
+\Phi_\eta'(0)=0.
+\]
+
+This derivative is called the \textbf{first variation}:
+\[
+\boxed{
+\delta\J[y;\eta]
+:=
+\left.
+\frac{\dd}{\dd\varepsilon}
+\J[y+\varepsilon\eta]
+\right|_{\varepsilon=0}.
+}
+\]
+
+The stationarity requirement is
+\[
+\boxed{
+\delta\J[y;\eta]=0
+\quad
+\text{for every admissible }\eta.
+}
+\]
+
+Underline \textbf{every}.
+
+Testing one wiggle tests only one direction in the space of curves.
+A minimum must resist all admissible small changes.
+
+\subsection*{Optional analogy with gradients}
+
+For an ordinary function of several variables,
+\[
+\left.
+\frac{\dd}{\dd\varepsilon}
+f(\mathbf{z}+\varepsilon\mathbf{v})
+\right|_{\varepsilon=0}
+=
+\nabla f(\mathbf{z})\cdot\mathbf{v}.
+\]
+
+Requiring this to vanish for every \(\mathbf{v}\) gives
+\[
+\nabla f(\mathbf{z})=0.
+\]
+
+We are about to find the corresponding statement for functions.
+
+\section*{18--30 minutes: Derive Euler--Lagrange}
+
+Start by substituting the perturbed curve:
+\[
+\J[y_\varepsilon]
+=
+\int_a^b
+F\bigl(x,y+\varepsilon\eta,y'+\varepsilon\eta'\bigr)\,\dd x.
+\]
+
+The independent variable \(x\), and the integration limits, stay fixed.
+
+Assuming sufficient smoothness, differentiate under the integral
+and apply the chain rule:
+\[
+\frac{\dd}{\dd\varepsilon}\J[y_\varepsilon]
+=
+\int_a^b
+\left[
+F_y\bigl(x,y_\varepsilon,y_\varepsilon'\bigr)\eta
++
+F_{y'}\bigl(x,y_\varepsilon,y_\varepsilon'\bigr)\eta'
+\right]\dd x.
+\]
+
+Evaluate at \(\varepsilon=0\):
+\[
+\boxed{
+\delta\J[y;\eta]
+=
+\int_a^b
+\left(
+F_y\,\eta+F_{y'}\,\eta'
+\right)\dd x.
+}
+\]
+
+From here onward, derivatives of \(F\) are evaluated along the
+original curve:
+\[
+\bigl(x,y(x),y'(x)\bigr).
+\]
+
+\subsection*{Clarifying the partial derivatives}
+
+Temporarily view the integrand as \(F(x,u,p)\), with three
+independent arguments.
+
+Take partial derivatives with respect to \(u\) and \(p\) first,
+then substitute
+\[
+u=y(x),
+\qquad
+p=y'(x).
+\]
+
+The notation \(F_y\) and \(F_{y'}\) refers to differentiation with
+respect to the second and third arguments, respectively.
+
+\subsection*{Integration by parts}
+
+The problem is now the \(\eta'\) term.
+We want everything multiplying the same arbitrary function \(\eta\).
+
+Use integration by parts:
+\[
+\int_a^b F_{y'}\,\eta'\,\dd x
+=
+\left[F_{y'}\eta\right]_a^b
+-
+\int_a^b
+\frac{\dd}{\dd x}\left(F_{y'}\right)\eta\,\dd x.
+\]
+
+Consequently,
+\[
+\delta\J[y;\eta]
+=
+\left[F_{y'}\eta\right]_a^b
++
+\int_a^b
+\left[
+F_y-\frac{\dd}{\dd x}\left(F_{y'}\right)
+\right]\eta\,\dd x.
+\]
+
+Because the endpoints are fixed,
+\[
+\eta(a)=\eta(b)=0,
+\]
+and hence
+\[
+\left[F_{y'}\eta\right]_a^b=0.
+\]
+
+We are left with
+\[
+\boxed{
+\delta\J[y;\eta]
+=
+\int_a^b
+\left[
+F_y-\frac{\dd}{\dd x}\left(F_{y'}\right)
+\right]\eta\,\dd x.
+}
+\]
+
+Pause:
+\begin{quote}
+We moved a derivative off the arbitrary wiggle and onto something
+determined by the curve.
+\end{quote}
+
+\subsection*{Why the coefficient must vanish}
+
+Let
+\[
+G(x)
+=
+F_y-\frac{\dd}{\dd x}\left(F_{y'}\right).
+\]
+
+Stationarity says
+\[
+\int_a^b G(x)\eta(x)\,\dd x=0
+\]
+for every smooth \(\eta\) vanishing at the endpoints.
+
+Why must \(G=0\)?
+
+Suppose \(G(x_0)>0\) somewhere in the interior.
+If \(G\) is continuous, it remains positive on a small interval
+around \(x_0\).
+
+Choose a nonnegative, nonzero smooth bump \(\eta\) supported
+entirely inside that interval. Then
+\[
+\int_a^b G(x)\eta(x)\,\dd x>0,
+\]
+contradicting stationarity.
+
+The same argument excludes \(G(x_0)<0\).
+
+This is the \textbf{fundamental lemma of the calculus of variations}.
+It gives
+\[
+\boxed{
+\frac{\partial F}{\partial y}
+-
+\frac{\dd}{\dd x}
+\left(
+\frac{\partial F}{\partial y'}
+\right)
+=0.
+}
+\]
+
+That is the \textbf{Euler--Lagrange equation}.
+
+\begin{quote}
+Optimizing an integral over curves has produced a differential
+equation for the curve.
+\end{quote}
+
+Two details to emphasize:
+\begin{enumerate}
+\item The outer \(\dd/\dd x\) is a \textbf{total derivative}
+along the curve.
+\item Euler--Lagrange gives a condition for \textbf{stationarity}.
+It does not, by itself, prove a minimum.
+\end{enumerate}
+
+\subsection*{Checking the total derivative explicitly}
+
+Writing the integrand as \(F(x,y,p)\), with \(p=y'\),
+\[
+\frac{\dd}{\dd x}F_p(x,y(x),y'(x))
+=
+F_{px}+F_{py}y'+F_{pp}y''.
+\]
+
+Thus the equation can also be written
+\[
+F_y-F_{px}-F_{py}y'-F_{pp}y''=0.
+\]
+
+This explains why Euler--Lagrange is typically a second-order
+differential equation.
+
+\subsection*{Functional derivative notation}
+
+The same calculation can be written
+\[
+\delta\J[y;\eta]
+=
+\int_a^b
+\frac{\delta\J}{\delta y(x)}
+\,\eta(x)\,\dd x,
+\]
+where
+\[
+\boxed{
+\frac{\delta\J}{\delta y(x)}
+=
+F_y-\frac{\dd}{\dd x}F_{y'}.
+}
+\]
+
+The first variation is a number for each chosen direction \(\eta\).
+The functional derivative above is its coefficient as a function
+of \(x\).
+
+\section*{30--39 minutes: A complete example}
+
+Consider
+\[
+\boxed{
+\J[y]
+=
+\int_0^1
+\left[
+\frac12(y')^2-y
+\right]\dd x,
+\qquad
+y(0)=y(1)=0.
+}
+\]
+
+Think of this as a normalized model of a stretched string under
+a uniform transverse load, with \(y\) measured in the load's direction.
+
+\begin{itemize}
+\item The term \(\tfrac12(y')^2\) penalizes steep slopes.
+\item The term \(-y\) favors displacement in the direction of the load.
+\end{itemize}
+
+Ask:
+\begin{quote}
+One term wants the string flat; the other wants it displaced.
+What shape balances them?
+\end{quote}
+
+Here,
+\[
+F(x,y,y')=\frac12(y')^2-y.
+\]
+
+Compute each piece:
+\[
+F_y=-1,
+\qquad
+F_{y'}=y',
+\qquad
+\frac{\dd}{\dd x}F_{y'}=y''.
+\]
+
+Euler--Lagrange gives
+\[
+-1-y''=0,
+\]
+or
+\[
+y''=-1.
+\]
+
+Integrate once:
+\[
+y'=-x+C_1.
+\]
+
+Integrate again:
+\[
+y=-\frac{x^2}{2}+C_1x+C_2.
+\]
+
+Apply the endpoint conditions:
+\[
+y(0)=0
+\quad\Longrightarrow\quad
+C_2=0,
+\]
+and
+\[
+y(1)=0
+\quad\Longrightarrow\quad
+-\frac12+C_1=0
+\quad\Longrightarrow\quad
+C_1=\frac12.
+\]
+
+Thus the stationary curve is
+\[
+\boxed{
+y_*(x)=\frac12x(1-x).
+}
+\]
+
+\subsection*{Have we proved a minimum?}
+
+Ask:
+\begin{quote}
+Have we proved that this is a minimum?
+\end{quote}
+
+Not yet. But for this example we can check it exactly.
+
+Write any competing curve with the same endpoints as
+\[
+y=y_*+h,
+\qquad
+h(0)=h(1)=0.
+\]
+
+Expand the functional difference:
+\begin{align*}
+\J[y_*+h]-\J[y_*]
+&=
+\int_0^1
+\left[
+\frac12(y_*'+h')^2-(y_*+h)
+-\frac12(y_*')^2+y_*
+\right]\dd x\\
+&=
+\int_0^1
+\left[
+y_*'h'+\frac12(h')^2-h
+\right]\dd x.
+\end{align*}
+
+Integrate the cross term by parts:
+\begin{align*}
+\int_0^1 y_*'h'\,\dd x
+&=
+[y_*'h]_0^1-\int_0^1 y_*''h\,\dd x\\
+&=
+0-\int_0^1(-1)h\,\dd x\\
+&=
+\int_0^1h\,\dd x.
+\end{align*}
+
+The terms linear in \(h\) cancel, leaving
+\[
+\boxed{
+\J[y_*+h]-\J[y_*]
+=
+\frac12\int_0^1(h')^2\,\dd x
+\geq0.
+}
+\]
+
+For smooth \(h\), equality requires \(h'=0\), so \(h\) is constant.
+Its endpoint values force \(h=0\).
+
+Therefore, \(y_*\) is the \textbf{unique global minimum}
+within this class of curves.
+
+This calculation also makes the first variation visible:
+at the stationary curve, the change has no linear term in the
+perturbation.
+
+\section*{39--43 minutes: Newton's law falls out}
+
+Replace the independent variable \(x\) by time \(t\), and the unknown
+function \(y\) by a particle trajectory \(q(t)\).
+
+Consider the action
+\[
+S[q]
+=
+\int_{t_0}^{t_1}
+L(q,\dot q)\,\dd t,
+\]
+where
+\[
+L(q,\dot q)=\frac12m\dot q^{\,2}-V(q).
+\]
+
+Fix the initial and final positions, and the endpoint times.
+
+Euler--Lagrange becomes
+\[
+\frac{\partial L}{\partial q}
+-
+\frac{\dd}{\dd t}
+\left(
+\frac{\partial L}{\partial\dot q}
+\right)
+=0.
+\]
+
+Calculate:
+\[
+\frac{\partial L}{\partial q}=-V'(q),
+\]
+\[
+\frac{\partial L}{\partial\dot q}=m\dot q,
+\]
+and
+\[
+\frac{\dd}{\dd t}
+\left(
+\frac{\partial L}{\partial\dot q}
+\right)
+=m\ddot q.
+\]
+
+Therefore,
+\[
+-V'(q)-m\ddot q=0,
+\]
+or
+\[
+\boxed{
+m\ddot q=-V'(q).
+}
+\]
+
+That is Newton's second law for a conservative force.
+
+For a spring,
+\[
+V(q)=\frac12kq^2,
+\]
+so
+\[
+V'(q)=kq
+\quad\Longrightarrow\quad
+\boxed{m\ddot q+kq=0.}
+\]
+
+\begin{quote}
+The integral statement describes the whole trajectory.
+Requiring stationarity under arbitrary local wiggles produces
+the equation of motion at every instant.
+\end{quote}
+
+Use the term \textbf{stationary action}:
+a physical trajectory need not minimize the action.
+
+\section*{43--45 minutes: Three questions to finish}
+
+\begin{enumerate}
+\item \textbf{Why must \(\eta\) vanish at the endpoints?}
+
+Because the endpoint values of the curve are prescribed.
+
+\item \textbf{Where does the minus sign in Euler--Lagrange come from?}
+
+Integration by parts.
+
+\item \textbf{Why do we need every admissible \(\eta\)?}
+
+So stationarity of the integral forces its coefficient
+to vanish pointwise.
+\end{enumerate}
+
+Leave this chain on the board:
+\[
+\boxed{
+\begin{gathered}
+y+\varepsilon\eta
+\;\longrightarrow\;
+\left.\frac{\dd}{\dd\varepsilon}\right|_{\varepsilon=0}
+\;\longrightarrow\;
+\text{integration by parts}\\[4pt]
+\longrightarrow\;
+F_y-\frac{\dd}{\dd x}F_{y'}=0.
+\end{gathered}
+}
+\]
+
+\clearpage
+
+\section*{Instructor backup: Exact calculation for a family of wiggles}
+
+Use the stationary curve and the variation
+\[
+y_*(x)=\frac12x(1-x),
+\qquad
+\eta(x)=x(1-x).
+\]
+
+Then
+\[
+y_\varepsilon(x)
+=
+\left(\frac12+\varepsilon\right)x(1-x).
+\]
+
+Let
+\[
+A=\frac12+\varepsilon.
+\]
+Thus,
+\[
+y_\varepsilon'=A(1-2x).
+\]
+
+The required integrals are
+\begin{align*}
+\int_0^1(1-2x)^2\,\dd x
+&=
+\int_0^1(1-4x+4x^2)\,\dd x\\
+&=
+1-2+\frac43\\
+&=
+\frac13,
+\end{align*}
+and
+\[
+\int_0^1x(1-x)\,\dd x
+=
+\frac12-\frac13
+=
+\frac16.
+\]
+
+Therefore,
+\begin{align*}
+\J[y_\varepsilon]
+&=
+\frac{A^2}{2}\cdot\frac13-A\cdot\frac16\\
+&=
+\frac{A^2-A}{6}\\
+&=
+\boxed{-\frac1{24}+\frac{\varepsilon^2}{6}}.
+\end{align*}
+
+Hence,
+\[
+\boxed{
+\frac{\dd}{\dd\varepsilon}\J[y_\varepsilon]
+=
+\frac{\varepsilon}{3},
+\qquad
+\frac{\dd^2}{\dd\varepsilon^2}\J[y_\varepsilon]
+=
+\frac13.
+}
+\]
+
+At \(\varepsilon=0\), the first derivative vanishes and
+\[
+\J[y_*]=-\frac1{24}.
+\]
+
+At \(\varepsilon=-\tfrac12\), the curve is flat:
+\[
+y_\varepsilon(x)=0,
+\qquad
+\J[y_\varepsilon]=0.
+\]
+
+This explores one family of curves.
+The earlier calculation with arbitrary \(h\) proves the minimum
+among all admissible curves.
+
+\section*{Instructor backup: How the brachistochrone becomes a cycloid}
+
+This is additional material, outside the 45-minute plan.
+
+The constant factor \(1/\sqrt{2g}\) does not affect which curves
+are stationary, so use
+\[
+F(y,y')=\frac{\sqrt{1+y'^2}}{\sqrt y}.
+\]
+
+Because \(F\) has no explicit dependence on \(x\),
+Euler--Lagrange gives a convenient first integral.
+
+\subsection*{Deriving the Beltrami identity}
+
+Differentiate:
+\begin{align*}
+\frac{\dd}{\dd x}\left(F-y'F_{y'}\right)
+&=
+F_x+F_y y'+F_{y'}y''
+-y''F_{y'}-y'\frac{\dd}{\dd x}F_{y'}\\
+&=
+F_x+y'\left(F_y-\frac{\dd}{\dd x}F_{y'}\right).
+\end{align*}
+
+Both terms vanish along an Euler--Lagrange solution here, so
+\[
+\boxed{F-y'F_{y'}=C.}
+\]
+
+This is the \textbf{Beltrami identity}.
+
+For the present integrand,
+\[
+F_{y'}
+=
+\frac{y'}{\sqrt y\sqrt{1+y'^2}}.
+\]
+
+Therefore,
+\begin{align*}
+F-y'F_{y'}
+&=
+\frac{\sqrt{1+y'^2}}{\sqrt y}
+-
+\frac{y'^2}{\sqrt y\sqrt{1+y'^2}}\\
+&=
+\frac{1+y'^2-y'^2}
+{\sqrt y\sqrt{1+y'^2}}\\
+&=
+\frac1{\sqrt{y(1+y'^2)}}.
+\end{align*}
+
+Consequently,
+\[
+y(1+y'^2)=\frac1{C^2}.
+\]
+
+Write the positive constant as \(2R\):
+\[
+\boxed{y(1+y'^2)=2R.}
+\]
+
+\subsection*{Solving the first integral}
+
+Set
+\[
+y=R(1-\cos\theta)
+=
+2R\sin^2\frac\theta2.
+\]
+
+Then
+\[
+1+y'^2
+=
+\frac{2R}{y}
+=
+\csc^2\frac\theta2,
+\]
+so
+\[
+y'^2=\cot^2\frac\theta2.
+\]
+
+On the initial descending branch, take
+\[
+y'=\cot\frac\theta2.
+\]
+
+This continues smoothly through the lowest point onto the
+rising branch when needed.
+
+Since
+\[
+\frac{\dd y}{\dd\theta}=R\sin\theta,
+\]
+we obtain
+\begin{align*}
+\frac{\dd x}{\dd\theta}
+&=
+\frac{\dd y/\dd\theta}{\dd y/\dd x}\\
+&=
+\frac{R\sin\theta}{\cot(\theta/2)}\\
+&=
+R(1-\cos\theta).
+\end{align*}
+
+At the lowest point, interpret the intermediate quotient by
+continuity.
+
+Integrating and setting \(x(0)=0\),
+\[
+\boxed{
+x(\theta)=R(\theta-\sin\theta),
+\qquad
+y(\theta)=R(1-\cos\theta).
+}
+\]
+
+These are the parametric equations of a cycloid, with \(y\)
+measured downward.
+
+The endpoint determines \(R\) and \(\theta_B\):
+\[
+b=R(\theta_B-\sin\theta_B),
+\qquad
+h=R(1-\cos\theta_B),
+\]
+using
+\[
+0<\theta_B<2\pi.
+\]
+
+Equivalently, first solve
+\[
+\frac bh
+=
+\frac{\theta_B-\sin\theta_B}{1-\cos\theta_B},
+\]
+then obtain
+\[
+R=\frac{h}{1-\cos\theta_B}.
+\]
+
+\subsection*{Checking the travel time}
+
+Along this arc,
+\begin{align*}
+\frac{\dd s}{\dd\theta}
+&=
+\sqrt{
+\left(\frac{\dd x}{\dd\theta}\right)^2+
+\left(\frac{\dd y}{\dd\theta}\right)^2
+}\\
+&=
+R\sqrt{(1-\cos\theta)^2+\sin^2\theta}\\
+&=
+R\sqrt{2-2\cos\theta}\\
+&=
+2R\sin\frac\theta2.
+\end{align*}
+
+The speed is
+\[
+v=\sqrt{2gy}
+=
+2\sqrt{gR}\sin\frac\theta2.
+\]
+
+Thus,
+\[
+\dd t
+=
+\frac{\dd s}{v}
+=
+\sqrt{\frac Rg}\,\dd\theta,
+\]
+and
+\[
+\boxed{
+T=\theta_B\sqrt{\frac Rg}.
+}
+\]
+
+The ratio has a finite limit at release, despite both
+\(\dd s/\dd\theta\) and \(v\) vanishing there.
+
+\textit{Scope of the calculation.}
+Apply the smooth Euler--Lagrange reasoning away from the singular
+starting point, for example using variations supported in the
+interior. This calculation identifies the cycloidal stationary
+candidate. Stationarity alone does not establish global optimality.
+
+\section*{Instructor backup: Direct Euler--Lagrange check for the brachistochrone}
+
+For an explicit algebra check, write \(p=y'\). Then
+\[
+F(y,p)=\frac{\sqrt{1+p^2}}{\sqrt y},
+\]
+with
+\[
+F_y=-\frac{\sqrt{1+p^2}}{2y^{3/2}},
+\qquad
+F_p=\frac{p}{\sqrt y\sqrt{1+p^2}}.
+\]
+
+Differentiating \(F_p\) along the curve gives
+\[
+\frac{\dd}{\dd x}F_p
+=
+\frac{y''}{\sqrt y(1+y'^2)^{3/2}}
+-
+\frac{y'^2}{2y^{3/2}\sqrt{1+y'^2}}.
+\]
+
+Therefore,
+\begin{align*}
+F_y-\frac{\dd}{\dd x}F_p
+&=
+-\frac{\sqrt{1+y'^2}}{2y^{3/2}}
+-\frac{y''}{\sqrt y(1+y'^2)^{3/2}}
++\frac{y'^2}{2y^{3/2}\sqrt{1+y'^2}}\\
+&=
+-\frac{1+y'^2+2yy''}
+{2y^{3/2}(1+y'^2)^{3/2}}.
+\end{align*}
+
+Euler--Lagrange is thus equivalent, where \(y>0\), to
+\[
+\boxed{2yy''+1+y'^2=0.}
+\]
+
+The first integral follows directly:
+\begin{align*}
+\frac{\dd}{\dd x}\left[y(1+y'^2)\right]
+&=
+y'(1+y'^2)+2yy'y''\\
+&=
+y'\left(1+y'^2+2yy''\right)\\
+&=
+0.
+\end{align*}
+
+Hence,
+\[
+y(1+y'^2)=\text{constant},
+\]
+in agreement with the Beltrami calculation.
+
+\section*{Small details worth checking before teaching}
+
+\begin{itemize}
+\item Fixed endpoint values imply
+\[
+\eta(a)=\eta(b)=0.
+\]
+They do not imply
+\[
+\eta'(a)=\eta'(b)=0.
+\]
+
+\item \(F_y\) and \(F_{y'}\) are partial derivatives;
+\(\dd F_{y'}/\dd x\) is a total derivative.
+
+\item You cannot set \(F_y=0\) and \(F_{y'}=0\) separately:
+\(\eta\) and \(\eta'\) are linked.
+
+\item In the general derivation, assuming \(F\) and the candidate
+curve are sufficiently smooth justifies differentiation under
+the integral and integration by parts.
+
+\item With fixed \(x\), variation and differentiation commute:
+\[
+\delta y
+=
+\left.
+\frac{\dd y_\varepsilon}{\dd\varepsilon}
+\right|_{\varepsilon=0}
+=
+\eta,
+\]
+and
+\[
+\delta y'
+=
+\eta'
+=
+\frac{\dd}{\dd x}(\delta y).
+\]
+
+\item A stationary curve need not be a minimum.
+For the string example, the exact nonnegative functional
+difference supplies the additional proof.
+\end{itemize}
+
+\section*{Historical reference}
+
+J.~J.~O'Connor and E.~F.~Robertson,
+\emph{The brachistochrone problem},
+MacTutor History of Mathematics, University of St Andrews.
+
+\url{https://mathshistory.st-andrews.ac.uk/HistTopics/Brachistochrone/}
+
+\end{document}

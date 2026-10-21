@@ -1,0 +1,8 @@
+.orbit-page .wave-stage { background:radial-gradient(ellipse at 55% 49%,#1c2531,#0c1420 78%) }
+.orbit-family { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:10px; margin:-5px 0 15px; font-variant-numeric:tabular-nums }
+.orbit-page .wave-inspector h1 { margin-bottom:8px }
+.orbit-page .wave-intro p { margin:8px 0 }
+.orbit-page .branch-switch button { padding:7px 3px; font-size:10px }
+.orbit-page .branch-switch [data-branch=after][aria-pressed=true] { background:#352a4b; color:#d7c4ff }
+.orbit-page .wave-notes p { margin:7px 0 }
+@media(max-width:1150px) and (min-width:741px) { .orbit-page .wave-view-controls { top:55px }.orbit-page .front-sampling { top:92px } }

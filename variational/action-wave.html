@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1019">
+  <meta name="description" content="See Hamilton's action as moving fronts. Explore ballistic rays, two action branches, and their caustic under uniform gravity.">
+  <title>Action as Wave — Variational</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b1019'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%235ae0d3' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='10' fill='none' stroke='%23b79bfa' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./action-wave.css">
+  <script type="module" src="./js/action-wave-scene.js"></script>
+</head>
+<body class="wave-page">
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Variational home">
+      <svg viewBox="0 0 38 30" aria-hidden="true"><path d="M3 6Q12 42 35 7"/><circle cx="3" cy="6" r="2.5"/><circle cx="35" cy="7" r="2.5"/></svg>
+      <span>Variational<small>A CURVE LABORATORY</small></span>
+    </a>
+    <nav class="modes" aria-label="Choose a variational problem">
+      <a href="./index.html?scene=length"><span>01</span> Straight line</a>
+      <a href="./index.html?scene=catenary"><span>02</span> Catenary</a>
+      <a href="./index.html?scene=brachistochrone"><span>03</span> Brachistochrone</a>
+      <a href="./index.html?scene=dynamics"><span>04</span> Dynamics</a>
+      <a href="./action-wave.html" aria-current="page"><span>05</span> Action as Wave</a>
+      <a href="./orbit-wave.html"><span>06</span> Orbits as Wave</a>
+    </nav>
+    <button class="text-button math-button" id="math-open"><span aria-hidden="true">∫</span> The mathematics</button>
+  </header>
+
+  <main class="wave-workspace">
+    <section class="wave-field" aria-label="Action fronts and rays">
+      <div class="wave-stage">
+        <canvas id="wave-canvas" tabindex="0" role="application" aria-label="Action fronts. Left-click or drag to move endpoint B. Middle mouse drag pans. Mouse wheel or plus and minus keys zoom. Arrow keys move B; Shift gives larger steps." aria-describedby="wave-help"></canvas>
+        <div class="wave-key" aria-label="Plot legend">
+          <span class="short-key"><i></i><span id="short-key-label">Short flight</span></span>
+          <span class="long-key" id="long-key"><i></i>Long flight</span>
+          <span class="caustic-key" id="caustic-key"><i></i>Caustic</span>
+        </div>
+        <div class="wave-view-controls"><span>Middle drag to pan · Wheel to zoom</span><output id="zoom-value">100%</output><button id="view-reset">Reset view</button></div>
+        <div id="front-sampling" class="front-sampling"></div>
+        <div class="wave-transport">
+          <button id="wave-play" aria-pressed="false">▶ Play</button>
+          <button id="wave-restart" title="Restart the phase clock" aria-label="Restart the phase clock">↺</button>
+          <label for="wave-time" id="clock-label">Phase time</label>
+          <input id="wave-time" type="range" min="0" max="1" step="0.001" value="0" aria-label="Phase time">
+          <output id="wave-time-value">0.00 s</output>
+          <span class="slow-label">slow motion</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="wave-inspector" aria-label="Wave controls and endpoint information">
+      <div class="wave-intro">
+        <span class="eyebrow">HAMILTON → OPTICS</span>
+        <h1>Action as Wave</h1>
+        <p id="view-description">One speed, every direction. Two action branches from a continuous point source.</p>
+        <div class="wave-equation" id="wave-equation">
+          <math><mi>S</mi><mo>=</mo><mi>W</mi><mo>−</mo><mi>E</mi><mi>t</mi><mspace width="1.2em"/><mi mathvariant="bold">p</mi><mo>=</mo><mo>∇</mo><mi>W</mi></math>
+        </div>
+      </div>
+      <div class="wave-settings">
+        <label class="wave-range" id="speed-control" for="launch-speed"><span>Launch speed <output id="speed-value">6.0 m/s</output></span><input id="launch-speed" type="range" min="3" max="8" step="0.1" value="6"></label>
+        <label class="wave-range" for="front-spacing"><span>Action between fronts <output id="spacing-value">2.0 J·s</output></span><input id="front-spacing" type="range" min="0.75" max="5" step="0.25" value="2"></label>
+        <div id="branch-control">
+          <span class="setting-label">Show branches</span>
+          <div class="wave-switch branch-switch" role="group" aria-label="Visible action branches">
+            <button data-branch="short" aria-pressed="false">Short</button><button data-branch="both" aria-pressed="true">Both</button><button data-branch="long" aria-pressed="false">Long</button>
+          </div>
+        </div>
+        <div class="wave-toggles">
+          <label><input id="ray-fan" type="checkbox" checked> Ray fan</label>
+          <label><input id="normals" type="checkbox" checked> Momentum arrows</label>
+        </div>
+        <div class="flight-controls"><button id="launch-fan" title="Launch one simultaneous set of 32 colored particles along the ray fan.">✦ Launch fan</button><output id="fan-time">One burst · 32 particles</output></div>
+      </div>
+      <section class="probe-panel" aria-labelledby="probe-heading">
+        <div class="probe-heading"><h2 id="probe-heading">At B</h2><output id="probe-coordinates">(2.30, 0.10) m</output></div>
+        <p id="ray-status" role="status">Two classical rays</p>
+        <div id="ray-details"></div>
+        <div class="flight-controls"><button id="launch-particle" title="Launch a particle on each visible route from A to B, with the waves running on the same clock.">● Launch A → B</button><output id="flight-time">One dot per route</output></div>
+        <div class="probe-actions"><button id="probe-caustic">Move B to caustic</button><button id="probe-reset">Reset B</button></div>
+      </section>
+      <div class="wave-notes">
+        <p id="wave-help">Drag B. Middle drag to pan; wheel to zoom. Play/Pause controls particles and waves together.</p>
+        <p id="branch-note">Two flight times, one energy. At the amber boundary the two rays merge; beyond it, neither reaches B.</p>
+        <p class="phase-note">Phase geometry only. Brightness does not represent wave intensity.</p>
+      </div>
+    </aside>
+  </main>
+
+  <dialog id="math-dialog" aria-labelledby="math-title">
+    <div class="dialog-heading"><span class="eyebrow">FROM STATIONARY ACTION TO FRONTS</span><button id="math-close" aria-label="Close mathematics">×</button></div>
+    <h2 id="math-title">One source. A field of actions.</h2>
+    <p>The Dynamics scene varies a whole history between fixed events. Here we evaluate the action on the classical history for each endpoint. That endpoint function is Hamilton’s principal function. We keep m = 1 kg, g = 9.81 m/s², A = (0, 0), and positive y downward, so V = −mgy.</p>
+    <h3>Action along a classical path</h3>
+    <p>The classical history from A to (x, y) in a duration T &gt; 0 has principal action S(x,y,T). Using t as the duration in the formula,</p>
+    <div class="equation"><math display="block"><mi>S</mi><mo>=</mo><mfrac><mrow><mi>m</mi><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup><mo>)</mo></mrow><mrow><mn>2</mn><mi>t</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>m</mi><mi>g</mi><mi>y</mi><mi>t</mi></mrow><mn>2</mn></mfrac><mo>−</mo><mfrac><mrow><mi>m</mi><msup><mi>g</mi><mn>2</mn></msup><msup><mi>t</mi><mn>3</mn></msup></mrow><mn>24</mn></mfrac></math></div>
+    <h3>Fixed speed: the optical construction</h3>
+    <p>Fixing the full initial velocity leaves just one ray. Instead, fixing its magnitude v₀ and allowing every direction fixes E = mv₀²/2. For each classical route, the abbreviated action W = ∫p · dq gives a separate phase branch S = W − Et. The moving lines are S = kΔS for a continuous source. The phase clock repeats one period ΔS/E; it is not a common flight time for the two rays.</p>
+    <div class="equation"><math display="block"><msup><mrow><mo>|</mo><mo>∇</mo><mi>W</mi><mo>|</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>2</mn><mi>m</mi><mo>(</mo><mi>E</mi><mo>+</mo><mi>m</mi><mi>g</mi><mi>y</mi><mo>)</mo></math></div>
+    <p>This is the mechanical eikonal equation: the optical index is proportional to the momentum magnitude √[2m(E − V)]. It is not the inverse particle speed used in the brachistochrone travel-time problem. Hamilton–Jacobi reads ∂S/∂t + |∇S|²/(2m) − mgy = 0.</p>
+    <h3>Where a single action stops being enough</h3>
+    <p>For a point inside the reachable region, two positive flight times solve v₀² = x²/T² + (y/T − gT/2)². Each time gives its own trajectory and its own W = S(x,y,T) + ET. They coalesce at the envelope</p>
+    <div class="equation"><math display="block"><msub><mi>y</mi><mi>c</mi></msub><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>g</mi><msup><mi>x</mi><mn>2</mn></msup></mrow><mrow><mn>2</mn><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup></mrow></mfrac><mo>−</mo><mfrac><msubsup><mi>v</mi><mn>0</mn><mn>2</mn></msubsup><mrow><mn>2</mn><mi>g</mi></mrow></mfrac></math></div>
+    <p>Above that parabola, no real classical ray at this energy reaches the point. The two colors keep the branches separate; their overlap is not interference. At the top of the caustic the particle stops momentarily, p = 0, and a front normal is undefined. The zero-duration source branch also has no unique momentum direction.</p>
+    <p>Fronts and particles generally travel at different speeds. A particle crosses fronts; it does not ride a crest. The faint ray fan shows trajectories, while the colored curves through B show its classical routes. Equal spatial scales make the right angles meaningful. Use the mouse wheel to zoom; changing the physics never changes the camera scale.</p>
+    <p>Launch A → B animates a dot on each visible route with the same elapsed physical time as the fronts. The short route arrives first and its dot waits at B; the waves continue. Launch fan instead sends one simultaneous set of 32 particles along the displayed rays, all with the chosen launch speed. It emits only once per click. Particles follow exact ballistic paths and cross the existing fixed-energy fronts.</p>
+    <p>Fan particles are cyan on the short-time action branch and violet on the long-time branch. An upward ray changes branches when it touches the caustic, at v₀² + gvᵧ₀t = 0; the instant of contact is amber. The branch buttons filter both fronts and fan particles. The colors describe the local action sheet, while the highlighted A → B paths retain their route colors. Play/Pause controls all particles and fronts together; Restart returns the current sets to A. Unresolved contour levels may be omitted at distant zoom; a label states the sampling.</p>
+    <p class="fine-print">This is an exact classical phase construction, not a numerical wave-equation solution. It does not calculate amplitudes, diffraction, interference, or the wave treatment that resolves a caustic. Stationary action is not generally a minimum. The fixed-time uniform-gravity problem is a special case with a positive quadratic excess action.</p>
+    <div class="lecture-links"><span>LECTURE SOURCES &amp; BACKGROUND</span><a href="./lectures/01-calculus-of-variations.tex" download>01 — Calculus of Variations (.tex)</a><a href="./lectures/02-hamilton-action-wavefronts.tex" download>02 — Hamilton’s Principle, Wavefronts and Rays (.tex)</a><a href="https://www.damtp.cam.ac.uk/user/tong/dynamics/dynhtml/S4.html#S4.S7" target="_blank" rel="noopener">David Tong — Hamilton–Jacobi theory</a></div>
+  </dialog>
+</body>
+</html>
