@@ -172,8 +172,7 @@
           <div class="equation">\[
             \begin{aligned}M=HS_iH&=I-2|s\rangle\langle s|\\&=-D.\end{aligned}
           \]</div>
-          <p><strong>This particular construction introduces the overall minus.</strong> \(S_i\) reverses the component parallel to \(|i\rangle\). After changing the reference direction, \(M\) reverses the component parallel to \(|s\rangle\). The conventional \(D\) above instead preserves that parallel component and reverses the perpendicular ones. The two outputs point in opposite directions but represent the same physical state, differing only by a global phase.</p>
-          <p>There is no requirement that Grover use the negative convention: \(H(-S_i)H\) gives \(D\) exactly. Its middle gate would leave the initial component fixed and flip all the others. <strong>Here we keep the phase flip of the initial state and display the resulting \(M=-D\) faithfully.</strong> This is a choice of gates, not a consequence of the later box geometry. <a class="cite" href="https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.circuit.library.grover_operator">[Operator conventions]</a></p>
+          <p id="global-phase"><strong>The minus sign changes only the global phase.</strong> Our reference gate \(S_i\) flips the initial component, so \(M\) flips the prepared direction \(|s\rangle\). This gives \(M=-D\): every output amplitude is the negative of the corresponding output from \(D\). Multiplying the whole state by \(-1\) leaves relative phases and all measurement probabilities unchanged. After \(k\) full rounds, the two conventions differ by \((-1)^k\). The opening vector diagram uses \(D\); the columns and wave views retain the signs produced by their gates. <a class="cite" href="https://quantum.cloud.ibm.com/docs/en/api/qiskit/qiskit.circuit.library.grover_operator">[Operator conventions]</a></p>
           <p>Here is the sandwich as simple real-vector geometry. The gold arrow is the reference \(|s\rangle\); the violet line perpendicular to it is the mirror for our \(M\). Turn the whole picture until the reference lines up with the horizontal initial-state axis, perform the simple reflection, then turn back.</p>
           <p>Call the turn \(R\), with \(R|i\rangle=|s\rangle\). The construction is <strong>\(RS_iR^{\mathsf T}\)</strong>: the rightmost operation acts first. This illustrates the same complete reflection as \(HS_iH\). Choose an example vector and watch the reference and mirror travel with it.</p>
         </div>
@@ -208,7 +207,7 @@
               <div class="reflection-controls construction-controls"><button id="construction-back" type="button" disabled>Previous</button><button id="construction-next" type="button" disabled>Turn to initial axis</button><button id="construction-pause" type="button" disabled>Resume</button><button id="construction-reset" type="button" disabled>Reset</button></div>
             </div>
           </div>
-          <p class="reflection-note">Turn the basis → reflect → turn back. Pause or scrub to follow the picture; Previous plays backward. The grey arrow keeps the original vector in the current basis. This real geometric sweep illustrates the sandwich; the Hadamard circuit implements the same complete M = −D.</p>
+          <p class="reflection-note">Turn the basis → reflect → turn back. Pause or scrub to follow the picture; Previous plays backward. The grey arrow keeps the original vector in the current basis.</p>
           <noscript><p class="reflection-note">Enable JavaScript to choose a vector and step through the construction.</p></noscript>
         </div>
         <div class="prose"><details><summary>How the real picture connects to the Hadamard circuit</summary><p>For the sixteen-state example, \(|u\rangle\) is the normalized sum of the fifteen states other than \(|i\rangle\), and \(|s\rangle=(|i\rangle+\sqrt{15}|u\rangle)/4\). In this real plane we choose the rotation</p><div class="equation">\[
@@ -218,11 +217,10 @@
           \]</div><p>The widget uses \(R\) to make the change of basis visible as a simple turn. Its moving arrows illustrate the geometry between stages. The circuit and column demo retain their actual Hadamard gates.</p></details></div>
         <figure class="circuit-figure">
           <a class="figure-link" href="images/circuit.svg" target="_blank" rel="noopener noreferrer"><picture><source media="(max-width: 600px)" srcset="images/circuit-mobile.svg" width="380" height="680" /><img src="images/circuit.svg" width="1100" height="320" alt="Four qubits start at zero. Apply H to each once, then repeat oracle O w, H on each, reference phase S i, and H on each. The final three gates form M equals H S i H equals minus D. Measure after three rounds for sixteen states." loading="lazy" /></picture><span class="figure-zoom">Open full-size figure ↗</span></a>
-          <figcaption>The circuit used here. \(O_w\) and \(S_i\) act on the full four-qubit register. The three-gate bracket is \(M=-D\). Replacing \(S_i\) by −\(S_i\) would give the conventional \(D\).</figcaption>
+          <figcaption>The circuit used here. \(O_w\) and \(S_i\) act on the full four-qubit register; the bracket groups the three mixer gates.</figcaption>
         </figure>
         <div class="prose">
-          <p>After \(k\) full rounds, \((MO_w)^k|s\rangle=(-1)^k(DO_w)^k|s\rangle\). Thus every odd completed round points opposite to the vector in the opening diagram. Every measurement probability and relative phase still agrees. The columns below retain this overall sign, so the first complete mixer puts them below zero.</p>
-          <p>Only \(O_w\) and \(S_i\) are selective sign-flip gates. Hadamard mixing adds and subtracts contributions, so other amplitudes can become negative between those two \(H\) gates. These intermediate signs are already present in abstract qubit Grover; they do not come from the wave encoding.</p>
+          <p>The two Hadamards also mix amplitudes along the way. The column view below lets us follow those intermediate states, gate by gate.</p>
         </div>
       </section>
 
@@ -231,15 +229,15 @@
         <h2 id="columns-title">Follow the amplitudes, gate by gate</h2>
         <div class="prose">
           <p>Now separate the vector into its sixteen basis amplitudes. Arrange the states on a \(4\times4\) grid: the first two bits label column x and the last two label row y, so \(j=4x+y\). The lower-left state is our input \(|0000\rangle\); the upper-right state is our example target \(|1111\rangle\). This grid arranges labels, with no physical distance between them yet. Column heights show real amplitudes, so a column below zero does not mean negative probability.</p>
-          <p>The vector reflection has a useful expression in these coordinates. Since \(|s\rangle\) is uniform, \(D\) reflects each amplitude about the arithmetic mean \(\mu\), while our \(M\) gives the global negative of that result:</p>
+          <p>For uniform \(|s\rangle\), \(D\) reflects each amplitude about the arithmetic mean \(\mu\). The two operators act as follows:</p>
           <div class="equation">\[
             \begin{aligned}\mu&=\frac1{16}\sum_j a_j,\\[0.4em]D:\quad a_j^{\prime}&=2\mu-a_j,\\M:\quad a_j^{\prime}&=a_j-2\mu.\end{aligned}
           \]</div>
-          <p>After the first oracle, fifteen amplitudes are \(+1/4\) and the marked amplitude is \(-1/4\). Their mean is \(7/32\). The conventional \(D\) gives \(+3/16\) and \(+11/16\) respectively; our \(M\) gives \(-3/16\) and \(-11/16\). Both give marked probability \((11/16)^2=47.265625\%\). No gate needs to measure the mean: these are fixed linear operators.</p>
+          <p>After the first oracle, fifteen amplitudes are \(+1/4\) and the marked amplitude is \(-1/4\), giving a mean of \(7/32\). Our mixer \(M\) takes them to \(-3/16\) and \(-11/16\), respectively, and the marked probability becomes \((11/16)^2=47.265625\%\). No gate needs to measure the mean: these are fixed linear operators.</p>
         </div>
         <figure>
           <a class="figure-link" href="images/reflection.svg" target="_blank" rel="noopener noreferrer"><picture><source media="(max-width: 600px)" srcset="images/reflection-mobile.svg" width="380" height="1030" /><img src="images/reflection.svg" width="1100" height="430" alt="The oracle leaves fifteen amplitudes at one quarter and reverses the marked one to minus one quarter. Reflection about the mean 7/32 gives unmarked amplitudes 3/16 and marked amplitude 11/16. Our displayed mixer has the opposite overall sign." loading="lazy" /></picture><span class="figure-zoom">Open full-size figure ↗</span></a>
-          <figcaption>The marked amplitude starts far below the mean. The conventional diffuser reflects it far above the mean. Our demo’s mixer produces the global negative of that result.</figcaption>
+          <figcaption>Oracle output, conventional diffuser \(D\), and the displayed mixer \(M\). The dashed gold lines show the mean labeled in each panel.</figcaption>
         </figure>
         <div class="prose">
           <p>Start with one column. Press <strong>Next step</strong> to prepare the equal superposition, then apply the oracle. Leave <strong>Combine</strong> off to see each of the three mixer gates. After the first \(H\) inside that mixer, the input amplitude is \(+7/8\), while the others are \(\pm1/8\). \(S_i\) flips \(+7/8\) to \(-7/8\), and the final \(H\) collects these contributions into the amplified result.</p>
@@ -275,9 +273,9 @@
           <noscript><p class="lab-hint">Enable JavaScript for the interactive columns, or follow the static figures and checkpoint table.</p></noscript>
         </div>
         <div class="prose">
-          <p>The gold mean plane travels with the columns in the combined animation. All real column tips shift by \(-2\mu\), which is \(-7/16\) in the first round, and their mean moves from \(+7/32\) to \(-7/32\). The solid plane shows the <em>current mean</em>; the dashed destination marks its final value. For conventional \(D\), the plane of reflection would stay at the input mean.</p>
+          <p>The gold mean plane travels with the columns in the combined animation. All real column tips shift by \(-2\mu\), which is \(-7/16\) in the first round, and their mean moves from \(+7/32\) to \(-7/32\). The solid plane shows the <em>current mean</em>; the dashed destination marks its final value.</p>
           <h3>Why repeating works—and why to stop</h3>
-          <p>Return to the two-dimensional picture at complete round boundaries. Using the same \(|r\rangle\) and \(\theta\) as the opening diagram, our gate convention gives</p>
+          <p>Return to the two-dimensional picture at complete round boundaries. Using the same \(|r\rangle\) and \(\theta\) as the opening diagram, the state after \(k\) rounds is</p>
           <div class="equation">\[
             \begin{aligned}|\psi_k\rangle&=(-1)^k\bigl[\sin\bigl((2k+1)\theta\bigr)|w\rangle\\&\quad+\cos\bigl((2k+1)\theta\bigr)|r\rangle\bigr],\\[0.4em]P_w(k)&=\sin^2\bigl((2k+1)\theta\bigr),\\\theta&=\arcsin(1/4).\end{aligned}
           \]</div>
@@ -358,7 +356,7 @@
           <div class="equation">\[
             \begin{aligned}M_A&=AS_iA^\dagger\\&=I-2|s_A\rangle\langle s_A|.\end{aligned}
           \]</div>
-          <p>We again have the negative of a reflection about the prepared state. If preparation gives marked probability \(1/16\), the same Grover amplification curve follows—even if the sixteen prepared amplitudes have different phases. This is the bridge from the qubit circuit to our free box. <a class="cite" href="https://arxiv.org/abs/quant-ph/0005055">[Amplitude amplification]</a></p>
+          <p>If preparation gives marked probability \(1/16\), the same Grover amplification curve follows—even if the sixteen prepared amplitudes have different phases. This is the bridge from the qubit circuit to our free box. <a class="cite" href="https://arxiv.org/abs/quant-ph/0005055">[Amplitude amplification]</a></p>
           <p>Inside the square, set the potential to zero and keep the hard walls. The Hamiltonian and sine-mode energies are</p>
           <div class="equation">\[
             \begin{aligned}\mathcal H_{\mathrm{box}}&=-\frac{\hbar^2}{2m}\nabla^2,\\[0.5em]E_{n\ell}&=E_1(n^2+\ell^2),\\E_1&=\frac{\pi^2\hbar^2}{2mL^2}.\end{aligned}
