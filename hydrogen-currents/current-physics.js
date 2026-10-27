@@ -117,3 +117,24 @@ export function sampleOrbital(state,count=32000) {
   return {positions,displayRadius:quantile(radialCdf.cdf,.995)*dr,
     radialNormalization:radialCdf.norm,radialNodes:nodes};
 }
+
+// Equal-weight Born samples turn a density quantile into a probability-mass
+// selection. Keep a highest-density region, rather than a radial or spatial cut.
+export function selectProbabilityRegion(state,sample,fraction=.9) {
+  const count=sample.positions.length/3,kept=Math.round(count*fraction);
+  if (!(fraction>0&&fraction<=1)) throw new Error('Invalid retained probability');
+  const densities=Float64Array.from({length:count},(_,i)=>densityAt(state,...sample.positions.subarray(i*3,i*3+3)));
+  const order=Uint32Array.from({length:count},(_,i)=>i).sort((a,b)=>densities[a]-densities[b]);
+  const discarded=count-kept,mask=new Uint8Array(count);
+  for (let i=discarded;i<count;i++) mask[order[i]]=1;
+  const positions=new Float64Array(kept*3);
+  let next=0,radius=0;
+  for (let i=0;i<count;i++) {
+    if(!mask[i])continue;
+    const point=sample.positions.subarray(i*3,i*3+3);
+    positions.set(point,next);next+=3;radius=Math.max(radius,Math.hypot(...point));
+  }
+  const threshold=discarded?(densities[order[discarded-1]]+densities[order[discarded]])/2:0;
+  return {...sample,positions,displayRadius:radius*1.05,densityThreshold:threshold,
+    probabilityFraction:kept/count,sourceCount:count,retainedCount:kept};
+}

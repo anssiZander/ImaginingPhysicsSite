@@ -11,16 +11,16 @@
   <meta property="og:description" content="The cloud can stand still while its probability current circulates. Look inside hydrogen orbitals to see how phase and spin shape the flow." />
   <meta property="og:url" content="https://imaginingphysics.com/hydrogen-currents/" />
   <meta property="og:image" content="https://imaginingphysics.com/hydrogen-currents/media/social.jpg" />
-  <meta property="og:image:alt" content="A cutaway of a hydrogen 6p orbital reveals nested gold and blue bands of opposite probability current." />
+  <meta property="og:image:alt" content="A cutaway of a hydrogen 6p orbital reveals nested yellow and blue bands of opposite probability current." />
   <meta property="article:published_time" content="2026-10-27" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../comments.css" />
   <link rel="stylesheet" href="../grover-search/vendor/katex-0.19.0/katex.min.css" />
-  <link rel="stylesheet" href="article.css?v=20261027-orbitals" />
+  <link rel="stylesheet" href="article.css?v=20261027-orbit-view" />
   <script defer src="../grover-search/vendor/katex-0.19.0/katex.min.js"></script>
   <script defer src="../grover-search/vendor/katex-0.19.0/auto-render.min.js"></script>
-  <script type="module" src="article.js?v=20261027-orbitals"></script>
+  <script type="module" src="article.js?v=20261027-orbit-view"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -48,7 +48,7 @@
           <a class="opening-link" href="#two-currents">Follow the two contributions <span aria-hidden="true">↓</span></a>
         </div>
         <figure class="opening-image">
-          <a href="media/6p.webp" aria-label="View the 6p cutaway at full size"><img src="media/6p.webp" width="1600" height="1200" alt="Gold and blue nested layers appear inside an octant cutaway of the 6p, m equals plus one orbital." fetchpriority="high" decoding="async" /></a>
+          <a href="media/6p.webp" aria-label="View the 6p cutaway at full size"><img src="media/6p.webp" width="1600" height="1200" alt="Yellow and blue nested layers appear inside an octant cutaway of the 6p, m equals plus one orbital." fetchpriority="high" decoding="async" /></a>
           <figcaption>6p, \(m_\ell=+1\), spin along +z. The cutaway exposes alternating directions of current.</figcaption>
         </figure>
       </header>
@@ -70,17 +70,17 @@
         </div>
         <div class="image-pair introductory-pair">
           <figure>
-            <a href="media/1s.webp"><img src="media/1s.webp" width="1600" height="1200" alt="A spherical 1s probability cloud, opened by a visual cutaway and filled with gold current tracers." loading="lazy" decoding="async" /></a>
+            <a href="media/1s.webp"><img src="media/1s.webp" width="1600" height="1200" alt="A spherical 1s probability cloud, opened by a visual cutaway and filled with yellow current tracers." loading="lazy" decoding="async" /></a>
             <figcaption><strong>1s, \(m_\ell=0\).</strong> A spherical density with a circulating spin contribution. The opening is a viewing cut, not a missing part of the orbital.</figcaption>
           </figure>
           <figure>
-            <a href="media/2p.webp"><img src="media/2p.webp" width="1600" height="1200" alt="Two gold lobes of the 2p z orbital with the nodal plane between them." loading="lazy" decoding="async" /></a>
+            <a href="media/2p.webp"><img src="media/2p.webp" width="1600" height="1200" alt="Two yellow lobes of the 2p z orbital with the nodal plane between them." loading="lazy" decoding="async" /></a>
             <figcaption><strong>2p<sub>z</sub>, \(m_\ell=0\).</strong> Both lobes circulate in the same sense for spin +z. The opposite signs of the wavefunction do not by themselves mean opposite currents.</figcaption>
           </figure>
         </div>
         <aside class="reading-note prose">
           <h3>How to read the pictures</h3>
-          <p>The dots are visualization samples of a single electron’s probability distribution, transported by \(\mathbf v=\mathbf j/\rho\). They are not a cloud of interacting electrons or recorded individual electron tracks. Gold/orange marks counterclockwise flow viewed from +z; blue/violet marks clockwise flow. In the comparison films, slow motion fades toward silver. These are colors of the <em>total</em> current, not separate colors for its two terms.</p>
+          <p>The dots are visualization samples of a single electron’s probability distribution, transported by \(\mathbf v=\mathbf j/\rho\). They are not a cloud of interacting electrons or recorded individual electron tracks. Yellow marks counterclockwise flow viewed from +z; blue marks clockwise flow. In the comparison films, slow motion fades toward white. These are colors of the <em>total</em> current, not separate colors for its two terms.</p>
         </aside>
       </section>
 
@@ -165,12 +165,12 @@
             <label for="flow-speed">Playback speed</label><input id="flow-speed" type="range" min="0.25" max="2" step="0.25" value="1" /><output id="flow-speed-value" for="flow-speed">1×</output>
           </div>
           <div class="explorer-visuals">
-            <div class="orbital-view"><p id="orbital-state" class="orbital-state">1s · n = 1, ℓ = 0, mℓ = 0</p><div class="orbital-canvases"><canvas id="orbital-density" width="800" height="720" aria-hidden="true"></canvas><canvas id="orbital-flow" width="800" height="720" role="img" aria-label="Animated hydrogen orbital current">Your browser needs canvas support to show the orbital current.</canvas></div><p id="orbital-view-note" class="orbital-view-note">Oblique view · quarter cutaway</p></div>
+            <div class="orbital-view"><p id="orbital-state" class="orbital-state">1s · n = 1, ℓ = 0, mℓ = 0</p><div class="orbital-canvases"><canvas id="orbital-density" width="800" height="720" aria-hidden="true"></canvas><canvas id="orbital-flow" width="800" height="720" role="img" tabindex="0" aria-describedby="orbital-instructions orbital-view-note" aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown + - Home" aria-label="Rotatable hydrogen orbital current">Your browser needs WebGL support to show the orbital current.</canvas><svg class="orbital-axis" viewBox="0 0 60 50" aria-hidden="true"><line id="orbital-z-axis" x1="23" x2="23" y1="32" y2="8" stroke="currentColor"/><circle cx="23" cy="32" r="2" fill="currentColor"/><text id="orbital-z-label" x="31" y="11" fill="currentColor">z</text></svg></div><p id="orbital-view-note" class="orbital-view-note">90% probability cloud</p><div class="view-controls"><button type="button" id="view-zoom-out" aria-label="Zoom out">−</button><button type="button" id="view-reset">Reset view</button><button type="button" id="view-zoom-in" aria-label="Zoom in">+</button></div><p id="orbital-instructions" class="orbital-view-note">Drag to rotate · scroll or pinch to zoom</p></div>
             <div class="profile-wrap"><svg id="density-profile" viewBox="0 0 430 265" role="img" aria-labelledby="profile-title"><title id="profile-title">Radial density factor for the selected orbital</title><path d="M42 24 V216 H410" fill="none" stroke="#647184"/><path id="profile-area" fill="#73b7bd" fill-opacity=".12"/><path id="profile-line" fill="none" stroke="#94d3d5" stroke-width="2.5"/><g id="profile-nodes"></g><text x="42" y="238" text-anchor="middle" class="diagram-label">0</text><text x="410" y="238" text-anchor="end" class="diagram-label"><tspan id="profile-extent">0</tspan> a₀</text><text x="44" y="20" class="diagram-label">|R|² · relative scale</text></svg><p class="profile-formula" id="profile-formula">Radial density factor</p><p id="profile-note"></p></div>
           </div>
-          <p class="explorer-note">The cutaway reveals the interior; it changes visibility only. Tracers follow \(\mathbf v=\mathbf j/\rho\). Size and playback time are fitted separately for each orbital, with one shared time scale for its three current contributions.</p>
+          <p class="explorer-note">The point cloud retains the densest regions containing 90% of the probability. Tracers follow \(\mathbf v=\mathbf j/\rho\). Size and playback time are fitted separately for each orbital, with one shared time scale for its three current contributions.</p>
           <p id="flow-explanation" class="flow-explanation" role="status" aria-live="polite">The spherical 1s density carries a spin current; its Schrödinger current is zero.</p>
-          <div class="direction-key"><span><i class="warm-dot"></i>Counterclockwise</span><span><i class="cool-dot"></i>Clockwise</span><span>Directions viewed from +z</span></div>
+          <div class="direction-key"><span><i class="yellow-dot"></i>Yellow · counterclockwise</span><span><i class="blue-dot"></i>Blue · clockwise</span><span><i class="white-dot"></i>White · density or zero current</span><span>Directions viewed from +z</span></div>
           <noscript><p>Enable JavaScript to choose an orbital and compare its currents. Each orbital’s density stays fixed when switching current contribution.</p></noscript>
         </section>
 
@@ -194,19 +194,19 @@
           <p>The \(m_\ell=0\) states make the spin contribution especially clear because the phase current is zero. Lobes and nodal surfaces give the density different slopes in different regions. The resulting bands of clockwise and counterclockwise motion follow that geometry.</p>
         </div>
         <div class="gallery-feature">
-          <figure><a href="media/3d.webp"><img src="media/3d.webp" width="1600" height="1200" alt="The 3d z squared orbital cutaway reveals a blue belt between gold lobes and an equatorial ring." loading="lazy" decoding="async" /></a><figcaption><strong>3d, \(m_\ell=0\), spin +z.</strong> The blue belt and gold regions have opposite currents. All the motion here comes from the spin term.</figcaption></figure>
-          <figure class="portrait-figure"><a href="media/5g-zero.webp"><img src="media/5g-zero.webp" width="900" height="1600" alt="A portrait render of 5g with m equals zero shows several angular lobes with alternating gold and blue flow regions." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=0\), spin +z.</strong> More angular structure creates more regions of counterflow.</figcaption></figure>
+          <figure><a href="media/3d.webp"><img src="media/3d.webp" width="1600" height="1200" alt="The 3d z squared orbital cutaway reveals a blue belt between yellow lobes and an equatorial ring." loading="lazy" decoding="async" /></a><figcaption><strong>3d, \(m_\ell=0\), spin +z.</strong> The blue belt and yellow regions have opposite currents. All the motion here comes from the spin term.</figcaption></figure>
+          <figure class="portrait-figure"><a href="media/5g-zero.webp"><img src="media/5g-zero.webp" width="900" height="1600" alt="A portrait render of 5g with m equals zero shows several angular lobes with alternating yellow and blue flow regions." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=0\), spin +z.</strong> More angular structure creates more regions of counterflow.</figcaption></figure>
         </div>
         <div class="prose">
           <h3>6p: radial nodes create nested layers</h3>
-          <p>The 6p cutaway at the top of this page has four radial nodes. Between them sit radial lobes, with density rising from a node and falling toward the next one. Their changing gradients produce a layered spin contribution. Combined with the \(m_\ell=+1\) phase current, this gives the alternating gold and blue regions visible inside the cloud.</p>
+          <p>The 6p cutaway at the top of this page has four radial nodes. Between them sit radial lobes, with density rising from a node and falling toward the next one. Their changing gradients produce a layered spin contribution. Combined with the \(m_\ell=+1\) phase current, this gives the alternating yellow and blue regions visible inside the cloud.</p>
           <p>A node is a zero of the density. The ratio \(\mathbf j/\rho\) can become very large nearby, even though the probability current itself remains small or vanishes. At the node the ratio is undefined. The displayed tracer speed is not a uniform approximation to the exact relativistic velocity in those tiny low-density regions.</p>
           <h3>The same shape can carry a different current</h3>
           <p>Changing \(m_\ell\) to \(-m_\ell\) preserves \(|Y_{\ell m_\ell}|^2\). The density is identical, but the phase circulation reverses. Keeping spin +z leaves the spin term unchanged. The two currents then add differently, so the resulting flow is not generally a simple reversal.</p>
         </div>
         <div class="image-pair comparison-pair">
           <figure><a href="media/5g-minus4.webp"><img src="media/5g-minus4.webp" width="1440" height="1280" alt="5g m equals minus four with fixed spin plus z, dominated by blue clockwise current." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=-4\).</strong> Clockwise phase circulation competes with the spin contribution.</figcaption></figure>
-          <figure><a href="media/5g-plus4.webp"><img src="media/5g-plus4.webp" width="1440" height="1280" alt="5g m equals plus four with fixed spin plus z, showing gold counterclockwise current in the same orbital density." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=+4\).</strong> The same density and spin, with the opposite phase winding.</figcaption></figure>
+          <figure><a href="media/5g-plus4.webp"><img src="media/5g-plus4.webp" width="1440" height="1280" alt="5g m equals plus four with fixed spin plus z, showing yellow counterclockwise current in the same orbital density." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=+4\).</strong> The same density and spin, with the opposite phase winding.</figcaption></figure>
         </div>
 
         <div class="prose"><h3>Watch the circulation</h3><p>These excerpts open a cutaway and move the camera overhead. Follow the texture within each layer: it circulates while the density profile remains stationary. The apparent opening is a display operation.</p></div>

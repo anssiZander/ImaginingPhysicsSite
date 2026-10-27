@@ -1,72 +1,24 @@
-import {createState,currentAt,densityAt,legendre,radial,sampleOrbital} from './current-physics.js?v=20261027-orbitals';
+import {createState,currentAt,radial,sampleOrbital,selectProbabilityRegion} from './current-physics.js?v=20261027-orbit-view';
+import {PointCloudView} from './current-view.js?v=20261027-orbit-view';
 
 const byId=id=>document.getElementById(id);
 const ns='http://www.w3.org/2000/svg';
 const orbitalSelect=byId('orbital-select'),spinSelect=byId('spin-direction'),phaseSelect=byId('phase-winding');
 const playToggle=byId('flow-play-toggle'),speedControl=byId('flow-speed'),speedValue=byId('flow-speed-value');
 const densityCanvas=byId('orbital-density'),flowCanvas=byId('orbital-flow');
-const densityContext=densityCanvas.getContext('2d'),flowContext=flowCanvas.getContext('2d');
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 let state=createState('1s'),component='spin',playing=!reducedMotion.matches,inView=false;
 let animationFrame=null,lastFrameTime=null,playbackSpeed=Number(speedControl.value);
 let model,shapeKey='',tracers=[];
 const models=new Map();
-const azimuth=.3,elevation=.43;
-const right=[Math.cos(azimuth),Math.sin(azimuth),0];
-const up=[-Math.sin(azimuth)*Math.sin(elevation),Math.cos(azimuth)*Math.sin(elevation),Math.cos(elevation)];
-const toward=[Math.sin(azimuth)*Math.cos(elevation),-Math.cos(azimuth)*Math.cos(elevation),Math.sin(elevation)];
 const timeScale=()=>.6*state.n**3;
-const hiddenByCut=(x,y)=>x>0&&y<0;
-const dot=(axis,x,y,z)=>axis[0]*x+axis[1]*y+axis[2]*z;
-function project(x,y,z) {
-  const scale=144/model.displayRadius;
-  return {x:200+scale*dot(right,x,y,z),y:172-scale*dot(up,x,y,z),depth:dot(toward,x,y,z)/model.displayRadius};
-}
+const cloudView=new PointCloudView(densityCanvas,flowCanvas,updateViewNote);
 
-function drawDensity() {
-  const width=densityCanvas.width,height=densityCanvas.height,pixels=new Float32Array(width*height);
-  const positions=model.positions;
-  for (let i=0;i<positions.length;i+=3) {
-    const x=positions[i],y=positions[i+1],z=positions[i+2];
-    if (hiddenByCut(x,y)||Math.hypot(x,y,z)>model.displayRadius) continue;
-    const screen=project(x,y,z),px=Math.round(screen.x*2),py=Math.round(screen.y*2);
-    for (let dy=-2;dy<=2;dy++) for (let dx=-2;dx<=2;dx++) {
-      const sx=px+dx,sy=py+dy;
-      if(sx>=0&&sx<width&&sy>=0&&sy<height) pixels[sy*width+sx]+=Math.exp(-(dx*dx+dy*dy)/2);
-    }
-  }
-  const nonzero=Array.from(pixels).filter(v=>v>0).sort((a,b)=>a-b);
-  const reference=nonzero[Math.floor(nonzero.length*.995)]||1;
-  const image=densityContext.createImageData(width,height);
-  for (let i=0;i<pixels.length;i++) {
-    const light=Math.pow(1-Math.exp(-pixels[i]/(reference*.6)),.65);
-    image.data.set([11+75*light,17+127*light,29+137*light,255],i*4);
-  }
-  // The exposed faces show local density, so radial nodes remain visible in
-  // the cutaway even where a projection through the remaining cloud overlaps.
-  let peakRadial=0,peakAngular=0;
-  for (let i=0;i<=1600;i++) {
-    peakRadial=Math.max(peakRadial,radial(state,i*model.displayRadius/1600)**2);
-    peakAngular=Math.max(peakAngular,(state.angularNorm*legendre(state.l,state.ma,-1+i/800))**2);
-  }
-  const peakDensity=peakRadial*peakAngular,worldPerPixel=model.displayRadius/144;
-  for (let py=56;py<632;py++) for (let px=112;px<688;px++) {
-    const horizontal=(px/2-200)*worldPerPixel,vertical=(172-py/2)*worldPerPixel;
-    const x=horizontal>=0?horizontal/right[0]:0;
-    const y=horizontal<0?horizontal/right[1]:0;
-    const z=(vertical-up[0]*x-up[1]*y)/up[2];
-    if (Math.hypot(x,y,z)>model.displayRadius) continue;
-    const density=densityAt(state,x,y,z),shade=horizontal>=0?1:.72;
-    const light=Math.pow(density/peakDensity,.35)*shade;
-    const index=(py*width+px)*4;
-    image.data.set([11+85*light,17+145*light,29+156*light,255],index);
-  }
-  densityContext.putImageData(image,0,0);
-  densityContext.save();densityContext.scale(2,2);
-  densityContext.strokeStyle='#93b4c0';densityContext.fillStyle='#afc7d2';densityContext.lineWidth=1;
-  densityContext.beginPath();densityContext.moveTo(360,305);densityContext.lineTo(360,276);
-  densityContext.moveTo(357,281);densityContext.lineTo(360,276);densityContext.lineTo(363,281);densityContext.stroke();
-  densityContext.font='12px Segoe UI, sans-serif';densityContext.fillText('z',367,281);densityContext.restore();
+function updateViewNote() {
+  if(!model)return;
+  byId('orbital-view-note').textContent=`90% probability cloud · ${model.retainedCount.toLocaleString()} points · zoom ${cloudView.zoom.toFixed(1)}×`;
+  flowCanvas.dataset.camera=[cloudView.azimuth,cloudView.elevation,cloudView.zoom].join(',');
+  flowCanvas.dataset.points=model.retainedCount;flowCanvas.dataset.probability=model.probabilityFraction;
 }
 
 function drawProfile() {
@@ -86,29 +38,28 @@ function drawProfile() {
   const formula=`|R_{${state.n},${state.l}}(r)|^2`;
   if (window.katex) katex.render(formula,byId('profile-formula'),{throwOnError:false});
   else byId('profile-formula').textContent=`Radial density factor |R${state.n},${state.l}(r)|²`;
-  byId('profile-note').textContent=`${model.radialNodes.length} radial ${model.radialNodes.length===1?'node':'nodes'}${model.radialNodes.length?' (dashed lines)':''}. This is the radial factor of local density, without the r² shell-volume weight. Angular structure is visible in the cutaway.`;
+  byId('profile-note').textContent=`${model.radialNodes.length} radial ${model.radialNodes.length===1?'node':'nodes'}${model.radialNodes.length?' (dashed lines)':''}. This is the radial factor of local density, without the r² shell-volume weight. Angular structure is visible in the point cloud.`;
 }
 
 function rebuildOrbital() {
   const nextShape=`${state.key}:${Math.abs(state.m)}`;
   if (nextShape!==shapeKey) {
     shapeKey=nextShape;
-    if (!models.has(shapeKey)) models.set(shapeKey,sampleOrbital(state));
+    if (!models.has(shapeKey)) models.set(shapeKey,selectProbabilityRegion(state,sampleOrbital(state,100000),.9));
     model=models.get(shapeKey);
-    drawDensity();drawProfile();
+    cloudView.setDensity(model.positions,model.displayRadius);drawProfile();
     tracers=[];
-    const positions=model.positions,stride=Math.floor(positions.length/3/440);
+    const positions=model.positions,stride=Math.floor(positions.length/3/1800);
     for (let i=0;i<positions.length;i+=stride*3) {
-      const x=positions[i],y=positions[i+1],z=positions[i+2],r=Math.hypot(x,y,z);
-      if (r>model.displayRadius) continue;
+      const x=positions[i],y=positions[i+1],z=positions[i+2];
       const fields=currentAt(state,x,y,z);
       if (!Number.isFinite(fields.spinOmega)||!Number.isFinite(fields.phaseOmega)) continue;
       tracers.push({s:Math.hypot(x,y),z,angle:Math.atan2(y,x),spinOmega:fields.spinOmega,omega:0});
     }
   }
   byId('orbital-state').textContent=`${state.key} · n = ${state.n}, ℓ = ${state.l}, mℓ = ${state.m>0?'+':''}${state.m}`;
-  byId('orbital-view-note').textContent=`Oblique view · cut faces show local density · frame radius ${model.displayRadius.toFixed(1)}a₀`;
-  flowCanvas.setAttribute('aria-label',`${state.key} orbital with m equals ${state.m}: ${component==='phase'?'Schrödinger':component} probability current over a stationary density cutaway`);
+  updateViewNote();
+  flowCanvas.setAttribute('aria-label',`${state.key} orbital with m equals ${state.m}: ${component==='phase'?'Schrödinger':component} probability current over a stationary point cloud`);
   updateCurrent();
 }
 
@@ -117,7 +68,6 @@ function updateCurrent() {
   for (const tracer of tracers) {
     const phase=state.m/(tracer.s*tracer.s),magnetization=spin*tracer.spinOmega;
     tracer.omega=component==='spin'?magnetization:component==='phase'?phase:phase+magnetization;
-    tracer.color=Math.abs(tracer.omega)<1e-12?'#d6e6eb':tracer.omega>0?'#ffb969':'#afa1ff';
   }
   let text;
   if (component==='phase') {
@@ -140,38 +90,7 @@ function updateCurrent() {
   drawFlow();
 }
 
-function drawFlow() {
-  flowContext.clearRect(0,0,flowCanvas.width,flowCanvas.height);
-  flowContext.save();flowContext.scale(2,2);
-  const visible=[];
-  for (const tracer of tracers) {
-    const x=tracer.s*Math.cos(tracer.angle),y=tracer.s*Math.sin(tracer.angle);
-    if (hiddenByCut(x,y)) continue;
-    visible.push({tracer,screen:project(x,y,tracer.z)});
-  }
-  visible.sort((a,b)=>a.screen.depth-b.screen.depth);
-  for (const {tracer,screen} of visible) {
-    const moving=Math.abs(tracer.omega)>1e-12;
-    const opacity=.48+.37*(screen.depth+1)/2;
-    flowContext.strokeStyle=tracer.color;flowContext.fillStyle=tracer.color;flowContext.lineWidth=1.1;
-    if (moving) {
-      const span=Math.sign(tracer.omega)*Math.min(.25,Math.abs(tracer.omega)*timeScale()*.2);
-      flowContext.globalAlpha=opacity*.4;flowContext.beginPath();
-      let started=false;
-      for (let j=0;j<=5;j++) {
-        const angle=tracer.angle-span*(1-j/5),x=tracer.s*Math.cos(angle),y=tracer.s*Math.sin(angle);
-        if (hiddenByCut(x,y)) {started=false;continue;}
-        const p=project(x,y,tracer.z);
-        if(started) flowContext.lineTo(p.x,p.y);else flowContext.moveTo(p.x,p.y);
-        started=true;
-      }
-      flowContext.stroke();
-    }
-    flowContext.globalAlpha=moving?opacity:.35;
-    flowContext.beginPath();flowContext.arc(screen.x,screen.y,moving?1.65:1.15,0,2*Math.PI);flowContext.fill();
-  }
-  flowContext.restore();
-}
+function drawFlow() {cloudView.setFlow(tracers,timeScale());}
 
 function animate(now) {
   const elapsed=lastFrameTime===null?0:(now-lastFrameTime)/1000;
@@ -204,6 +123,9 @@ phaseSelect.addEventListener('change',()=>{state=createState(orbitalSelect.value
 spinSelect.addEventListener('change',updateCurrent);
 document.querySelectorAll('[data-component]').forEach(button=>button.addEventListener('click',()=>{component=button.dataset.component;updateCurrent();}));
 playToggle.addEventListener('click',()=>{playing=!playing;syncPlayback();});
+byId('view-reset').addEventListener('click',()=>cloudView.reset());
+byId('view-zoom-in').addEventListener('click',()=>cloudView.zoomBy(1.25));
+byId('view-zoom-out').addEventListener('click',()=>cloudView.zoomBy(.8));
 speedControl.addEventListener('input',()=>{playbackSpeed=Number(speedControl.value);speedValue.value=`${playbackSpeed}×`;});
 reducedMotion.addEventListener('change',event=>{if(event.matches){playing=false;syncPlayback();}});
 document.addEventListener('visibilitychange',syncPlayback);
