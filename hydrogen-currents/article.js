@@ -1,176 +1,228 @@
-/* The explorer uses the exact equatorial 2p |m|=1 density, not a fitted profile.
-   u = s/a0; velocities are in units of hbar/(m_e a0).
-   v_Sch = m/u; v_spin = spin*(1/2 - 1/u). */
-(() => {
-  if (window.renderMathInElement) {
-    renderMathInElement(document.querySelector('.orbital-post'), {
-      delimiters: [{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],
-      throwOnError: false
-    });
-  }
+import {createState,currentAt,densityAt,legendre,radial,sampleOrbital} from './current-physics.js?v=20261027-orbitals';
 
-  const ns = 'http://www.w3.org/2000/svg';
-  const contours = document.getElementById('density-contours');
-  const arrows = document.getElementById('current-arrows');
-  const spinSelect = document.getElementById('spin-direction');
-  const phaseSelect = document.getElementById('phase-winding');
-  const explanation = document.getElementById('flow-explanation');
-  const tracerLayer = document.getElementById('current-tracers');
-  const playToggle = document.getElementById('flow-play-toggle');
-  const speedControl = document.getElementById('flow-speed');
-  const speedValue = document.getElementById('flow-speed-value');
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  let component = 'spin';
-  let playing = !reducedMotion.matches;
-  let inView = false;
-  let animationFrame = null;
-  let lastFrameTime = null;
-  let playbackSpeed = Number(speedControl.value);
-  // A common time scale preserves relative speeds across radii and components.
-  const timeScale = 2;
-  // Use the same analytic profile for the ring brightness and the graph.
-  const gradient = document.getElementById('density-ring');
-  gradient.replaceChildren();
-  for (let i=0;i<=70;i++) {
-    const u=i/10, density=u*u*Math.exp(2-u)/4;
-    const color=[8,13,24].map((base,k)=>Math.round(base+density*([101,139,144][k]-base)));
-    const stop=document.createElementNS(ns,'stop');
-    stop.setAttribute('offset',`${i/70*100}%`);stop.setAttribute('stop-color',`rgb(${color.join(',')})`);gradient.append(stop);
-  }
-  document.querySelectorAll('#ring-view marker').forEach(marker=>{
-    marker.setAttribute('markerWidth','4');marker.setAttribute('markerHeight','4');
-    marker.setAttribute('refX','3.5');marker.setAttribute('refY','2');
-    marker.querySelector('path').setAttribute('d','M0,0 L4,2 L0,4 Z');
-  });
-  const radii = [0.8, 1.4, 2.0, 2.8, 3.5, 4.0, 4.4, 5.5, 6.6];
-  radii.forEach(u => {
-    const circle = document.createElementNS(ns, 'circle');
-    circle.setAttribute('cx',200); circle.setAttribute('cy',172); circle.setAttribute('r',u*22);
-    if (u === 2) { circle.setAttribute('stroke-opacity','.65'); circle.setAttribute('stroke-dasharray','3 4'); }
-    contours.append(circle);
-  });
-  const profile = Array.from({length:181}, (_,i) => {
-    const u = i*7/180, density = u*u*Math.exp(2-u)/4;
-    return `${(42+u*368/7).toFixed(2)},${(216-density*177).toFixed(2)}`;
-  });
-  document.getElementById('profile-line').setAttribute('d','M'+profile.join(' L'));
-  document.getElementById('profile-area').setAttribute('d','M42,216 L'+profile.join(' L')+' L410,216 Z');
+const byId=id=>document.getElementById(id);
+const ns='http://www.w3.org/2000/svg';
+const orbitalSelect=byId('orbital-select'),spinSelect=byId('spin-direction'),phaseSelect=byId('phase-winding');
+const playToggle=byId('flow-play-toggle'),speedControl=byId('flow-speed'),speedValue=byId('flow-speed-value');
+const densityCanvas=byId('orbital-density'),flowCanvas=byId('orbital-flow');
+const densityContext=densityCanvas.getContext('2d'),flowContext=flowCanvas.getContext('2d');
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
+let state=createState('1s'),component='spin',playing=!reducedMotion.matches,inView=false;
+let animationFrame=null,lastFrameTime=null,playbackSpeed=Number(speedControl.value);
+let model,shapeKey='',tracers=[];
+const models=new Map();
+const azimuth=.3,elevation=.43;
+const right=[Math.cos(azimuth),Math.sin(azimuth),0];
+const up=[-Math.sin(azimuth)*Math.sin(elevation),Math.cos(azimuth)*Math.sin(elevation),Math.cos(elevation)];
+const toward=[Math.sin(azimuth)*Math.cos(elevation),-Math.cos(azimuth)*Math.cos(elevation),Math.sin(elevation)];
+const timeScale=()=>.6*state.n**3;
+const hiddenByCut=(x,y)=>x>0&&y<0;
+const dot=(axis,x,y,z)=>axis[0]*x+axis[1]*y+axis[2]*z;
+function project(x,y,z) {
+  const scale=144/model.displayRadius;
+  return {x:200+scale*dot(right,x,y,z),y:172-scale*dot(up,x,y,z),depth:dot(toward,x,y,z)/model.displayRadius};
+}
 
-  const tracerRings = radii.map(u => {
-    const group = document.createElementNS(ns,'g');
-    group.dataset.radius = u;
-    group.setAttribute('transform','rotate(0 200 172)');
-    tracerLayer.append(group);
-    const count = Math.max(6,Math.round(u*3));
-    const tracers = Array.from({length:count},(_,i) => {
-      const angle = i*2*Math.PI/count+u*.19;
-      const tail = document.createElementNS(ns,'path');
-      const wake = document.createElementNS(ns,'path');
-      for (const [path,opacity] of [[tail,.14],[wake,.48]]) {
-        path.setAttribute('fill','none');path.setAttribute('stroke-width','1.6');
-        path.setAttribute('stroke-linecap','round');path.setAttribute('opacity',opacity);
-        group.append(path);
-      }
-      const dot = document.createElementNS(ns,'circle');
-      dot.setAttribute('cx',200+u*22*Math.cos(angle));
-      dot.setAttribute('cy',172-u*22*Math.sin(angle));
-      dot.setAttribute('r','2.1');group.append(dot);
-      return {angle,tail,wake,dot};
-    });
-    return {u,group,tracers,angle:0,omega:0};
-  });
-
-  function arc(u,start,end) {
-    const r=u*22;
-    return `M${200+r*Math.cos(start)},${172-r*Math.sin(start)} A${r},${r} 0 0 ${end>start?0:1} ${200+r*Math.cos(end)},${172-r*Math.sin(end)}`;
-  }
-
-  function animate(now) {
-    const elapsed=lastFrameTime===null?0:(now-lastFrameTime)/1000;
-    lastFrameTime=now;
-    for (const ring of tracerRings) {
-      ring.angle=(ring.angle+ring.omega*elapsed*timeScale*playbackSpeed)%(2*Math.PI);
-      ring.group.setAttribute('transform',`rotate(${-ring.angle*180/Math.PI} 200 172)`);
+function drawDensity() {
+  const width=densityCanvas.width,height=densityCanvas.height,pixels=new Float32Array(width*height);
+  const positions=model.positions;
+  for (let i=0;i<positions.length;i+=3) {
+    const x=positions[i],y=positions[i+1],z=positions[i+2];
+    if (hiddenByCut(x,y)||Math.hypot(x,y,z)>model.displayRadius) continue;
+    const screen=project(x,y,z),px=Math.round(screen.x*2),py=Math.round(screen.y*2);
+    for (let dy=-2;dy<=2;dy++) for (let dx=-2;dx<=2;dx++) {
+      const sx=px+dx,sy=py+dy;
+      if(sx>=0&&sx<width&&sy>=0&&sy<height) pixels[sy*width+sx]+=Math.exp(-(dx*dx+dy*dy)/2);
     }
-    animationFrame=requestAnimationFrame(animate);
   }
-
-  function syncPlayback() {
-    if (animationFrame!==null) cancelAnimationFrame(animationFrame);
-    animationFrame=null;lastFrameTime=null;
-    playToggle.textContent=playing?'Pause':'Play';
-    playToggle.setAttribute('aria-pressed',String(playing));
-    playToggle.setAttribute('aria-label',playing?'Pause current animation':'Play current animation');
-    if (playing && inView && !document.hidden) animationFrame=requestAnimationFrame(animate);
+  const nonzero=Array.from(pixels).filter(v=>v>0).sort((a,b)=>a-b);
+  const reference=nonzero[Math.floor(nonzero.length*.995)]||1;
+  const image=densityContext.createImageData(width,height);
+  for (let i=0;i<pixels.length;i++) {
+    const light=Math.pow(1-Math.exp(-pixels[i]/(reference*.6)),.65);
+    image.data.set([11+75*light,17+127*light,29+137*light,255],i*4);
   }
+  // The exposed faces show local density, so radial nodes remain visible in
+  // the cutaway even where a projection through the remaining cloud overlaps.
+  let peakRadial=0,peakAngular=0;
+  for (let i=0;i<=1600;i++) {
+    peakRadial=Math.max(peakRadial,radial(state,i*model.displayRadius/1600)**2);
+    peakAngular=Math.max(peakAngular,(state.angularNorm*legendre(state.l,state.ma,-1+i/800))**2);
+  }
+  const peakDensity=peakRadial*peakAngular,worldPerPixel=model.displayRadius/144;
+  for (let py=56;py<632;py++) for (let px=112;px<688;px++) {
+    const horizontal=(px/2-200)*worldPerPixel,vertical=(172-py/2)*worldPerPixel;
+    const x=horizontal>=0?horizontal/right[0]:0;
+    const y=horizontal<0?horizontal/right[1]:0;
+    const z=(vertical-up[0]*x-up[1]*y)/up[2];
+    if (Math.hypot(x,y,z)>model.displayRadius) continue;
+    const density=densityAt(state,x,y,z),shade=horizontal>=0?1:.72;
+    const light=Math.pow(density/peakDensity,.35)*shade;
+    const index=(py*width+px)*4;
+    image.data.set([11+85*light,17+145*light,29+156*light,255],index);
+  }
+  densityContext.putImageData(image,0,0);
+  densityContext.save();densityContext.scale(2,2);
+  densityContext.strokeStyle='#93b4c0';densityContext.fillStyle='#afc7d2';densityContext.lineWidth=1;
+  densityContext.beginPath();densityContext.moveTo(360,305);densityContext.lineTo(360,276);
+  densityContext.moveTo(357,281);densityContext.lineTo(360,276);densityContext.lineTo(363,281);densityContext.stroke();
+  densityContext.font='12px Segoe UI, sans-serif';densityContext.fillText('z',367,281);densityContext.restore();
+}
 
-  function update() {
-    const spin=Number(spinSelect.value), m=Number(phaseSelect.value);
-    arrows.replaceChildren();
-    for (const ring of tracerRings) {
-      const u=ring.u;
-      const phase=m/u, magnetization=spin*(0.5-1/u);
-      const velocity=component==='spin'?magnetization:component==='phase'?phase:phase+magnetization;
-      const stopped=Math.abs(velocity)<1e-8;
-      const sign=stopped?0:Math.sign(velocity), color=stopped?'#d6e6eb':sign>0?'#ffb969':'#afa1ff';
-      ring.omega=stopped?0:velocity/u;
-      ring.group.dataset.direction=stopped?'stationary':sign>0?'ccw':'cw';
-      for (const tracer of ring.tracers) {
-        tracer.dot.setAttribute('fill',color);
-        tracer.dot.setAttribute('opacity',stopped?'.7':'1');
-        for (const path of [tracer.tail,tracer.wake]) {
-          path.setAttribute('stroke',color);path.setAttribute('visibility',stopped?'hidden':'visible');
-        }
-        tracer.tail.setAttribute('d',arc(u,tracer.angle-ring.omega*.8,tracer.angle-ring.omega*.25));
-        tracer.wake.setAttribute('d',arc(u,tracer.angle-ring.omega*.25,tracer.angle));
-      }
-      if (stopped) continue;
-      for (let i=0;i<3;i++) {
-        const center=i*2*Math.PI/3+u*.19;
-        const angles=[center-sign*.22,center+sign*.22];
-        const points=angles.map(a=>[200+u*22*Math.cos(a),172-u*22*Math.sin(a)]);
-        const path=document.createElementNS(ns,'path');
-        path.setAttribute('d',`M${points[0].join(',')} A${u*22},${u*22} 0 0 ${sign>0?0:1} ${points[1].join(',')}`);
-        path.setAttribute('stroke',color); path.setAttribute('marker-end',`url(#arrow-${sign>0?'positive':'negative'})`);
-        path.dataset.radius=u; path.dataset.direction=sign>0?'ccw':'cw';
-        arrows.append(path);
-      }
+function drawProfile() {
+  const count=500,extent=model.displayRadius;
+  const values=Array.from({length:count+1},(_,i)=>radial(state,i*extent/count)**2);
+  const max=Math.max(...values),coords=values.map((v,i)=>`${42+i*368/count},${216-177*v/max}`);
+  byId('profile-line').setAttribute('d','M'+coords.join(' L'));
+  byId('profile-area').setAttribute('d','M42,216 L'+coords.join(' L')+' L410,216 Z');
+  byId('profile-extent').textContent=extent.toFixed(1);
+  byId('profile-title').textContent=`Radial density factor for ${state.key}, with ${model.radialNodes.length} radial nodes`;
+  byId('profile-nodes').replaceChildren();
+  for (const node of model.radialNodes) {
+    const line=document.createElementNS(ns,'line'),x=42+node/extent*368;
+    for (const [name,value] of Object.entries({x1:x,x2:x,y1:32,y2:216,stroke:'#8192af','stroke-dasharray':'3 5','stroke-opacity':.55})) line.setAttribute(name,value);
+    byId('profile-nodes').append(line);
+  }
+  const formula=`|R_{${state.n},${state.l}}(r)|^2`;
+  if (window.katex) katex.render(formula,byId('profile-formula'),{throwOnError:false});
+  else byId('profile-formula').textContent=`Radial density factor |R${state.n},${state.l}(r)|²`;
+  byId('profile-note').textContent=`${model.radialNodes.length} radial ${model.radialNodes.length===1?'node':'nodes'}${model.radialNodes.length?' (dashed lines)':''}. This is the radial factor of local density, without the r² shell-volume weight. Angular structure is visible in the cutaway.`;
+}
+
+function rebuildOrbital() {
+  const nextShape=`${state.key}:${Math.abs(state.m)}`;
+  if (nextShape!==shapeKey) {
+    shapeKey=nextShape;
+    if (!models.has(shapeKey)) models.set(shapeKey,sampleOrbital(state));
+    model=models.get(shapeKey);
+    drawDensity();drawProfile();
+    tracers=[];
+    const positions=model.positions,stride=Math.floor(positions.length/3/440);
+    for (let i=0;i<positions.length;i+=stride*3) {
+      const x=positions[i],y=positions[i+1],z=positions[i+2],r=Math.hypot(x,y,z);
+      if (r>model.displayRadius) continue;
+      const fields=currentAt(state,x,y,z);
+      if (!Number.isFinite(fields.spinOmega)||!Number.isFinite(fields.phaseOmega)) continue;
+      tracers.push({s:Math.hypot(x,y),z,angle:Math.atan2(y,x),spinOmega:fields.spinOmega,omega:0});
     }
-    const spinText=spin>0?'+z':'−z';
-    if (component==='spin') {
-      explanation.textContent=`With spin ${spinText}, the spin current is ${spin>0?'clockwise':'counterclockwise'} inside the density maximum and ${spin>0?'counterclockwise':'clockwise'} outside it. It vanishes at s = 2a₀. Changing phase winding has no effect on this contribution.`;
-    } else if (component==='phase') {
-      explanation.textContent=`For mℓ = ${m>0?'+1':'−1'}, the Schrödinger current is ${m>0?'counterclockwise':'clockwise'} at every radius in this slice. Changing the spin does not change this contribution.`;
-    } else if (m===spin) {
-      explanation.textContent=`The two contributions add to ${m>0?'counterclockwise':'clockwise'} total flow at every radius. For this particular equatorial slice, vφ = ${spin>0?'':'−'}ℏ/(2mₑa₀). The spin contribution reverses at 2a₀, but the total does not.`;
-    } else {
-      explanation.textContent=`The total current is ${m>0?'counterclockwise':'clockwise'} inside s = 4a₀ and ${spin>0?'counterclockwise':'clockwise'} outside it. Cancellation shifts the reversal away from the density maximum at 2a₀.`;
-    }
-    document.querySelectorAll('[data-component]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.component===component)));
   }
-  document.querySelectorAll('[data-component]').forEach(button=>button.addEventListener('click',()=>{component=button.dataset.component;update();}));
-  spinSelect.addEventListener('change',update); phaseSelect.addEventListener('change',update); update();
-  playToggle.addEventListener('click',()=>{playing=!playing;syncPlayback();});
-  speedControl.addEventListener('input',()=>{
-    playbackSpeed=Number(speedControl.value);speedValue.value=`${playbackSpeed}×`;
-  });
-  reducedMotion.addEventListener('change',event=>{if(event.matches){playing=false;syncPlayback();}});
-  document.addEventListener('visibilitychange',syncPlayback);
-  const flowObserver=new IntersectionObserver(entries=>{
-    inView=entries.some(entry=>entry.isIntersecting);syncPlayback();
-  });
-  flowObserver.observe(document.getElementById('ring-view'));
-  syncPlayback();
+  byId('orbital-state').textContent=`${state.key} · n = ${state.n}, ℓ = ${state.l}, mℓ = ${state.m>0?'+':''}${state.m}`;
+  byId('orbital-view-note').textContent=`Oblique view · cut faces show local density · frame radius ${model.displayRadius.toFixed(1)}a₀`;
+  flowCanvas.setAttribute('aria-label',`${state.key} orbital with m equals ${state.m}: ${component==='phase'?'Schrödinger':component} probability current over a stationary density cutaway`);
+  updateCurrent();
+}
 
-  // Keep reading quiet: no autoplay and only one film playing at a time.
-  const videos=[...document.querySelectorAll('video')];
-  videos.forEach(video=>video.addEventListener('play',()=>videos.forEach(other=>{if(other!==video)other.pause();})));
-  const comments=document.querySelector('[data-comments]');
-  if (comments && 'IntersectionObserver' in window) {
-    const observer=new IntersectionObserver(entries=>{
-      if (!entries.some(entry=>entry.isIntersecting)) return;
-      const script=document.createElement('script');script.src='../comments.js';document.body.append(script);observer.disconnect();
-    },{rootMargin:'200px'});
-    observer.observe(comments);
+function updateCurrent() {
+  const spin=Number(spinSelect.value);
+  for (const tracer of tracers) {
+    const phase=state.m/(tracer.s*tracer.s),magnetization=spin*tracer.spinOmega;
+    tracer.omega=component==='spin'?magnetization:component==='phase'?phase:phase+magnetization;
+    tracer.color=Math.abs(tracer.omega)<1e-12?'#d6e6eb':tracer.omega>0?'#ffb969':'#afa1ff';
   }
-})();
+  let text;
+  if (component==='phase') {
+    text=state.m===0?`For ${state.key} with mℓ = 0, the spatial wavefunction is real and the Schrödinger current vanishes. Switch to spin or total current to see the circulation.`
+      :`With mℓ = ${state.m>0?'+':''}${state.m}, the Schrödinger current is ${state.m>0?'counterclockwise':'clockwise'} around z. Changing the spin direction leaves this contribution unchanged.`;
+  } else if (component==='total'&&state.m===0) {
+    text=`For ${state.key} with mℓ = 0, the Schrödinger contribution is zero, so the total current equals the spin current. Reversing spin reverses the flow while preserving this density.`;
+  } else if (component==='total') {
+    text=`The phase and spin contributions add at each point in the ${state.key} orbital. Compare the three switches to see where they reinforce or oppose one another. Changing current contribution leaves the density and playback scale fixed.`;
+  } else if (state.key==='1s') {
+    text=`The spherical 1s density carries a spin current ${spin>0?'counterclockwise':'clockwise'} around z, viewed from +z. Its Schrödinger current is zero.`;
+  } else if (state.key==='2p'&&state.m===0) {
+    text=`The 2p_z lobes both carry ${spin>0?'counterclockwise':'clockwise'} spin current around z, viewed from +z. Their opposite wavefunction signs do not reverse the current.`;
+  } else {
+    text=`The ${state.key} density gradient sets the spin current. It can reverse direction on opposite slopes of a density lobe. Reversing spin reverses this contribution while preserving the density.`;
+  }
+  byId('flow-explanation').textContent=text;
+  document.querySelectorAll('[data-component]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.component===component)));
+  flowCanvas.setAttribute('aria-label',`${state.key}, m equals ${state.m}, ${component==='phase'?'Schrödinger':component} current. ${text}`);
+  drawFlow();
+}
+
+function drawFlow() {
+  flowContext.clearRect(0,0,flowCanvas.width,flowCanvas.height);
+  flowContext.save();flowContext.scale(2,2);
+  const visible=[];
+  for (const tracer of tracers) {
+    const x=tracer.s*Math.cos(tracer.angle),y=tracer.s*Math.sin(tracer.angle);
+    if (hiddenByCut(x,y)) continue;
+    visible.push({tracer,screen:project(x,y,tracer.z)});
+  }
+  visible.sort((a,b)=>a.screen.depth-b.screen.depth);
+  for (const {tracer,screen} of visible) {
+    const moving=Math.abs(tracer.omega)>1e-12;
+    const opacity=.48+.37*(screen.depth+1)/2;
+    flowContext.strokeStyle=tracer.color;flowContext.fillStyle=tracer.color;flowContext.lineWidth=1.1;
+    if (moving) {
+      const span=Math.sign(tracer.omega)*Math.min(.25,Math.abs(tracer.omega)*timeScale()*.2);
+      flowContext.globalAlpha=opacity*.4;flowContext.beginPath();
+      let started=false;
+      for (let j=0;j<=5;j++) {
+        const angle=tracer.angle-span*(1-j/5),x=tracer.s*Math.cos(angle),y=tracer.s*Math.sin(angle);
+        if (hiddenByCut(x,y)) {started=false;continue;}
+        const p=project(x,y,tracer.z);
+        if(started) flowContext.lineTo(p.x,p.y);else flowContext.moveTo(p.x,p.y);
+        started=true;
+      }
+      flowContext.stroke();
+    }
+    flowContext.globalAlpha=moving?opacity:.35;
+    flowContext.beginPath();flowContext.arc(screen.x,screen.y,moving?1.65:1.15,0,2*Math.PI);flowContext.fill();
+  }
+  flowContext.restore();
+}
+
+function animate(now) {
+  const elapsed=lastFrameTime===null?0:(now-lastFrameTime)/1000;
+  lastFrameTime=now;
+  for (const tracer of tracers) tracer.angle=(tracer.angle+tracer.omega*elapsed*timeScale()*playbackSpeed)%(2*Math.PI);
+  drawFlow();animationFrame=requestAnimationFrame(animate);
+}
+
+function syncPlayback() {
+  if (animationFrame!==null) cancelAnimationFrame(animationFrame);
+  animationFrame=null;lastFrameTime=null;
+  playToggle.textContent=playing?'Pause':'Play';playToggle.setAttribute('aria-pressed',String(playing));
+  playToggle.setAttribute('aria-label',playing?'Pause current animation':'Play current animation');
+  if (playing&&inView&&!document.hidden) animationFrame=requestAnimationFrame(animate);
+}
+
+function selectOrbital() {
+  state=createState(orbitalSelect.value);
+  phaseSelect.replaceChildren();
+  for (let m=-state.l;m<=state.l;m++) {
+    const option=document.createElement('option');option.value=m;option.textContent=`mℓ = ${m>0?'+':''}${m}`;
+    phaseSelect.append(option);
+  }
+  phaseSelect.value=state.m;phaseSelect.disabled=state.l===0;
+  rebuildOrbital();syncPlayback();
+}
+
+orbitalSelect.addEventListener('change',selectOrbital);
+phaseSelect.addEventListener('change',()=>{state=createState(orbitalSelect.value,Number(phaseSelect.value));rebuildOrbital();});
+spinSelect.addEventListener('change',updateCurrent);
+document.querySelectorAll('[data-component]').forEach(button=>button.addEventListener('click',()=>{component=button.dataset.component;updateCurrent();}));
+playToggle.addEventListener('click',()=>{playing=!playing;syncPlayback();});
+speedControl.addEventListener('input',()=>{playbackSpeed=Number(speedControl.value);speedValue.value=`${playbackSpeed}×`;});
+reducedMotion.addEventListener('change',event=>{if(event.matches){playing=false;syncPlayback();}});
+document.addEventListener('visibilitychange',syncPlayback);
+const flowObserver=new IntersectionObserver(entries=>{inView=entries.some(entry=>entry.isIntersecting);syncPlayback();});
+flowObserver.observe(flowCanvas);selectOrbital();
+
+const renderArticleMath=()=>{
+  if(window.renderMathInElement) renderMathInElement(document.querySelector('.orbital-post'),{
+    delimiters:[{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false
+  });
+  drawProfile();
+};
+if(document.readyState==='complete') renderArticleMath();else document.addEventListener('DOMContentLoaded',renderArticleMath,{once:true});
+const videos=[...document.querySelectorAll('video')];
+videos.forEach(video=>video.addEventListener('play',()=>videos.forEach(other=>{if(other!==video)other.pause();})));
+const comments=document.querySelector('[data-comments]');
+if(comments) {
+  const observer=new IntersectionObserver(entries=>{
+    if(!entries.some(entry=>entry.isIntersecting))return;
+    const script=document.createElement('script');script.src='../comments.js';document.body.append(script);observer.disconnect();
+  },{rootMargin:'200px'});observer.observe(comments);
+}

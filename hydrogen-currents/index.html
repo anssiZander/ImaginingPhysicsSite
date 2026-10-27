@@ -17,10 +17,10 @@
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../comments.css" />
   <link rel="stylesheet" href="../grover-search/vendor/katex-0.19.0/katex.min.css" />
-  <link rel="stylesheet" href="article.css?v=20261027-flow-animation" />
+  <link rel="stylesheet" href="article.css?v=20261027-orbitals" />
   <script defer src="../grover-search/vendor/katex-0.19.0/katex.min.js"></script>
   <script defer src="../grover-search/vendor/katex-0.19.0/auto-render.min.js"></script>
-  <script defer src="article.js?v=20261027-flow-animation"></script>
+  <script type="module" src="article.js?v=20261027-orbitals"></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -153,10 +153,11 @@
         </div>
 
         <section class="flow-explorer" aria-labelledby="explorer-title">
-          <div class="explorer-heading"><p class="section-number">Explore the equation</p><h3 id="explorer-title">Keep the density. Change the current.</h3><p>An equatorial slice through a 2p orbital with \(|m_\ell|=1\). The density peaks at \(s=2a_0\); \(a_0\) is the Bohr radius.</p></div>
+          <div class="explorer-heading"><p class="section-number">Explore the equation</p><h3 id="explorer-title">Choose an orbital. Follow its current.</h3><p>Compare the shapes and circulation of four hydrogen orbitals. Within each state, the density stays fixed as you switch between the Schrödinger contribution, spin current, and total current.</p></div>
           <div class="explorer-controls">
+            <label>Orbital<select id="orbital-select"><option value="1s">1s</option><option value="2p">2p</option><option value="3d">3d</option><option value="6p">6p</option></select></label>
             <fieldset><legend>Current contribution</legend><div class="segmented"><button type="button" data-component="spin" aria-pressed="true">Spin</button><button type="button" data-component="phase" aria-pressed="false">Schrödinger</button><button type="button" data-component="total" aria-pressed="false">Total</button></div></fieldset>
-            <label>Spin direction<select id="spin-direction"><option value="1">+z · toward you</option><option value="-1">−z · away from you</option></select></label>
+            <label>Spin direction<select id="spin-direction"><option value="1">+z · along axis</option><option value="-1">−z · opposite axis</option></select></label>
             <label>Phase winding<select id="phase-winding"><option value="1">mℓ = +1</option><option value="-1">mℓ = −1</option></select></label>
           </div>
           <div class="playback-controls">
@@ -164,24 +165,19 @@
             <label for="flow-speed">Playback speed</label><input id="flow-speed" type="range" min="0.25" max="2" step="0.25" value="1" /><output id="flow-speed-value" for="flow-speed">1×</output>
           </div>
           <div class="explorer-visuals">
-            <svg id="ring-view" viewBox="0 0 400 360" role="img" aria-labelledby="ring-title ring-desc">
-              <title id="ring-title">Current in an equatorial slice</title><desc id="ring-desc">Moving tracers follow the selected current over a stationary density field. Their direction and relative speed change with the current contribution, spin, and phase winding. Pause the animation to inspect the arrows.</desc>
-              <defs><radialGradient id="density-ring"><stop offset="0" stop-color="#060a12"/><stop offset="12%" stop-color="#20313a"/><stop offset="29%" stop-color="#658b90"/><stop offset="49%" stop-color="#28434c"/><stop offset="77%" stop-color="#101e2a"/><stop offset="100%" stop-color="#080d18"/></radialGradient><marker id="arrow-positive" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#ffb969"/></marker><marker id="arrow-negative" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#afa1ff"/></marker></defs>
-              <circle cx="200" cy="172" r="154" fill="url(#density-ring)"/><g id="density-contours" fill="none" stroke="#76919c" stroke-opacity=".26"></g><g id="current-arrows" fill="none" stroke-width="3" stroke-linecap="round"></g>
-              <g id="current-tracers" aria-hidden="true"></g>
-              <circle cx="200" cy="172" r="3" fill="#f1ddd1"/><text x="200" y="346" text-anchor="middle" class="diagram-label">View from +z · tracers follow the current</text>
-            </svg>
-            <div class="profile-wrap"><svg id="density-profile" viewBox="0 0 430 265" role="img" aria-labelledby="profile-title"><title id="profile-title">The same density profile for every spin and phase setting, with a maximum at two Bohr radii</title><path d="M42 24 V216 H410" fill="none" stroke="#647184"/><path id="profile-area" fill="#73b7bd" fill-opacity=".12"/><path id="profile-line" fill="none" stroke="#94d3d5" stroke-width="2.5"/><line x1="147" x2="147" y1="30" y2="216" stroke="#acb7c9" stroke-dasharray="4 5" stroke-opacity=".6"/><text x="147" y="20" text-anchor="middle" class="diagram-label">density maximum</text><text x="147" y="238" text-anchor="middle" class="diagram-label">2</text><text x="42" y="238" text-anchor="middle" class="diagram-label">0</text><text x="410" y="238" text-anchor="end" class="diagram-label">s / a₀</text><text x="44" y="20" class="diagram-label">ρ</text></svg><p class="profile-formula">\(\rho(s,0)\propto s^2e^{-s/a_0}\)</p><p>The density stays fixed. Moving tracers follow \(\mathbf v=\mathbf j/\rho\), with a shared time scale slowed for viewing. Arrows indicate direction; tracer spacing is illustrative.</p></div>
+            <div class="orbital-view"><p id="orbital-state" class="orbital-state">1s · n = 1, ℓ = 0, mℓ = 0</p><div class="orbital-canvases"><canvas id="orbital-density" width="800" height="720" aria-hidden="true"></canvas><canvas id="orbital-flow" width="800" height="720" role="img" aria-label="Animated hydrogen orbital current">Your browser needs canvas support to show the orbital current.</canvas></div><p id="orbital-view-note" class="orbital-view-note">Oblique view · quarter cutaway</p></div>
+            <div class="profile-wrap"><svg id="density-profile" viewBox="0 0 430 265" role="img" aria-labelledby="profile-title"><title id="profile-title">Radial density factor for the selected orbital</title><path d="M42 24 V216 H410" fill="none" stroke="#647184"/><path id="profile-area" fill="#73b7bd" fill-opacity=".12"/><path id="profile-line" fill="none" stroke="#94d3d5" stroke-width="2.5"/><g id="profile-nodes"></g><text x="42" y="238" text-anchor="middle" class="diagram-label">0</text><text x="410" y="238" text-anchor="end" class="diagram-label"><tspan id="profile-extent">0</tspan> a₀</text><text x="44" y="20" class="diagram-label">|R|² · relative scale</text></svg><p class="profile-formula" id="profile-formula">Radial density factor</p><p id="profile-note"></p></div>
           </div>
-          <p id="flow-explanation" class="flow-explanation" role="status" aria-live="polite">With spin +z, the spin current is clockwise inside the density maximum and counterclockwise outside it.</p>
-          <div class="direction-key"><span><i class="warm-dot"></i>Counterclockwise</span><span><i class="cool-dot"></i>Clockwise</span></div>
-          <noscript><p>Enable JavaScript to animate the tracers and switch currents. For spin +z, the spin contribution reverses at s = 2a₀; the Schrödinger contribution follows the sign of mℓ.</p></noscript>
+          <p class="explorer-note">The cutaway reveals the interior; it changes visibility only. Tracers follow \(\mathbf v=\mathbf j/\rho\). Size and playback time are fitted separately for each orbital, with one shared time scale for its three current contributions.</p>
+          <p id="flow-explanation" class="flow-explanation" role="status" aria-live="polite">The spherical 1s density carries a spin current; its Schrödinger current is zero.</p>
+          <div class="direction-key"><span><i class="warm-dot"></i>Counterclockwise</span><span><i class="cool-dot"></i>Clockwise</span><span>Directions viewed from +z</span></div>
+          <noscript><p>Enable JavaScript to choose an orbital and compare its currents. Each orbital’s density stays fixed when switching current contribution.</p></noscript>
         </section>
 
         <div class="prose">
           <p>The complete flow also includes the phase contribution. For the states shown here,</p>
           <div class="equation">\[v_\phi=\underbrace{\frac{\hbar m_\ell}{m_es}}_{\text{Schrödinger}}\;\underbrace{-\frac{\hbar}{2m_e}\partial_s\ln\rho}_{\text{spin along +z}}.\]</div>
-          <p>The two can reinforce or oppose one another. A reversal of the <em>spin contribution</em> need not be a reversal of the <em>total current</em>. In the explorer, choose Total with \(m_\ell=+1\) and spin +z: the inner clockwise contribution is outweighed by the phase current, and the total is counterclockwise throughout.</p>
+          <p>The two can reinforce or oppose one another. A reversal of the <em>spin contribution</em> need not be a reversal of the <em>total current</em>. In the explorer, choose 2p, set \(m_\ell=+1\) and spin +z, then choose Total: the inner clockwise contribution is outweighed by the phase current, and the total is counterclockwise throughout.</p>
           <details class="derivation"><summary>Where the uniform-spin assumption matters</summary><p>If the spin direction varies with position, the general expression contains an additional term:</p><div class="equation">\[\mathbf j_{\rm spin}=\frac{\hbar}{2m_e}\left(\nabla\rho\times\mathbf n+\rho\nabla\times\mathbf n\right).\]</div><p>The full curl is still divergence-free. It need not be tangent to density level sets, however. The simpler geometric picture above applies to the uniform polarization used in all the renders on this page.</p></details>
         </div>
       </section>

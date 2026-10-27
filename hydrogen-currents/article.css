@@ -46,7 +46,7 @@
 .derivation summary { cursor:pointer; color:#e1e6f3; font-size:.94rem; }
 .derivation p { font-size:.94rem; }
 .flow-explorer { background:#0b111d; border:1px solid #293345; border-radius:18px; margin:2.8rem 0; padding:2rem; }
-.explorer-heading h3 { font-size:1.7rem; margin:.7rem 0; }
+.explorer-heading h3 { font-size:1.7rem; margin:.7rem 0; scroll-margin-top:105px; }
 .explorer-heading > p:last-child { max-width:68ch; color:var(--text-soft); font-size:.95rem; }
 .explorer-controls { display:flex; flex-wrap:wrap; gap:1rem 1.5rem; align-items:end; padding:1.1rem 0 .8rem; }
 .explorer-controls fieldset { border:0; padding:0; margin:0; min-width:0; }
@@ -55,15 +55,19 @@
 .segmented button { border:0; border-radius:0; background:#101a2a; color:#b7c4dc; font:inherit; font-size:.85rem; padding:.65rem .9rem; cursor:pointer; }
 .segmented button[aria-pressed=true] { color:#10151e; background:#d8e3ed; }
 .explorer-controls select { display:block; margin-top:.35rem; color:#e4e9f2; background:#101a2a; border:1px solid #394457; border-radius:7px; padding:.6rem .7rem; font:inherit; font-size:.85rem; min-height:41px; }
+.explorer-controls select:disabled { opacity:.65; }
 .playback-controls { display:flex; align-items:center; flex-wrap:wrap; gap:.6rem .9rem; padding:.4rem 0 .9rem; color:#abb8d0; font-size:.78rem; }
 .playback-toggle { min-width:80px; min-height:40px; border:1px solid #455062; border-radius:7px; padding:.5rem .8rem; color:#e4e9f2; background:#101a2a; font:inherit; font-size:.85rem; cursor:pointer; }
 .playback-toggle[aria-pressed=true] { border-color:#92734d; color:var(--warm); background:#241e1b; }
 .playback-controls input { width:120px; max-width:100%; margin:0; accent-color:var(--warm); cursor:pointer; }
 .playback-controls output { min-width:3ch; color:#e0e8f3; font-variant-numeric:tabular-nums; }
-#current-arrows { opacity:.42; }
-#current-tracers { pointer-events:none; }
 .explorer-visuals { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:2rem; }
 .explorer-visuals svg { display:block; width:100%; height:auto; }
+.orbital-canvases { position:relative; width:100%; aspect-ratio:400/360; }
+.orbital-canvases canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.orbital-state { font-size:.86rem; color:#d1dde9; margin:.6rem 0 0; text-align:center; }
+.orbital-view-note { color:#a3b3ca; font-size:.75rem; text-align:center; margin:.3rem 0 .8rem; }
+.explorer-note { color:#9cabc3; font-size:.8rem; line-height:1.7; max-width:90ch; }
 .diagram-label { font-family:inherit; fill:#a9b6cc; font-size:12px; }
 .profile-wrap p { color:#9cabc3; font-size:.8rem; margin:.6rem 0; line-height:1.6; }
 .profile-wrap .profile-formula { text-align:center; font-size:1rem; color:#d0e5ea; }
