@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The currents inside an orbital | Imagining Physics</title>
+  <meta name="description" content="A visual tour of hydrogen probability currents: phase circulation, the spin contribution inherited from Dirac theory, and the counterflow hidden inside stationary orbitals." />
+  <link rel="canonical" href="https://imaginingphysics.com/hydrogen-currents/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The currents inside an orbital" />
+  <meta property="og:description" content="The cloud can stand still while its probability current circulates. Look inside hydrogen orbitals to see how phase and spin shape the flow." />
+  <meta property="og:url" content="https://imaginingphysics.com/hydrogen-currents/" />
+  <meta property="og:image" content="https://imaginingphysics.com/hydrogen-currents/media/social.jpg" />
+  <meta property="og:image:alt" content="A cutaway of a hydrogen 6p orbital reveals nested gold and blue bands of opposite probability current." />
+  <meta property="article:published_time" content="2026-10-27" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../comments.css" />
+  <link rel="stylesheet" href="../grover-search/vendor/katex-0.19.0/katex.min.css" />
+  <link rel="stylesheet" href="article.css" />
+  <script defer src="../grover-search/vendor/katex-0.19.0/katex.min.js"></script>
+  <script defer src="../grover-search/vendor/katex-0.19.0/auto-render.min.js"></script>
+  <script defer src="article.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="logo" href="../index.html">Imagining Physics</a>
+      <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="site-nav" aria-label="Main navigation"><ul>
+        <li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li>
+        <li><a href="../blog.html" class="active">Blog Posts</a></li><li><a href="../videos.html">Videos</a></li>
+        <li><a href="../shorts.html">Shorts</a></li><li><a href="../interactive.html">Interactive demos</a></li>
+        <li><a href="../shadertoy.html">Shadertoy</a></li><li><a href="../games.html">Games</a></li>
+      </ul></nav>
+    </div>
+  </header>
+  <main id="main-content" class="orbital-post">
+    <a class="post-back" href="../blog.html">← All blog posts</a>
+    <article>
+      <header class="opening">
+        <div class="opening-copy">
+          <p class="eyebrow">Hydrogen · Probability current · Spin</p>
+          <h1>The currents<br />inside an orbital</h1>
+          <p class="standfirst">An orbital’s shape can stay perfectly still while its probability current circulates. Spin reveals a rich pattern of motion inside the familiar cloud.</p>
+          <p class="post-meta">By Anssi · <time datetime="2026-10-27">27 October 2026</time></p>
+          <a class="opening-link" href="#two-currents">Follow the two contributions <span aria-hidden="true">↓</span></a>
+        </div>
+        <figure class="opening-image">
+          <a href="media/6p.webp" aria-label="View the 6p cutaway at full size"><img src="media/6p.webp" width="1600" height="1200" alt="Gold and blue nested layers appear inside an octant cutaway of the 6p, m equals plus one orbital." fetchpriority="high" decoding="async" /></a>
+          <figcaption>6p, \(m_\ell=+1\), spin along +z. The cutaway exposes alternating directions of current.</figcaption>
+        </figure>
+      </header>
+
+      <nav class="contents" aria-label="In this article">
+        <a href="#still-cloud">A stationary cloud</a><a href="#two-currents">Two contributions</a><a href="#dirac">The Dirac connection</a><a href="#density-gradient">Inside and outside a lobe</a><a href="#orbital-gallery">Reading the renders</a>
+      </nav>
+
+      <section class="chapter" aria-labelledby="still-cloud">
+        <div class="prose">
+          <p class="section-number">01 / Density and flow</p>
+          <h2 id="still-cloud">What moves when the cloud does not?</h2>
+          <p>The usual orbital picture answers a question about position: where is an electron likely to be found? In these simulations I also wanted to see the <em>probability current</em>—its direction, its circulation, and the places where neighboring regions flow in opposite directions.</p>
+          <p>We need only a brief reminder of the familiar hydrogen states. A radial function and an angular harmonic determine the orbital; the quantum numbers \(n,\ell,m_\ell\) label its energy, angular structure, and phase winding. Here each orbital is paired with a fixed, uniform spin direction. In this nonrelativistic Coulomb model, its time dependence is a common phase:</p>
+          <div class="equation">\[\Psi(\mathbf r,t)=\psi_{n\ell m_\ell}(\mathbf r)\,\chi\,e^{-iE_nt/\hbar},\qquad \chi^\dagger\chi=1.\]</div>
+          <p>That phase disappears from the density \(\rho=\Psi^\dagger\Psi=|\psi|^2\), so the probability cloud is stationary. This does not require the current to vanish. The continuity equation says</p>
+          <div class="equation compact-equation">\[\frac{\partial\rho}{\partial t}+\nabla\cdot\mathbf j=0.\]</div>
+          <p>A stationary state has no local accumulation or depletion of probability. A steady circulation can satisfy that condition everywhere.</p>
+        </div>
+        <div class="image-pair introductory-pair">
+          <figure>
+            <a href="media/1s.webp"><img src="media/1s.webp" width="1600" height="1200" alt="A spherical 1s probability cloud, opened by a visual cutaway and filled with gold current tracers." loading="lazy" decoding="async" /></a>
+            <figcaption><strong>1s, \(m_\ell=0\).</strong> A spherical density with a circulating spin contribution. The opening is a viewing cut, not a missing part of the orbital.</figcaption>
+          </figure>
+          <figure>
+            <a href="media/2p.webp"><img src="media/2p.webp" width="1600" height="1200" alt="Two gold lobes of the 2p z orbital with the nodal plane between them." loading="lazy" decoding="async" /></a>
+            <figcaption><strong>2p<sub>z</sub>, \(m_\ell=0\).</strong> Both lobes circulate in the same sense for spin +z. The opposite signs of the wavefunction do not by themselves mean opposite currents.</figcaption>
+          </figure>
+        </div>
+        <aside class="reading-note prose">
+          <h3>How to read the pictures</h3>
+          <p>The dots are visualization samples of a single electron’s probability distribution, transported by \(\mathbf v=\mathbf j/\rho\). They are not a cloud of interacting electrons or recorded individual electron tracks. Gold/orange marks counterclockwise flow viewed from +z; blue/violet marks clockwise flow. In the comparison films, slow motion fades toward silver. These are colors of the <em>total</em> current, not separate colors for its two terms.</p>
+        </aside>
+      </section>
+
+      <section class="chapter" aria-labelledby="two-currents">
+        <div class="prose">
+          <p class="section-number">02 / Phase and spin</p>
+          <h2 id="two-currents">One current, two contributions</h2>
+          <p>For a two-component Pauli spinor, with no external vector potential, the current inherited from Dirac theory is</p>
+          <div class="equation key-equation">\[\mathbf j=\mathbf j_{\rm Sch}+\mathbf j_{\rm spin}.\]</div>
+        </div>
+        <div class="component-pair">
+          <section class="component phase-component" aria-labelledby="phase-title">
+            <span class="component-label">The Schrödinger contribution</span>
+            <h3 id="phase-title">The phase sets a direction</h3>
+            <div class="equation">\[\mathbf j_{\rm Sch}=\frac{\hbar}{m_e}\operatorname{Im}(\Psi^\dagger\nabla\Psi).\]</div>
+            <p>For our fixed spinor, write \(\psi=\sqrt\rho\,e^{iS/\hbar}\). Then \(\mathbf j_{\rm Sch}=\rho\nabla S/m_e\): spatial variation of phase supplies the familiar flow.</p>
+            <p>A factor \(e^{im_\ell\phi}\) produces circulation around z. A real spatial orbital, such as 1s or 2p<sub>z</sub>, has zero Schrödinger current.</p>
+          </section>
+          <section class="component spin-component" aria-labelledby="spin-title">
+            <span class="component-label">The spin contribution</span>
+            <h3 id="spin-title">A curl of spin density</h3>
+            <div class="equation">\[\mathbf j_{\rm spin}=\frac{\hbar}{2m_e}\nabla\times(\Psi^\dagger\boldsymbol\sigma\Psi).\]</div>
+            <p>Here \(\boldsymbol\sigma\) is the vector of Pauli matrices, and \(m_e\) is the electron mass. The vector inside the curl is the density weighted by local spin polarization.</p>
+            <p>This term can remain nonzero even when the spatial wavefunction is real. It is the entire current in the 1s and 2p<sub>z</sub> examples above.</p>
+          </section>
+        </div>
+        <div class="prose">
+          <p class="source-note">The spin term and its coefficient follow from the nonrelativistic reduction of the Dirac probability current; see <a href="https://arxiv.org/abs/physics/9807019">Marek Nowakowski’s derivation</a>.</p>
+          <p>“Spin current” here means the spin-dependent part of the <em>position probability current</em>, often called the magnetization contribution. Multiplying the probability current by the electron charge \(-e\) gives the electric current, whose direction is opposite.</p>
+        </div>
+      </section>
+
+      <section class="chapter" aria-labelledby="dirac">
+        <div class="prose">
+          <p class="section-number">03 / A trace of relativity</p>
+          <h2 id="dirac">Why does Dirac theory leave this term behind?</h2>
+          <p>The relativistic theory describes an electron with a four-component wavefunction \(\Psi_D\). Its probability current is \(\mathbf j_D=c\Psi_D^\dagger\boldsymbol\alpha\Psi_D\). At low energies, the two smaller components are approximately a momentum derivative of the two larger components.</p>
+          <p>Substituting that approximation into the <em>current</em> gives both terms above. The spin contribution survives at leading nonrelativistic order; it is not merely a tiny high-speed correction. A small component proportional to \(1/c\) is multiplied by the \(c\) in the Dirac current.</p>
+          <details class="derivation">
+            <summary>A short look at the algebra</summary>
+            <p>After removing the rest-energy phase, write \(\Psi_D=(\varphi,\eta)^T\). For \(\mathbf A=0\),</p>
+            <div class="equation">\[\eta\simeq\frac{\boldsymbol\sigma\cdot\mathbf p}{2m_ec}\varphi,\qquad\mathbf p=-i\hbar\nabla.\]</div>
+            <p>Insert this into \(\mathbf j_D=c(\varphi^\dagger\boldsymbol\sigma\eta+\eta^\dagger\boldsymbol\sigma\varphi)\). The identity \(\sigma_i\sigma_j=\delta_{ij}I+i\epsilon_{ijk}\sigma_k\) separates a derivative term from a curl, giving \(\mathbf j_{\rm Sch}+\mathbf j_{\rm spin}\).</p>
+          </details>
+          <p class="source-note">This is the current reduction in <a href="https://arxiv.org/html/physics/9807019v1">Nowakowski, equations 6–9</a>. The same magnetization term can also be obtained within Pauli theory when the spin structure is retained; see <a href="https://arxiv.org/abs/1601.05934">Shikakhwa, Turgut and Pak</a>.</p>
+          <p>The pictures use nonrelativistic hydrogen orbitals and this Pauli current. They do not include fine-structure corrections to the orbital shapes or spin–orbit evolution.</p>
+
+          <h3>A current that does not reshape the density</h3>
+          <p>The divergence of a curl is identically zero:</p>
+          <div class="equation">\[\nabla\cdot\mathbf j_{\rm spin}=\frac{\hbar}{2m_e}\nabla\cdot\left[\nabla\times(\Psi^\dagger\boldsymbol\sigma\Psi)\right]=0.\]</div>
+          <p>For a given wavefunction, adding this term changes the flow while leaving the density’s continuity equation unchanged. It contributes no net probability flux through a closed surface. Density evolution alone therefore cannot determine this part of the current.</p>
+          <p>This statement concerns the current term. Spin-dependent interactions can still change a quantum state and hence its density. Here the hydrogen Hamiltonian has no such external interaction.</p>
+        </div>
+      </section>
+
+      <section class="chapter" aria-labelledby="density-gradient">
+        <div class="prose">
+          <p class="section-number">04 / The geometry of circulation</p>
+          <h2 id="density-gradient">Across the gradient, along the level set</h2>
+          <p>For the uniform spin in these renders, let \(\mathbf n=\chi^\dagger\boldsymbol\sigma\chi\) be its unit direction. The curl simplifies to</p>
+          <div class="equation key-equation">\[\mathbf j_{\rm spin}=\frac{\hbar}{2m_e}\nabla\rho\times\mathbf n.\]</div>
+          <p>The density gradient points toward increasing probability density. The cross product turns that direction sideways, perpendicular to both the gradient and the spin. Thus \(\mathbf j_{\rm spin}\cdot\nabla\rho=0\): <strong>the spin current is tangent to surfaces of constant density.</strong> It also lies in planes perpendicular to the spin.</p>
+          <p>Dividing by the density gives \(\mathbf v_{\rm spin}=\frac{\hbar}{2m_e}\nabla\ln\rho\times\mathbf n\). The flow speed depends on the <em>relative</em> density gradient. This is a relation between fields, not a force pushing probability downhill.</p>
+
+          <h3>Why the inner and outer sides can flow oppositely</h3>
+          <p>Take spin along +z and an axisymmetric orbital. At cylindrical radius \(s\), measured away from that axis,</p>
+          <div class="equation">\[j_{{\rm spin},\phi}=-\frac{\hbar}{2m_e}\left.\frac{\partial\rho}{\partial s}\right|_z.\]</div>
+          <p>Cross a ring-shaped lobe at fixed height. On its inner side the density rises outward, so the spin current is clockwise viewed from +z. Beyond the density maximum it falls outward, so the spin current is counterclockwise. The gradient changes sign, and the sideways current changes with it.</p>
+          <p>The relevant gradient is that of the <em>local three-dimensional density</em> \(\rho\), not the radial probability distribution \(4\pi r^2\rho\). And the reversal is conditional: the density slope perpendicular to spin must reverse. A monotonic 1s density has no inner ring of opposite flow; 2p<sub>z</sub> with spin +z also circulates in the same sense in both lobes.</p>
+        </div>
+
+        <section class="flow-explorer" aria-labelledby="explorer-title">
+          <div class="explorer-heading"><p class="section-number">Explore the equation</p><h3 id="explorer-title">Keep the density. Change the current.</h3><p>An equatorial slice through a 2p orbital with \(|m_\ell|=1\). The density peaks at \(s=2a_0\); \(a_0\) is the Bohr radius.</p></div>
+          <div class="explorer-controls">
+            <fieldset><legend>Current contribution</legend><div class="segmented"><button type="button" data-component="spin" aria-pressed="true">Spin</button><button type="button" data-component="phase" aria-pressed="false">Schrödinger</button><button type="button" data-component="total" aria-pressed="false">Total</button></div></fieldset>
+            <label>Spin direction<select id="spin-direction"><option value="1">+z · toward you</option><option value="-1">−z · away from you</option></select></label>
+            <label>Phase winding<select id="phase-winding"><option value="1">mℓ = +1</option><option value="-1">mℓ = −1</option></select></label>
+          </div>
+          <div class="explorer-visuals">
+            <svg id="ring-view" viewBox="0 0 400 360" role="img" aria-labelledby="ring-title ring-desc">
+              <title id="ring-title">Current in an equatorial slice</title><desc id="ring-desc">Concentric density contours with arrows inside and outside the density maximum. The arrows update with the selected current and spin.</desc>
+              <defs><radialGradient id="density-ring"><stop offset="0" stop-color="#060a12"/><stop offset="12%" stop-color="#20313a"/><stop offset="29%" stop-color="#658b90"/><stop offset="49%" stop-color="#28434c"/><stop offset="77%" stop-color="#101e2a"/><stop offset="100%" stop-color="#080d18"/></radialGradient><marker id="arrow-positive" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#ffb969"/></marker><marker id="arrow-negative" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#afa1ff"/></marker></defs>
+              <circle cx="200" cy="172" r="154" fill="url(#density-ring)"/><g id="density-contours" fill="none" stroke="#76919c" stroke-opacity=".26"></g><g id="current-arrows" fill="none" stroke-width="3" stroke-linecap="round"></g>
+              <circle cx="200" cy="172" r="3" fill="#f1ddd1"/><text x="200" y="346" text-anchor="middle" class="diagram-label">View from +z · arrows show direction</text>
+            </svg>
+            <div class="profile-wrap"><svg id="density-profile" viewBox="0 0 430 265" role="img" aria-labelledby="profile-title"><title id="profile-title">The same density profile for every spin and phase setting, with a maximum at two Bohr radii</title><path d="M42 24 V216 H410" fill="none" stroke="#647184"/><path id="profile-area" fill="#73b7bd" fill-opacity=".12"/><path id="profile-line" fill="none" stroke="#94d3d5" stroke-width="2.5"/><line x1="147" x2="147" y1="30" y2="216" stroke="#acb7c9" stroke-dasharray="4 5" stroke-opacity=".6"/><text x="147" y="20" text-anchor="middle" class="diagram-label">density maximum</text><text x="147" y="238" text-anchor="middle" class="diagram-label">2</text><text x="42" y="238" text-anchor="middle" class="diagram-label">0</text><text x="410" y="238" text-anchor="end" class="diagram-label">s / a₀</text><text x="44" y="20" class="diagram-label">ρ</text></svg><p class="profile-formula">\(\rho(s,0)\propto s^2e^{-s/a_0}\)</p><p>The curve is unchanged by either selector. Arrow lengths are illustrative; they do not encode speed.</p></div>
+          </div>
+          <p id="flow-explanation" class="flow-explanation" role="status" aria-live="polite">With spin +z, the spin current is clockwise inside the density maximum and counterclockwise outside it.</p>
+          <div class="direction-key"><span><i class="warm-dot"></i>Counterclockwise</span><span><i class="cool-dot"></i>Clockwise</span></div>
+          <noscript><p>Enable JavaScript to change the arrows. For spin +z, the spin contribution reverses at s = 2a₀; the Schrödinger contribution follows the sign of mℓ.</p></noscript>
+        </section>
+
+        <div class="prose">
+          <p>The complete flow also includes the phase contribution. For the states shown here,</p>
+          <div class="equation">\[v_\phi=\underbrace{\frac{\hbar m_\ell}{m_es}}_{\text{Schrödinger}}\;\underbrace{-\frac{\hbar}{2m_e}\partial_s\ln\rho}_{\text{spin along +z}}.\]</div>
+          <p>The two can reinforce or oppose one another. A reversal of the <em>spin contribution</em> need not be a reversal of the <em>total current</em>. In the explorer, choose Total with \(m_\ell=+1\) and spin +z: the inner clockwise contribution is outweighed by the phase current, and the total is counterclockwise throughout.</p>
+          <details class="derivation"><summary>Where the uniform-spin assumption matters</summary><p>If the spin direction varies with position, the general expression contains an additional term:</p><div class="equation">\[\mathbf j_{\rm spin}=\frac{\hbar}{2m_e}\left(\nabla\rho\times\mathbf n+\rho\nabla\times\mathbf n\right).\]</div><p>The full curl is still divergence-free. It need not be tangent to density level sets, however. The simpler geometric picture above applies to the uniform polarization used in all the renders on this page.</p></details>
+        </div>
+      </section>
+
+      <section class="chapter" aria-labelledby="orbital-gallery">
+        <div class="prose">
+          <p class="section-number">05 / Reading the patterns</p>
+          <h2 id="orbital-gallery">From a sphere to layers of counterflow</h2>
+          <h3>1s: circulation without orbital phase winding</h3>
+          <p>For the ground state, \(\rho\propto e^{-2r/a_0}\), and the Schrödinger contribution vanishes. With spin +z, the spin term gives</p>
+          <div class="equation">\[\mathbf v_{1s}=\frac{\hbar}{m_ea_0}\sin\theta\,\mathbf e_\phi.\]</div>
+          <p>The current follows circles around the spin axis while the spherical cloud stays unchanged. At a fixed polar angle the speed does not depend on radius, but the angular speed does: a smaller circle is traversed more quickly. This is not rigid rotation of the whole orbital, and it does not give the 1s state nonzero orbital angular momentum \(\ell\).</p>
+          <h3>3d and 5g: angular lobes organize the flow</h3>
+          <p>The \(m_\ell=0\) states make the spin contribution especially clear because the phase current is zero. Lobes and nodal surfaces give the density different slopes in different regions. The resulting bands of clockwise and counterclockwise motion follow that geometry.</p>
+        </div>
+        <div class="gallery-feature">
+          <figure><a href="media/3d.webp"><img src="media/3d.webp" width="1600" height="1200" alt="The 3d z squared orbital cutaway reveals a blue belt between gold lobes and an equatorial ring." loading="lazy" decoding="async" /></a><figcaption><strong>3d, \(m_\ell=0\), spin +z.</strong> The blue belt and gold regions have opposite currents. All the motion here comes from the spin term.</figcaption></figure>
+          <figure class="portrait-figure"><a href="media/5g-zero.webp"><img src="media/5g-zero.webp" width="900" height="1600" alt="A portrait render of 5g with m equals zero shows several angular lobes with alternating gold and blue flow regions." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=0\), spin +z.</strong> More angular structure creates more regions of counterflow.</figcaption></figure>
+        </div>
+        <div class="prose">
+          <h3>6p: radial nodes create nested layers</h3>
+          <p>The 6p cutaway at the top of this page has four radial nodes. Between them sit radial lobes, with density rising from a node and falling toward the next one. Their changing gradients produce a layered spin contribution. Combined with the \(m_\ell=+1\) phase current, this gives the alternating gold and blue regions visible inside the cloud.</p>
+          <p>A node is a zero of the density. The ratio \(\mathbf j/\rho\) can become very large nearby, even though the probability current itself remains small or vanishes. At the node the ratio is undefined. The displayed tracer speed is not a uniform approximation to the exact relativistic velocity in those tiny low-density regions.</p>
+          <h3>The same shape can carry a different current</h3>
+          <p>Changing \(m_\ell\) to \(-m_\ell\) preserves \(|Y_{\ell m_\ell}|^2\). The density is identical, but the phase circulation reverses. Keeping spin +z leaves the spin term unchanged. The two currents then add differently, so the resulting flow is not generally a simple reversal.</p>
+        </div>
+        <div class="image-pair comparison-pair">
+          <figure><a href="media/5g-minus4.webp"><img src="media/5g-minus4.webp" width="1440" height="1280" alt="5g m equals minus four with fixed spin plus z, dominated by blue clockwise current." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=-4\).</strong> Clockwise phase circulation competes with the spin contribution.</figcaption></figure>
+          <figure><a href="media/5g-plus4.webp"><img src="media/5g-plus4.webp" width="1440" height="1280" alt="5g m equals plus four with fixed spin plus z, showing gold counterclockwise current in the same orbital density." loading="lazy" decoding="async" /></a><figcaption><strong>5g, \(m_\ell=+4\).</strong> The same density and spin, with the opposite phase winding.</figcaption></figure>
+        </div>
+
+        <div class="prose"><h3>Watch the circulation</h3><p>These excerpts open a cutaway and move the camera overhead. Follow the texture within each layer: it circulates while the density profile remains stationary. The apparent opening is a display operation.</p></div>
+        <div class="image-pair film-pair">
+          <figure><video controls loop muted playsinline preload="none" poster="media/2p-flow-poster.webp" width="720" height="720" aria-label="Twelve-second animation of the 2p m equals plus one current" aria-describedby="film-2p-caption"><source src="media/2p-flow.mp4" type="video/mp4" /><a href="media/2p-flow.mp4">Watch the 2p current film.</a></video><figcaption id="film-2p-caption"><strong>2p, \(m_\ell=+1\), spin +z.</strong> A toroidal density with counterclockwise total current. <span class="media-size">12 seconds · 720 × 720 · 2.9 MB</span></figcaption></figure>
+          <figure><video controls loop muted playsinline preload="none" poster="media/5f-flow-poster.webp" width="720" height="720" aria-label="Twelve-second animation of the 5f m equals minus three current" aria-describedby="film-5f-caption"><source src="media/5f-flow.mp4" type="video/mp4" /><a href="media/5f-flow.mp4">Watch the 5f current film.</a></video><figcaption id="film-5f-caption"><strong>5f, \(m_\ell=-3\), spin +z.</strong> A radial node separates the inner and outer toroidal layers. <span class="media-size">12 seconds · 720 × 720 · 2.9 MB</span></figcaption></figure>
+        </div>
+        <div class="prose">
+          <p>Reversing only the spin would reverse only the spin contribution. For a real \(m_\ell=0\) orbital that reverses the entire current, with no change in density. Tilting the spin can change the geometry of the flow as well: the spin current follows intersections of density level surfaces with planes perpendicular to the new spin direction.</p>
+          <p>The familiar orbital gives us the distribution. Its phase and spin supply the additional information needed to see the current inside it.</p>
+        </div>
+      </section>
+
+      <section class="chapter production-notes prose" aria-labelledby="rendering-title">
+        <h2 id="rendering-title">About these visualizations</h2>
+        <p>The images and films are from my existing hydrogen renders. Their spatial states are single Coulomb eigenstates with uniform spin +z. For this alignment, the full Pauli current is azimuthal; samples keep their radius and height while their angle evolves according to the calculated current. No circular tracks need to be fitted to the rendered pictures.</p>
+        <p>Lighting, the bright central marker, particle size, and cloud opacity are visual choices. Brightness is not a calibrated density or speed scale; the nucleus marker is enlarged. Orbitals are fitted independently in their panels, and time is slowed for readability, so their displayed sizes and playback speeds should not be compared as physical scales. The films retain their source timing and continuous 30 fps motion.</p>
+        <p>The web editions use compressed images and short H.264 videos. Video files load on demand when you press play.</p>
+        <h3>Further reading</h3>
+        <ul class="references">
+          <li>Marek Nowakowski, <a href="https://arxiv.org/abs/physics/9807019">The Quantum Mechanical Current of the Pauli Equation</a>, <cite>American Journal of Physics</cite> 67, 916–919 (1999). The Dirac-to-Pauli current reduction.</li>
+          <li>M. S. Shikakhwa, S. Turgut and N. K. Pak, <a href="https://arxiv.org/abs/1601.05934">Derivation of the magnetization current from the non-relativistic Pauli equation</a>, <cite>American Journal of Physics</cite> 79, 1177–1179 (2011). A complementary derivation within the Pauli framework.</li>
+        </ul>
+      </section>
+    </article>
+    <section class="comments-section prose" aria-labelledby="comments-title"><div class="comments-heading"><h2 id="comments-title">Comments and questions</h2><p>Share a thought about the currents inside these orbitals.</p></div><div class="comments-widget" data-comments data-theme="github-dark"><noscript>JavaScript is required to load the comment section.</noscript></div></section>
+  </main>
+  <footer class="site-footer"><div class="container footer-grid"><div><strong>Imagining Physics</strong><p>Visualizing physics through videos, simulations, shaders, and small games.</p></div><nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="../blog.html">Blog Posts</a></li><li><a href="../interactive.html">Interactive demos</a></li><li><a href="../about.html">About</a></li><li><a href="https://www.youtube.com/@imaginingPhysics" target="_blank" rel="noopener noreferrer">YouTube</a></li></ul></nav></div></footer>
+  <script src="../main.js"></script>
+</body>
+</html>

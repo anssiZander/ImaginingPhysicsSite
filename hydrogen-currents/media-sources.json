@@ -1,0 +1,198 @@
+[
+  {
+    "file": "1s.webp",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/lighting-study-gold/1s_sculpted.png",
+    "state_n_l_m": [
+      1,
+      0,
+      0
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "width": 1600,
+    "height": 1200,
+    "bytes": 427772,
+    "source_sha256": "744a7dec4422b952111f05d00294f8c61f41df60d551f7a46507fbd520c0bfd7"
+  },
+  {
+    "file": "2p.webp",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/lighting-study-gold/2p_sculpted.png",
+    "state_n_l_m": [
+      2,
+      1,
+      0
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "width": 1600,
+    "height": 1200,
+    "bytes": 433510,
+    "source_sha256": "0e36d595c937c8f8696891bbd550824d6777e2240d02e5e85cc7c125aaf000c2"
+  },
+  {
+    "file": "3d.webp",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/lighting-study-gold/3d_sculpted.png",
+    "state_n_l_m": [
+      3,
+      2,
+      0
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "width": 1600,
+    "height": 1200,
+    "bytes": 386812,
+    "source_sha256": "6144287e3714e56bf5063e0f98c836cd62dd63c3f21ac29b2c200f52cc18bec5"
+  },
+  {
+    "file": "6p.webp",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/lighting-study-gold/6p_sculpted.png",
+    "state_n_l_m": [
+      6,
+      1,
+      1
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "width": 1600,
+    "height": 1200,
+    "bytes": 347644,
+    "source_sha256": "c09ec262bda522b4d6d41f02af82b2e361555638c676925c406d2859bdab8fc5"
+  },
+  {
+    "file": "5g-minus4.webp",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/fiveg-comparison-edit/5g_m4/poster_octant.png",
+    "state_n_l_m": [
+      5,
+      4,
+      -4
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "width": 1440,
+    "height": 1280,
+    "bytes": 374040,
+    "source_sha256": "d75e71a4e73ef736e1f5ab69d7578f902df7806dbbb8532bb89837df15f13e1d"
+  },
+  {
+    "file": "5g-plus4.webp",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/fiveg-comparison-edit/5g_p4/poster_octant.png",
+    "state_n_l_m": [
+      5,
+      4,
+      4
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "width": 1440,
+    "height": 1280,
+    "bytes": 368020,
+    "source_sha256": "57e6cff34a9d742c203d3d7cbef8255b4422f2a897d8aef218ee1384dda5f2ae"
+  },
+  {
+    "file": "5g-zero.webp",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/fiveg-m-comparison-native-2k/5g_m0/poster_octant.png",
+    "state_n_l_m": [
+      5,
+      4,
+      0
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "width": 900,
+    "height": 1600,
+    "bytes": 286232,
+    "source_sha256": "c41b0dd327692964503bb1fef8024981337215a04d6297c4ba6411b236a415d4"
+  },
+  {
+    "file": "2p-flow.mp4",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/component-orbitals-16s-720-20261012/Hydrogen_2p_m_plus1/Hydrogen_2p_m_plus1_Full_To_Top_16s_720.mp4",
+    "state_n_l_m": [
+      2,
+      1,
+      1
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "source_excerpt_seconds": [
+      4,
+      16
+    ],
+    "time_scale_changed": false,
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 720,
+          "height": 720,
+          "r_frame_rate": "30/1"
+        }
+      ],
+      "format": {
+        "duration": "12.000000",
+        "size": "2856792"
+      }
+    },
+    "full_decode": true,
+    "source_sha256": "6e259572aebf0415a32f6f5755a7bbba832337e9af6f04f0548f90269d0dd459"
+  },
+  {
+    "file": "5f-flow.mp4",
+    "source": "Hydrogen/blender/quantum-silk/recordings/PURE/component-orbitals-16s-720-20261012/Hydrogen_5f_m_minus3/Hydrogen_5f_m_minus3_Full_To_Top_16s_720.mp4",
+    "state_n_l_m": [
+      5,
+      3,
+      -3
+    ],
+    "spin": [
+      0,
+      0,
+      1
+    ],
+    "source_excerpt_seconds": [
+      4,
+      16
+    ],
+    "time_scale_changed": false,
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "width": 720,
+          "height": 720,
+          "r_frame_rate": "30/1"
+        }
+      ],
+      "format": {
+        "duration": "12.000000",
+        "size": "2874071"
+      }
+    },
+    "full_decode": true,
+    "source_sha256": "1f23753487627f8145873de21e794635a40fec8d2e2729ccc5fa9b37ec8913a7"
+  }
+]
