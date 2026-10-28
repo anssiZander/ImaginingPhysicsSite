@@ -375,6 +375,7 @@ h1, h2, h3 {
 }
 .thumbnail {
   aspect-ratio: 16 / 9;
+  height: auto;
   background: var(--bg-soft);
   border-bottom: 1px solid rgba(255,255,255,.07);
   object-fit: cover;
