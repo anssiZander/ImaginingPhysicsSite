@@ -1,0 +1,495 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="robots" content="index, follow" />
+
+  <meta name="description" content="A companion to the Zeeman effect video: hydrogen probability current, opposite spins, and Hestenes’s kinetic interpretation of the energy split." />
+
+  <title>The Zeeman effect in the current | Imagining Physics</title>
+
+  <link rel="canonical" href="https://imaginingphysics.com/zeeman-effect/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Zeeman effect in the current" />
+  <meta property="og:description" content="Electron circulation in a magnetic field: compare opposite spins, look inside higher orbitals, and explore Hestenes’s kinetic interpretation of the Zeeman split." />
+  <meta property="og:url" content="https://imaginingphysics.com/zeeman-effect/" />
+  <meta property="og:image" content="https://imaginingphysics.com/zeeman-effect/media/cover.webp" />
+  <meta property="og:image:alt" content="Apricot and violet 1s probability clouds with opposite electron spins in an upward magnetic field." />
+  <meta property="og:image:width" content="960" />
+  <meta property="og:image:height" content="600" />
+  <meta property="article:published_time" content="2026-11-12" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="../comments.css" />
+  <link rel="stylesheet" href="../styles.css" />
+
+  <link rel="stylesheet" href="../grover-search/vendor/katex-0.19.0/katex.min.css" />
+
+  <link rel="stylesheet" href="article.css" />
+
+
+  <script defer src="../grover-search/vendor/katex-0.19.0/katex.min.js"></script>
+
+  <script defer src="../grover-search/vendor/katex-0.19.0/auto-render.min.js"></script>
+
+  <script defer src="article.js"></script>
+
+
+</head>
+
+<body>
+
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+
+    <div class="container nav">
+
+      <a class="logo" href="../index.html">Imagining Physics</a>
+
+      <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+
+      <nav class="site-nav" aria-label="Main navigation"><ul>
+
+        <li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li>
+
+        <li><a href="../blog.html" class="active">Blog Posts</a></li><li><a href="../videos.html">Videos</a></li>
+
+        <li><a href="../shorts.html">Shorts</a></li><li><a href="../interactive.html">Interactive demos</a></li>
+
+      </ul></nav>
+
+    </div>
+
+  </header>
+
+  <main id="main-content" class="zeeman-post">
+
+    <div class="draft-line"><a href="../blog.html">← Blog posts</a><time datetime="2026-11-12">12 November 2026</time></div>
+
+    <article>
+
+      <header class="opening">
+
+        <div class="opening-copy">
+
+          <p class="eyebrow">Hydrogen · A companion to the video</p>
+
+          <h1>The Zeeman effect<br><em>in the current</em></h1>
+
+          <p class="standfirst">A magnetic field separates the energies of two spin states. The circulating probability current provides us with another way to look at the energy split.</p>
+
+          <p class="byline">By Anssi · Imagining Physics</p>
+
+          <p class="related-video"><a href="https://www.youtube.com/shorts/unOlqKBSsnU" target="_blank" rel="noopener noreferrer">Watch the related Short ↗</a></p>
+          <a class="opening-link" href="#watch">Watch the two states together <span aria-hidden="true">↓</span></a>
+
+        </div>
+
+        <figure class="opening-image">
+
+          <a href="media/1s-up-full.webp"><img src="media/1s-up-full.webp" width="1080" height="1080" alt="An apricot hydrogen 1s cloud with a cutaway, upward field lines and a downward magnetic moment arrow." fetchpriority="high" /></a>
+
+          <figcaption>The 1s orbital with spin up at 100kT. The large arrow shows the magnetic moment, which points down.</figcaption>
+
+        </figure>
+
+      </header>
+
+
+
+      <div class="prose introduction">
+
+        <p>The dot visualize the mathematics of <strong>probability current</strong>, calculated from the electron’s wavefunction. The standard interpretation of Quantum Mechanics does not allow the flow to be measured. Indeed, QM would question its physical existence. Be that as it may, I find it fun to visualize. Moreover, in the last section I discuss an argument by David Hestenes for taking that flow more seriously.</p>
+
+      </div>
+
+      <nav class="contents" aria-label="In this article">
+
+        <a href="#standard">The usual explanation</a><a href="#zero-field">Before the field</a><a href="#watch">Compare the films</a><a href="#force-balance">Force balance</a><a href="#hestenes">The kinetic interpretation</a>
+
+      </nav>
+
+
+
+      <section class="chapter" aria-labelledby="standard">
+
+        <div class="prose">
+
+          <p class="section-number">01 / The standard account</p>
+
+          <h2 id="standard">A magnetic field splits the Energy levels</h2>
+
+          <p>An atom placed in a magnetic field can acquire several distinct energies where it previously had one. Transitions between the shifted levels can then produce several spectral lines. This is the Zeeman effect. The number and spacing of those lines depend on both levels involved and on which transitions are allowed. <a class="reference-mark" href="#ref-nist" aria-label="Reference 1">[1]</a></p>
+
+          <p>The standard explanation starts with magnetic moments. A magnetic moment <span>\(\boldsymbol\mu\)</span> in a field <span>\(\mathbf B\)</span> has interaction energy</p>
+
+          <div class="equation">\[H_Z=-\boldsymbol\mu\cdot\mathbf B.\]</div>
+
+          <p>A moment pointing along the field has lower interaction energy than one pointing against it. For an electron, the spin magnetic moment points <em>opposite</em> to the spin (negative charge). With the field upward, spin up therefore gives the higher of the two spin energies.</p>
+
+          <p>We will concentrate on hydrogen’s 1s state. Its ordinary orbital angular momentum is zero, so the linear splitting of this pair comes from spin. In the Pauli model used here,</p>
+
+          <div class="equation two-lines">\[E_\uparrow(B)=E_{\rm common}(B)+\mu_BB,\]
+
+            \[E_\downarrow(B)=E_{\rm common}(B)-\mu_BB.\]</div>
+
+          <p>Here <span>\(\mu_B\)</span> is the Bohr magneton (a constant). The two levels are separated by <span>\(2\mu_BB\)</span>. The common part includes the spatial energy of the orbital and its response to the field. <a href="#ref-zeeman" aria-label="Reference 2" class="reference-mark">[2]</a></p>
+
+        </div>
+
+        <figure class="level-figure">
+
+          <svg viewBox="0 0 820 270" role="img" aria-labelledby="levels-title levels-description">
+
+            <title id="levels-title">The spin contribution separates into two energies</title>
+
+            <desc id="levels-description">The common zero spin shift at zero field separates into plus mu B times B for spin up and minus mu B times B for spin down. The shared spatial energy is subtracted.</desc>
+
+            <text x="80" y="36" class="diagram-muted">B = 0</text><text x="496" y="36" class="diagram-muted">B points up</text>
+
+            <path d="M80 135 H240" stroke="#c9cad1" stroke-width="3" />
+
+            <path d="M240 135 L476 76 M240 135 L476 194" stroke="#687084" stroke-width="1.5" stroke-dasharray="4 6" />
+
+            <path d="M460 135 H728" stroke="#5c6375" stroke-width="1" stroke-dasharray="4 6" />
+
+            <path d="M476 76 H660" stroke="#ffbb86" stroke-width="3" /><path d="M476 194 H660" stroke="#b9a4ff" stroke-width="3" />
+
+            <text x="480" y="64" class="warm-fill">Spin up · +μ<tspan baseline-shift="sub" font-size="12">B</tspan>B</text>
+
+            <text x="480" y="224" class="cool-fill">Spin down · −μ<tspan baseline-shift="sub" font-size="12">B</tspan>B</text>
+
+            <path d="M694 78 V192 M687 84 L694 77 L701 84 M687 186 L694 193 L701 186" fill="none" stroke="#ced1dd" stroke-width="1.4" />
+
+            <text x="714" y="123" fill="#ced1dd">2μ<tspan baseline-shift="sub" font-size="12">B</tspan>B</text>
+
+            <text x="80" y="169" class="diagram-muted">Same energy</text>
+
+          </svg>
+
+          <figcaption>The spin contribution to the energy.</figcaption>
+
+        </figure>
+
+      </section>
+
+
+
+      <section class="chapter" aria-labelledby="zero-field">
+
+        <div class="prose">
+
+          <p class="section-number">02 / Before the field</p>
+
+          <h2 id="zero-field">The cloud is stationary. Its current circulates.</h2>
+
+          <p>In the <a href="../hydrogen-currents/">earlier orbital visualizations</a>, I followed both the probability density and the probability current. The density \(\rho\) tells us how likely a position measurement is to find the electron in a small region. The vector field \(\mathbf j\) describes probability flux. Dividing one by the other defines the flow shown by the dots:</p>
+
+          <div class="equation">\[\mathbf v=\frac{\mathbf j}{\rho}.\]</div>
+
+          <p>For an electron, the current inherited from Dirac theory contains a spin contribution. Even the stationary 1s state can carry this current. Reversing the spin reverses the circulation while leaving the zero field density and speed unchanged. The ordinary orbital quantum number is still <span>\(\ell=0\)</span>, so all the angular momentum comes from the spin. <a href="#ref-current" aria-label="Reference 3" class="reference-mark">[3]</a></p>
+
+          <p>The circulating current does not reshape the cloud. Probability flows around the axis without building up anywhere. In the continuity equation, a stationary density requires the current’s divergence to vanish; it does not require the current itself to vanish.</p>
+
+        </div>
+
+        <figure class="still-pair">
+
+          <div class="pair-images">
+
+            <a href="media/1s-up-zero.webp"><img src="media/1s-up-zero.webp" width="1080" height="1080" alt="At zero field, the spherical 1s cloud with spin up is apricot and has a downward magnetic moment." loading="lazy" /></a>
+
+            <a href="media/1s-down-zero.webp"><img src="media/1s-down-zero.webp" width="1080" height="1080" alt="At zero field, the same spherical 1s density with spin down is violet and has an upward magnetic moment." loading="lazy" /></a>
+
+          </div>
+
+          <figcaption><strong>Before the field.</strong> Spin up on the left, spin down on the right. The same density carries opposite circulation. The cutaway reveals the interior.</figcaption>
+
+        </figure>
+
+        <div class="prose">
+
+          <aside class="reading-note" aria-labelledby="current-status">
+
+            <h3 id="current-status">What the pictures claim</h3>
+
+            <p>Probability current belongs to standard quantum mechanics. For an electron, the full current is related to electric charge current by \(\mathbf J=-e\mathbf j\), so it has physical electromagnetic significance. It would be misleading to say that standard theory denies the current’s existence. <a class="reference-mark" href="#ref-current" aria-label="Reference 3">[3]</a></p>
+
+            <p>The dots are most safely taken as an artistic choice for the bringing out the flow. They do not record an undisturbed electron(s) travelling around an atom. The usual textbook interpretation does not assign the electron a definite path between position measurements.  (Although, check the last chapter.)</p>
+
+          </aside>
+
+        </div>
+
+      </section>
+
+
+
+      <section class="chapter" aria-labelledby="upward-field">
+
+        <div class="prose">
+
+          <p class="section-number">03 / Turning on B</p>
+
+          <h2 id="upward-field">The Magnetic field adds to one circulation and opposes the other</h2>
+
+          <p>Keep the field pointing up throughout. We shall be comparing the effect on spin UP versus spin DOWN.<span> </span></p>
+
+          <p>Observe the two spin states of hydrogen ground state 1s as we turn on the magnetic field.</p>
+
+        </div>
+
+        <figure class="comparison" id="watch">
+
+          <div class="film-pair">
+
+            <div class="film-panel"><p><span class="warm">Spin up</span> · \(+\mu_BB\)</p>
+
+            <video id="film-up" controls muted playsinline preload="metadata" poster="media/1s-up-zero.webp" width="1080" height="1080" aria-label="Hydrogen 1s with spin up as the upward field increases to 100000 tesla" aria-describedby="film-caption"><source src="media/1s-spin-up.mp4" type="video/mp4" />Your browser cannot play this film. <a href="media/1s-spin-up.mp4">Open the spin up video.</a></video>
+
+            </div>
+
+            <div class="film-panel"><p><span class="cool">Spin down</span> · \(-\mu_BB\)</p>
+
+            <video id="film-down" controls muted playsinline preload="metadata" poster="media/1s-down-zero.webp" width="1080" height="1080" aria-label="Hydrogen 1s with spin down under the same upward field" aria-describedby="film-caption"><source src="media/1s-spin-down.mp4" type="video/mp4" />Your browser cannot play this film. <a href="media/1s-spin-down.mp4">Open the spin down video.</a></video>
+
+            </div>
+
+          </div>
+
+          <div class="film-controls" hidden>
+
+            <button type="button" id="play-pair" aria-pressed="false">Play both</button>
+
+            <button type="button" id="restart-pair">Restart</button>
+
+            <label class="timeline-label" for="film-time">Film position</label><input id="film-time" type="range" min="0" max="23.333333" step="0.033333" value="0" aria-label="Position in both films" />
+
+            <output id="film-clock" for="film-time">0:00 / 0:23</output>
+
+          </div>
+
+          <p class="film-status" id="film-status" role="status" aria-live="polite"></p>
+
+          <figcaption id="film-caption"><strong>Magnetic field "increases" orange circulation (spin UP), and "decreases" the violet circulation (spin DOWN). </strong>Orange marks counterclockwise flow, violet clockwise flow.</figcaption>
+
+          <div class="media-links"><a href="media/1s-spin-up.mp4" target="_blank" rel="noopener">Open spin up film ↗</a><a href="media/1s-spin-down.mp4" target="_blank" rel="noopener">Open spin down film ↗</a></div>
+
+        </figure>
+
+        <div class="prose comparison-copy">
+
+          <p>For a weak field, with the both clouds have the same shape (same probability distribution), but their velocities change.</p>
+
+          <div class="equation two-lines">\[v_{\phi,\uparrow}\simeq v_0+\frac{eBR}{2m_e},\]
+
+            \[v_{\phi,\downarrow}\simeq -v_0+\frac{eBR}{2m_e}.\]</div>
+
+          <p>Here <span>\(v_0\)</span> is the local speed before the field, <span>\(R\)</span> is distance from the field axis, and <span>\(e\)</span> is the positive magnitude of the electron’s charge.</p>
+
+        </div>
+
+
+        <div class="orbital-gallery" aria-labelledby="other-orbitals">
+          <div class="prose">
+            <h3 id="other-orbitals">Beyond the 1s orbital</h3>
+            <p>Higher orbitals reveal more layers of circulation. Each pair shows spin up followed by spin down. The field points up, and both images use the same field strength and camera scale.</p>
+
+            <p>The labels identify the starting orbitals; the pictures show their deformed clouds at the stated fields. Orange and violet regions carry opposite directions of circulation, while silver marks slow flow.</p>
+          </div>
+
+          <figure class="orbital-still-pair" id="gallery-3s">
+            <div class="pair-images">
+              <div class="orbital-panel">
+                <p class="orbital-spin-label">3s · Spin up</p>
+                <a href="media/3s-spin-up-full.webp" target="_blank" rel="noopener" aria-label="View the 3s spin up image at full size"><img src="media/3s-spin-up-full.webp" width="1440" height="1400" alt="At 50000 tesla, the spin up 3s cloud has elongated orange lobes and a small violet region exposed by the cutaway." loading="lazy" decoding="async" /></a>
+              </div>
+              <div class="orbital-panel">
+                <p class="orbital-spin-label">3s · Spin down</p>
+                <a href="media/3s-spin-down-full.webp" target="_blank" rel="noopener" aria-label="View the 3s spin down image at full size"><img src="media/3s-spin-down-full.webp" width="1440" height="1400" alt="The matching spin down 3s cloud at 50000 tesla shows violet and silver outer lobes with an orange band around the middle." loading="lazy" decoding="async" /></a>
+              </div>
+            </div>
+            <figcaption><strong>3s · 50,000 T.</strong> The cloud has the same outline in the two spin states. The cutaway exposes a violet region inside the mostly orange spin up state; spin down reveals a different pattern of opposing currents.</figcaption>
+          </figure>
+
+          <figure class="orbital-still-pair" id="gallery-4d">
+            <div class="pair-images">
+              <div class="orbital-panel">
+                <p class="orbital-spin-label">4d, \(m_\ell=0\) · Spin up</p>
+                <a href="media/4d-spin-up-full.webp" target="_blank" rel="noopener" aria-label="View the 4d m equals zero spin up image at full size"><img src="media/4d-spin-up-full.webp" width="1440" height="1400" alt="The spin up 4d m equals zero cloud at 30000 tesla has orange lobes along the field and a violet band in the cutaway." loading="lazy" decoding="async" /></a>
+              </div>
+              <div class="orbital-panel">
+                <p class="orbital-spin-label">4d, \(m_\ell=0\) · Spin down</p>
+                <a href="media/4d-spin-down-full.webp" target="_blank" rel="noopener" aria-label="View the 4d m equals zero spin down image at full size"><img src="media/4d-spin-down-full.webp" width="1440" height="1400" alt="The matching spin down 4d m equals zero cloud at 30000 tesla shows pale outer lobes and alternating orange and violet inner regions." loading="lazy" decoding="async" /></a>
+              </div>
+            </div>
+            <figcaption><strong>4d, \(m_\ell=0\) · 30,000 T.</strong> Look at the alternating bands near the centre and the pale outer lobes of the spin down state. Several regions of the same cloud circulate in opposite directions.</figcaption>
+          </figure>
+
+          <figure class="orbital-still-pair" id="gallery-3p">
+            <div class="pair-images">
+              <div class="orbital-panel">
+                <p class="orbital-spin-label">3p, \(m_\ell=-1\) · Spin up</p>
+                <a href="media/3p_mminus1-spin-up-full.webp" target="_blank" rel="noopener" aria-label="View the 3p m equals minus one spin up image at full size"><img src="media/3p_mminus1-spin-up-full.webp" width="1440" height="1440" alt="At 25000 tesla, the spin up 3p m equals minus one cloud has orange outer regions and violet circulation inside the cutaway." loading="lazy" decoding="async" /></a>
+              </div>
+              <div class="orbital-panel">
+                <p class="orbital-spin-label">3p, \(m_\ell=-1\) · Spin down</p>
+                <a href="media/3p_mminus1-spin-down-full.webp" target="_blank" rel="noopener" aria-label="View the 3p m equals minus one spin down image at full size"><img src="media/3p_mminus1-spin-down-full.webp" width="1440" height="1440" alt="The matching spin down 3p m equals minus one cloud at 25000 tesla has violet outer regions and a broad orange band around its centre." loading="lazy" decoding="async" /></a>
+              </div>
+            </div>
+            <figcaption><strong>3p, \(m_\ell=-1\) · 25,000 T.</strong> Notice the violet interior of the spin up state and the orange band within spin down. Both states contain regions carrying opposite circulation.</figcaption>
+          </figure>
+        </div>
+</section>
+
+
+
+<section class="chapter" aria-labelledby="force-balance">
+
+        <div class="prose">
+
+          <p class="section-number">04 / Reading the motion</p>
+
+          <h2 id="force-balance">The familiar intuition from classical physics</h2>
+
+          <p>There is a classical intuition behind the change in speed. An electron moving counterclockwise around an upward field has an inward magnetic Lorentz force, toward the field axis. For clockwise motion, that contribution points outward. That is "why" magnetic field changes the circulation.</p>
+
+          <p>A static magnetic force does no work: it is perpendicular to the velocity. But during the turn on of the magnetic field there is (by induction) a circulating electric field, which may be interpreted as the "driver" of the changing circulation speeds.</p>
+
+          <p></p>
+
+          <p></p>
+
+          <p>But surely this is just a fun coincidence and not something to be made consistent with serious quantum physics?</p>
+
+        </div>
+
+</section>
+
+
+
+      <section class="chapter" aria-labelledby="hestenes">
+
+        <div class="prose">
+
+          <p class="section-number">05 / An interpretation of the energy</p>
+
+          <h2 id="hestenes">Hestenes: taking the circulation seriously</h2>
+
+          <p>So far, the motion has been a way to display a calculated current. David Hestenes proposed giving that current a more direct physical meaning. In his 1979 paper <cite>Spin and uncertainty in the interpretation of quantum mechanics</cite>, he examined the Pauli current as a description of electron motion and related the magnetic energy change to kinetic energy. Section II, especially equations (2.7) through (2.10), makes the comparison with the conventional magnetic interaction term explicit. <a class="reference-mark" href="#ref-hestenes" aria-label="Reference 4">[4]</a></p>
+
+          <p>We can test this idea mathematically for the pair shown here. Define the kinetic energy associated with the complete flow:</p>
+
+          <div class="equation">\[K_{\rm flow}=\frac{m_e}{2}\int\rho\,|\mathbf v|^2\,d^3x.\]</div>
+
+          <p>For these two stationary spin states, the difference is</p>
+
+          <div class="equation key-equation">\[K_{{\rm flow},\uparrow}-K_{{\rm flow},\downarrow}
+
+            =2\mu_BB=E_\uparrow-E_\downarrow.\]</div>
+
+          <p><strong>The difference in this flow kinetic energy equals the entire spin Zeeman splitting.</strong> The connection between faster circulation and higher energy is quantitative.</p>
+
+          <p>The standard calculation assigns the split to magnetic interaction energy. With the full Pauli current taken as a flow of electron motion, the same split can be read as a kinetic energy difference between the two circulations.</p>
+
+          <p>Hestenes’s viewpoint, on the other hand, gives the circulation interpretation a concrete physical motivation: it accounts for the magnetic energy change through motion.</p>
+
+          <details class="derivation">
+
+            <summary>The calculation for our 1s pair</summary>
+
+            <p>Write the common real spatial amplitude as \(f_B(R,z)\), normalized so that \(\int f_B^2\,d^3x=1\), with \(\rho=f_B^2\). In the symmetric gauge, \(\mathbf A=\tfrac12\mathbf B\times\mathbf r\), the two azimuthal velocities are</p>
+
+            <div class="equation">\[v_{\phi,\uparrow}=u+w,\qquad v_{\phi,\downarrow}=-u+w,\]
+
+              \[u=-\frac{\hbar}{m_e}\partial_R\ln f_B,\qquad w=\frac{eBR}{2m_e}.\]</div>
+
+            <p>The squared velocities differ by \(4uw\). Substitution into the flow energy therefore gives</p>
+
+            <div class="equation">\[\Delta K_{\rm flow}=2m_e\int f_B^2uw\,d^3x\]
+
+              \[=-\frac{e\hbar B}{m_e}\int Rf_B\,\partial_R f_B\,d^3x.\]</div>
+
+            <p>Using the cylindrical volume element \(d^3x=R\,dR\,d\phi\,dz\), integration by parts gives \(\int Rf_B\partial_Rf_B\,d^3x=-1\). The boundary term vanishes for this regular, localized state. Hence \(\Delta K_{\rm flow}=e\hbar B/m_e=2\mu_BB\).</p>
+
+            <p>The flow term alone is not the entire energy. For this particular pair the remaining terms can be written as</p>
+
+            <div class="equation">\[E_s=K_{{\rm flow},s}+\frac{\hbar^2}{2m_e}\int|\partial_z f_B|^2\,d^3x
+
+              +\int V_Cf_B^2\,d^3x.\]</div>
+
+            <p>Both additional terms are shared by the spins. They cancel when we subtract the energies. This derivation uses the stationary flow at a fixed field, without the illustrative transport used while the movie changes the field.</p>
+
+          </details>
+
+          <p>Agreement with the energy splitting does not establish that an individual electron follows a displayed curve. It does show why these curves deserve attention beyond their visual appeal.</p>
+
+          <p></p>
+
+        </div>
+
+      </section>
+
+
+
+      <section class="endnotes prose" aria-labelledby="model-notes">
+
+        <h2 id="model-notes">About these visualizations</h2>
+
+        <p>The calculation uses a nonrelativistic electron with a fixed nucleus, a uniform applied magnetic field and spin factor \(g=2\). It includes the common magnetic compression. Proton spin, hyperfine coupling, relativistic corrections and the small anomalous correction to the electron’s magnetic moment are omitted. The simple two level description therefore concerns this electronic model.</p>
+
+        <p>“Weak field” here means weak enough to leave the 1s spatial density nearly unchanged. The 100kT endpoint is used to make the changes visible and is outside that small deformation limit. The clouds show an 80% probability region with a viewing cutaway. Their density has no hard physical edge. All films here retain the same time scaling for both spins; the displayed seconds are animation time.</p>
+
+        <details class="derivation">
+
+          <summary>The probability current used in the films</summary>
+
+          <p>For charge \(-e\), with \(e&gt;0\), the full Pauli current is</p>
+
+          <div class="equation">\[\mathbf j=\frac{\hbar}{m_e}\operatorname{Im}(\Psi^\dagger\nabla\Psi)
+
+            +\frac{e}{m_e}\mathbf A\rho
+
+            +\frac{\hbar}{2m_e}\nabla\times(\Psi^\dagger\boldsymbol\sigma\Psi).\]</div>
+
+          <p>Here \(\rho=\Psi^\dagger\Psi\), and \(\boldsymbol\sigma\) denotes the Pauli matrices. The three terms contain the phase contribution, the vector potential contribution and the spin contribution. Their sum is gauge invariant. The last term is the magnetization current obtained in the nonrelativistic limit of the Dirac current. <a href="#ref-current">[3]</a></p>
+
+        </details>
+
+        <h2 id="references">References</h2>
+
+        <ol class="references">
+
+          <li id="ref-nist"><a href="https://www.nist.gov/pml/atomic-spectroscopy-compendium-basic-ideas-notation-data-and-formulas/atomic-spectroscopy-zeeman">NIST, <cite>Atomic Spectroscopy: Zeeman Effect</cite></a>. Magnetic sublevels and the usual expression for their energy shifts.</li>
+
+          <li id="ref-zeeman"><a href="https://farside.ph.utexas.edu/teaching/qmech/lectures/node108.html">Richard Fitzpatrick, <cite>Zeeman Effect</cite></a>. Orbital and spin magnetic moments, including the 1s energy gap.</li>
+
+          <li id="ref-current"><a href="https://arxiv.org/abs/physics/9807019">Marek Nowakowski, <cite>The Quantum Mechanical Current of the Pauli Equation</cite></a> (1998 preprint). The spin contribution and its derivation from Dirac theory, especially equations (4) and (9).</li>
+
+          <li id="ref-hestenes"><a href="https://davidhestenes.net/geocalc/pdf/Spin%26uncert.pdf">David Hestenes, <cite>Spin and uncertainty in the interpretation of quantum mechanics</cite></a>, <cite>American Journal of Physics</cite> <strong>47</strong>, 399–415 (1979). Section II, equations (2.7) through (2.10). <a href="https://doi.org/10.1119/1.11806">doi:10.1119/1.11806</a>.</li>
+
+        </ol>
+
+        <p class="related">Earlier in this series: <a href="../hydrogen-currents/">The currents inside an orbital</a>.</p>
+
+      </section>
+
+    </article>
+    <section class="comments-section prose" aria-labelledby="comments-title"><div class="comments-heading"><h2 id="comments-title">Comments and questions</h2><p>Share a thought about this visualization.</p></div><div class="comments-widget" data-comments data-theme="github-dark"><noscript>JavaScript is required to load the comment section.</noscript></div></section>
+
+  </main>
+
+  <footer class="site-footer"><div class="container footer-grid"><div><strong>Imagining Physics</strong><p>Physics through images, mathematics and motion.</p></div></div></footer>
+
+  <script src="../main.js"></script>
+  <script src="../comments.js"></script>
+
+</body>
+
+</html>
