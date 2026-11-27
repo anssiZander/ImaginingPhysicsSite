@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Hydrogen orbitals in an electric field: superpositions, changing lobes, and the probability current inside them." />
+  <link rel="canonical" href="https://imaginingphysics.com/stark-effect/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Stark effect reshaping an orbital | Imagining Physics" />
+  <meta property="og:description" content="Hydrogen orbitals in an electric field: superpositions, changing lobes, and the probability current inside them." />
+  <meta property="og:url" content="https://imaginingphysics.com/stark-effect/" />
+  <meta property="og:image" content="https://imaginingphysics.com/stark-effect/media/cover.webp" />
+  <meta property="og:image:width" content="960" />
+  <meta property="og:image:height" content="600" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>The Stark effect reshaping an orbital | Imagining Physics</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../comments.css" />
+  <link rel="stylesheet" href="../grover-search/vendor/katex-0.19.0/katex.min.css" />
+  <link rel="stylesheet" href="article.css" />
+  <script defer src="../grover-search/vendor/katex-0.19.0/katex.min.js"></script>
+  <script defer src="../grover-search/vendor/katex-0.19.0/auto-render.min.js"></script>
+  <script defer src="article.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="logo" href="../index.html">Imagining Physics</a>
+      <button class="nav-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="site-nav" aria-label="Main navigation"><ul>
+        <li><a href="../index.html">Home</a></li><li><a href="../about.html">About</a></li>
+        <li><a href="../blog.html" class="active">Blog Posts</a></li><li><a href="../videos.html">Videos</a></li>
+        <li><a href="../shorts.html">Shorts</a></li><li><a href="../interactive.html">Interactive demos</a></li>
+      </ul></nav>
+    </div>
+  </header>
+  <main id="main-content" class="stark-post">
+    <div class="post-line"><a href="../blog.html">← Blog posts</a><span><time datetime="2026-11-27">27 November 2026</time></span></div>
+    <article>
+      <header class="opening">
+        <div class="opening-copy">
+          <p class="eyebrow">Hydrogen · Probability current</p>
+          <h1>The Stark effect<br><em>reshaping an orbital</em></h1>
+          <p class="standfirst">An electric field changes an atom’s energies. It can also reorganize the orbital’s lobes. Hydrogen gives us a particularly clear view of why.</p>
+          <p class="byline">By Anssi · Imagining Physics</p>
+          <a class="opening-link" href="#two-states">Compare the two 2s branches <span aria-hidden="true">↓</span></a>
+        </div>
+        <figure class="opening-image">
+          <a href="media/3s-balanced.webp"><img src="media/3s-balanced.webp" width="960" height="960" alt="The balanced hydrogen 3s Stark state, seen from above its equator: violet inner lobes surrounded by an apricot outer region, with the electric field pointing upward." fetchpriority="high" /></a>
+          <figcaption>A Stark state containing both 3s and 3d. The camera looks into its centre; the electric field points along z.</figcaption>
+        </figure>
+      </header>
+
+      <div class="prose introduction">
+        <p>In the <a href="../hydrogen-currents/">first orbital post</a>, I used moving dots to show probability current inside hydrogen. The <a href="../zeeman-effect/">Zeeman post</a> added a magnetic field. Here the field is electric, and some of the shapes change substantially.</p>
+        <p>The <strong>Stark effect</strong> is the shift and splitting of atomic energy levels in an electric field. It is usually introduced through those energies, or the spectral lines they produce. This post (and the Youtube video) shows how the orbitals change in shape. They also venture do demonstrate how the probability current changes mathematically.</p>
+        <aside class="reading-note">
+          <h3>How to read the films</h3>
+          <p>The initial orbitals and final Stark states are calculated within the hydrogen model described below. The Initial and Final orbitals are correct physically. However, the time evolution between the two states is an <strong>illustrative preparation, and not physically exact</strong>.</p>
+          <p>Orange and violet distinguish spatial lobes. They do not indicate circulation direction in these simulations. The dots are samples of one electron’s distribution, not many electrons or recorded individual electron tracks.</p>
+        </aside>
+      </div>
+
+      <nav class="contents" aria-label="In this article">
+        <a href="#two-states">Two states from 2s</a><a href="#direction">Why direction matters</a><a href="#balanced">A balanced 3s state</a><a href="#current">The current</a>
+      </nav>
+
+      <section class="chapter" aria-labelledby="two-states">
+        <div class="prose">
+          <p class="section-number">01 / Superposition</p>
+          <h2 id="two-states">A small energy change can accompany a large shape change</h2>
+          <p>In the simplest hydrogen model, 2s and the three 2p states have exactly the same energy. This equality is called degeneracy. A superposition of them therefore costs no extra energy before the field is applied.</p>
+          <p>With the electric field along z, 2s couples to 2p<sub>z</sub>. The stationary combinations are an equal sum and an equal difference. One has lower energy and the other higher energy. Their densities are mirror images. <a class="reference-mark" href="#ref-n2" aria-label="Reference 1">[1]</a></p>
+          <p>We add the <em>wavefunctions</em> before calculating the density. Their amplitudes reinforce each other in some places and cancel in others. The cross term changes the lobes much more than simply adding a spherical cloud to a two-lobed cloud would suggest.</p>
+        </div>
+
+        <figure class="comparison" id="branch-films">
+          <div class="film-pair">
+            <div class="film-panel">
+              <p><strong>Higher energy</strong><span class="branch-state">\((2s-2p_z)/\sqrt2\)</span></p>
+              <video id="film-up" controls muted playsinline preload="none" poster="media/2s-upper.webp" width="900" height="900" aria-label="Illustrative preparation of the higher-energy 2s Stark branch" aria-describedby="pair-caption"><source src="media/2s-upper.mp4" type="video/mp4" /><a href="media/2s-upper.mp4">Watch the higher-energy branch.</a></video>
+            </div>
+            <div class="film-panel">
+              <p><strong>Lower energy</strong><span class="branch-state">\((2s+2p_z)/\sqrt2\)</span></p>
+              <video id="film-down" controls muted playsinline preload="none" poster="media/2s-lower.webp" width="900" height="900" aria-label="Illustrative preparation of the lower-energy 2s Stark branch" aria-describedby="pair-caption"><source src="media/2s-lower.mp4" type="video/mp4" /><a href="media/2s-lower.mp4">Watch the lower-energy branch.</a></video>
+            </div>
+          </div>
+          <div class="film-controls" hidden>
+            <button type="button" id="play-pair" aria-pressed="false">Play both</button>
+            <button type="button" id="restart-pair">Reset</button>
+            <label class="timeline-label" for="film-time">Position in both films</label><input id="film-time" type="range" min="0" max="14" step="0.01" value="0" />
+            <output id="film-clock" for="film-time">0:00 / 0:14</output>
+          </div>
+          <p id="film-status" class="film-status" role="status"></p>
+          <figcaption id="pair-caption"><strong>The two branches, with the same upward field.</strong> Both films start at 2s and open a front cutaway. The field rises to 50 MV/m; at full field the energy changes are +7.94 meV and −7.94 meV. The views share spatial and playback scales. Spin points along +z.</figcaption>
+          <div class="media-links"><a href="media/2s-upper.mp4">Open higher-energy film ↗</a><a href="media/2s-lower.mp4">Open lower-energy film ↗</a></div>
+        </figure>
+
+        <div class="prose comparison-copy">
+          <p>Because the unperturbed energies coincide, even a weak field can distinguish combinations with very different shapes.</p>
+          <p>The 1s orbital also polarizes. Its possible partners have different energies, however, so their contributions are small when the electric interaction is small compared with those energy gaps. Its density changes at first order in the field, while its energy shift begins at second order. <a class="reference-mark" href="#ref-regime" aria-label="Reference 3">[3]</a></p>
+
+          <details class="derivation">
+            <summary>The 2s–2p calculation, and what a field ramp actually does</summary>
+            <p>Write the field as \(\mathbf E=\mathcal E\,\hat{\mathbf z}\), with \(e&gt;0\) the magnitude of the electron charge. The electric interaction is \(H'=e\mathcal E z\). In the basis \((|2s\rangle,|2p_z\rangle)\),</p>
+            <div class="equation">\[H=E_2 I-3ea_0\mathcal E
+              \begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}.\]</div>
+            <p>Here \(a_0\) is the Bohr radius. With 2s positive at the origin and 2p<sub>z</sub> positive on the positive z axis, \(\langle2s|z|2p_z\rangle=-3a_0\). Thus</p>
+            <div class="equation">\[\begin{aligned}
+              |\psi_{\rm low}\rangle&amp;=\frac{|2s\rangle+|2p_z\rangle}{\sqrt2},\\
+              E_{\rm low}&amp;=E_2-3ea_0\mathcal E,\\[.65em]
+              |\psi_{\rm high}\rangle&amp;=\frac{|2s\rangle-|2p_z\rangle}{\sqrt2},\\
+              E_{\rm high}&amp;=E_2+3ea_0\mathcal E.
+            \end{aligned}\]</div>
+            <p>The sign written between basis states depends on their phase convention; the two energies and densities do not. The density contains the interference term</p>
+            <div class="equation">\[\rho_\pm=\frac{|\psi_s|^2+|\psi_p|^2}{2}
+              \pm\operatorname{Re}(\psi_s^*\psi_p).\]</div>
+            <p>A pure 2s state contains both branches equally. In this exactly degenerate two-state model, a field ramp only changes their relative phase. Removing the common energy phase gives</p>
+            <div class="equation">\[\begin{aligned}
+              |\psi(t)\rangle&amp;=\cos\Theta(t)|2s\rangle+i\sin\Theta(t)|2p_z\rangle,\\
+              \Theta(t)&amp;=\frac{3ea_0}{\hbar}\int_0^t\mathcal E(t')\,dt'.
+            \end{aligned}\]</div>
+            <p>The density then oscillates between s-like and p-like forms. Slowing that ramp does not select one branch. Preparing a chosen stationary branch requires something beyond this ramp, which is why the morph in these films is labelled illustrative.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="chapter" aria-labelledby="direction">
+        <div class="prose">
+          <p class="section-number">02 / Direction</p>
+          <h2 id="direction">The field needs a state it can couple to</h2>
+          <p>An electric field still exerts a force on the electron. But the large rearrangement above depends on having a suitable state at the same energy. The direction of the field determines which connections are available.</p>
+          <p>Take a fixed 3d<sub>xy</sub> orbital. A field along x couples it to 3p<sub>y</sub>, allowing a large change of shape within the n = 3 family. A field along z has no such partner in that family. The large first-order rearrangement is absent in that direction. Weaker polarization through other energy levels remains possible. <a class="reference-mark" href="#ref-selection" aria-label="Reference 2">[2]</a></p>
+        </div>
+        <figure class="still-pair">
+          <div class="pair-images">
+            <div class="orbital-panel"><p class="orbital-spin-label">Initial 3d<sub>xy</sub></p><a href="media/3dxy-initial.webp"><img src="media/3dxy-initial.webp" width="960" height="960" alt="The initial four-lobed 3d xy probability cloud without an electric field." loading="lazy" /></a></div>
+            <div class="orbital-panel"><p class="orbital-spin-label">Lower branch · field along x</p><a href="media/3dxy-field.webp"><img src="media/3dxy-field.webp" width="960" height="960" alt="The chosen 3d xy and 3p y Stark superposition in a sideways electric field, with enlarged lobes on one side." loading="lazy" /></a></div>
+          </div>
+          <figcaption>The same view before preparation and in the selected lower Stark branch, <span>\((3d_{xy}+3p_y)/\sqrt2\)</span>, at 10 MV/m. This pair shows the response to a field along x.</figcaption>
+        </figure>
+        <div class="prose">
+          <p></p>
+          <details class="derivation">
+            <summary>Why 3d<sub>xy</sub> responds differently along x and z</summary>
+            <p>With z as the quantization axis, the z operator connects states satisfying</p>
+            <div class="equation">\[\Delta\ell=\pm1,\qquad\Delta m_z=0.\]</div>
+            <p>The real 3d<sub>xy</sub> orbital is a combination of \(m_z=+2\) and \(-2\). A p orbital cannot have \(|m_z|=2\), and the n = 3 family contains no f orbital. There is therefore no first-order mixing partner in that family for a z-directed field.</p>
+            <p>Along x, the angular dependence is different. Direct evaluation gives</p>
+            <div class="equation">\[\langle3p_y|x|3d_{xy}\rangle=-\frac92a_0.\]</div>
+            <p>The equal sum and difference are then stationary branches of the projected n = 3 Hamiltonian, with linear shifts \(\mp\frac92ea_0\mathcal E\). These statements concern the leading, same-n model; they do not exclude coupling to other principal energy levels.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="chapter" aria-labelledby="balanced">
+        <div class="prose">
+          <p class="section-number">03 / A different combination</p>
+          <h2 id="balanced">A deformed cloud with no linear energy shift</h2>
+          <p>The n = 3 family offers more possibilities. The state below combines 3s and 3d<sub>z²</sub>. Its probability redistributes into a different set of lobes and nodal surfaces, yet its linear Stark shift is zero.</p>
+          <p>At this order the density remains symmetric under z → −z. Shape change need not mean that the entire cloud moves to one side.</p>
+        </div>
+        <figure class="feature-film">
+          <video id="film-balanced" controls muted playsinline preload="none" poster="media/3s-balanced.webp" width="960" height="960" aria-label="Sixty-frame-per-second preparation and circulation of the balanced 3s Stark state with an upward camera orbit" aria-describedby="balanced-caption"><source src="media/3s-balanced.mp4" type="video/mp4" /><a href="media/3s-balanced.mp4">Watch the balanced 3s film.</a></video>
+          <figcaption id="balanced-caption"><strong>3s to the balanced branch.</strong> Field and spin both point along +z. The field reaches 10 MV/m.</figcaption>
+        </figure>
+        <div class="prose">
+          <details class="derivation">
+            <summary>The balanced state and its zero shift</summary>
+            <p>Within the \(n=3,m_z=0\) subspace, the field couples 3s to 3p<sub>z</sub>, and 3p<sub>z</sub> to 3d<sub>z²</sub>. In that ordered basis,</p>
+            <div class="equation">\[H'=-3ea_0\mathcal E
+              \begin{pmatrix}0&amp;\sqrt6&amp;0\\\sqrt6&amp;0&amp;\sqrt3\\0&amp;\sqrt3&amp;0\end{pmatrix}.\]</div>
+            <p>The combination</p>
+            <div class="equation">\[|\psi_{\rm bal}\rangle=\frac{1}{\sqrt3}|3s\rangle
+              -\sqrt{\frac23}|3d_{z^2}\rangle\]</div>
+            <p>is a zero eigenvector of this matrix. The two contributions to its coupling with 3p<sub>z</sub> cancel. Both terms are even under inversion, so \(\langle z\rangle=0\) in this approximation. Higher-order coupling to other n levels produces smaller corrections to the shape and energy.</p>
+            <p>As with the 2s films, this selects one possible Stark branch. It does not assert that a pure 3s state follows this branch under the field ramp alone.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="chapter" aria-labelledby="current">
+        <div class="prose">
+          <p class="section-number">04 / Probability current</p>
+          <h2 id="current">The lobes settle. The current keeps circulating.</h2>
+          <p>A stationary density can carry a nonzero probability current. Probability flows without accumulating anywhere. The dots show this flow using \(\mathbf v=\mathbf j/\rho\), where \(\rho\) is the probability density and \(\mathbf j\) its current.</p>
+          <p>For an electron, the current contains a phase contribution and a spin contribution. The spatial wavefunctions used in the examples on this page are real in the stationary holds. Their phase contribution vanishes, but the spin contribution remains. <a class="reference-mark" href="#ref-current" aria-label="Reference 4">[4]</a></p>
+          <p>With uniform spin along +z, that current runs along contours of the density in horizontal planes. In the balanced 3s state above, axial symmetry makes those contours circles. When the density has a different symmetry, the paths can bend around lobes and become noncircular. Changing the orbital shape changes the geometry of its current as well.</p>
+          <details class="derivation">
+            <summary>The current used in these visualizations</summary>
+            <p>For a Pauli spinor \(\Psi\), with no magnetic vector potential, the current obtained from the nonrelativistic limit of Dirac theory is</p>
+            <div class="equation">\[\begin{aligned}
+              \mathbf j&amp;=\mathbf j_{\rm phase}+\mathbf j_{\rm spin},\\[.4em]
+              \mathbf j_{\rm phase}&amp;=\frac{\hbar}{m_e}\operatorname{Im}(\Psi^\dagger\nabla\Psi),\\[.4em]
+              \mathbf j_{\rm spin}&amp;=\frac{\hbar}{2m_e}\nabla\times(\Psi^\dagger\boldsymbol\sigma\Psi).
+            \end{aligned}\]</div>
+            <p>Here \(\boldsymbol\sigma\) denotes the Pauli matrices. For a spatially uniform spin polarization \(\hat{\mathbf n}\), the second term simplifies to</p>
+            <div class="equation">\[\mathbf j_{\rm spin}=\frac{\hbar}{2m_e}\nabla\rho\times\hat{\mathbf n}.\]</div>
+            <p>It is perpendicular to both the density gradient and the spin direction. Its divergence vanishes identically. The continuity equation,</p>
+            <div class="equation">\[\frac{\partial\rho}{\partial t}+\nabla\cdot\mathbf j=0,\]</div>
+            <p>therefore allows this circulation while the density stays fixed.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="endnotes prose" aria-labelledby="model">
+        <h2 id="model">The approximation behind the pictures</h2>
+        <p>These are leading Stark states of hydrogen, calculated by mixing states within one principal energy level. Real hydrogen has fine structure and smaller splittings. The degenerate model is appropriate when the electric coupling dominates those splittings while remaining small compared with the spacing between principal levels. It should not be extrapolated to arbitrarily tiny or arbitrarily large fields. <a class="reference-mark" href="#ref-regime" aria-label="Reference 3">[3]</a></p>
+        <p>The films omit coupling between different n levels, relativistic corrections and field ionization. At finite static field, excited Stark states are more accurately resonances with finite lifetimes. The pictures describe their leading bound-like shapes. The 1s discussion above explains a response outside the same-n approximation.</p>
+        <p>Time is slowed for readability. Lighting, bead size and the bright nucleus marker are visual choices; brightness is not a calibrated probability scale.</p>
+
+        <h2 id="references">Further reading</h2>
+        <ol class="references">
+          <li id="ref-n2">UC San Diego, <a href="https://quantummechanics.ucsd.edu/ph130a/130_notes/node338.html">The Stark Effect for n = 2 States</a>. The degenerate calculation and its two split branches.</li>
+          <li id="ref-selection">University of Illinois, <a href="https://courses.physics.illinois.edu/phys581/sp2014/stark.pdf">Hydrogen atom in an electric field</a>. Dipole selection rules and the linear Stark effect.</li>
+          <li id="ref-regime">James K. Freericks, Georgetown University, <a href="https://site.physics.georgetown.edu/~jkf/grad_quant2/html/lecture19.html">Graduate Quantum Mechanics II, lecture 19</a>. The ground-state response and the role of fine structure in choosing the appropriate regime.</li>
+          <li id="ref-current">Marek Nowakowski, <a href="https://arxiv.org/abs/physics/9807019">The Quantum Mechanical Current of the Pauli Equation</a>, <cite>American Journal of Physics</cite> 67, 916–919 (1999). The phase and spin terms in the probability current.</li>
+        </ol>
+        <p class="related">Earlier posts: <a href="../hydrogen-currents/">the currents inside hydrogen orbitals</a> · <a href="../zeeman-effect/">the Zeeman effect</a>.</p>
+      </section>
+    </article>
+    <section class="comments-section prose" aria-labelledby="comments-title"><div class="comments-heading"><h2 id="comments-title">Comments and questions</h2><p>Share a thought about this visualization.</p></div><div class="comments-widget" data-comments data-theme="github-dark"><noscript>JavaScript is required to load the comment section.</noscript></div></section>
+  </main>
+  <footer class="site-footer"><div class="container footer-grid"><div><strong>Imagining Physics</strong><p>Visualizing physics through videos, simulations, shaders, and small games.</p></div><nav aria-label="Footer navigation"><ul class="footer-links"><li><a href="../blog.html">Blog Posts</a></li><li><a href="../interactive.html">Interactive demos</a></li><li><a href="../about.html">About</a></li></ul></nav></div></footer>
+  <script src="../main.js"></script>
+  <script src="../comments.js"></script>
+</body>
+</html>
